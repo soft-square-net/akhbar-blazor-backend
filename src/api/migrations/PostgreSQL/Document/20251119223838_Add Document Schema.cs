@@ -34,6 +34,26 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 {
                     table.PrimaryKey("PK_Documents", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Files",
+                schema: "document",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    Deleted = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Id);
+                });
         }
 
         /// <inheritdoc />
@@ -41,6 +61,10 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
         {
             migrationBuilder.DropTable(
                 name: "Documents",
+                schema: "document");
+
+            migrationBuilder.DropTable(
+                name: "Files",
                 schema: "document");
         }
     }

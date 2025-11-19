@@ -9,10 +9,4 @@
     <ProjectReference Include="..\..\modules\Document\Document.Infrastructure\Document.Infrastructure.csproj" />
     <ProjectReference Include="..\..\modules\Todo\Todo.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Catalog\" />
-    <Folder Include="Identity\" />
-    <Folder Include="Tenant\" />
-    <Folder Include="Todo\" />
-  </ItemGroup>
 </Project>

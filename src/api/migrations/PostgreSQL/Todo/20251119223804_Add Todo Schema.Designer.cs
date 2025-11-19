@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Todo
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20241123024832_Add Todo Schema")]
+    [Migration("20251119223804_Add Todo Schema")]
     partial class AddTodoSchema
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Todo
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("todo")
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -51,6 +51,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Todo
                         .HasColumnType("uuid");
 
                     b.Property<string>("Note")
+                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
@@ -60,6 +61,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Todo
                         .HasColumnType("character varying(64)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
