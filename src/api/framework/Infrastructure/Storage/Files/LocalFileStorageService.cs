@@ -5,6 +5,7 @@ using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
 using FSH.Framework.Infrastructure.Common.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 namespace FSH.Framework.Infrastructure.Storage.Files
 {
@@ -129,5 +130,6 @@ namespace FSH.Framework.Infrastructure.Storage.Files
 
             return string.Format(pattern, max);
         }
+    
     }
 }
