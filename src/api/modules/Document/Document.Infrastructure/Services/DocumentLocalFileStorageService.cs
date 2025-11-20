@@ -28,6 +28,59 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         _ => Path.Combine("assets", "others", folder),
     };
 
+    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? request, FileType supportedFileType, CancellationToken cancellationToken = default) where T : class
+    {
+        if (request.Bucket == null || request.Data == null || request.ContentType == null)
+        {
+            return null!;
+        }
+
+        if (request.Extension is null || !supportedFileType.GetDescriptionList().Contains(request.Extension.ToLower(System.Globalization.CultureInfo.CurrentCulture)))
+            throw new InvalidOperationException("File Format Not Supported.");
+        if (request.Name is null)
+            throw new InvalidOperationException("Name is required.");
+
+        string base64Data = Regex.Match(request.Data, "data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+
+        var streamData = new MemoryStream(Convert.FromBase64String(base64Data));
+        if (streamData.Length > 0)
+        {
+            // string folder = typeof(T).Name;
+            string folder = request.Prefix;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                folder = folder.Replace(@"\", "/", StringComparison.Ordinal);
+            }
+
+            string folderName = GetFolderName(supportedFileType, folder);
+
+            string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            Directory.CreateDirectory(pathToSave);
+
+            request.Name = request.Name.Trim('"');
+            request.Name = RemoveSpecialCharacters(request.Name);
+            request.Name = request.Name.ReplaceWhitespace("-");
+            request.Name += request.Extension.Trim();
+            string fullPath = Path.Combine(pathToSave, request.Name);
+            string dbPath = Path.Combine(folderName, request.Name);
+            if (File.Exists(dbPath))
+            {
+                dbPath = NextAvailableFilename(dbPath);
+                fullPath = NextAvailableFilename(fullPath);
+            }
+
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await streamData.CopyToAsync(stream, cancellationToken);
+            var path = dbPath.Replace("\\", "/", StringComparison.Ordinal);
+            var imageUri = new Uri(originSettings.Value.OriginUrl!, path);
+            // return imageUri.MakeRelative( To the root file);
+            return imageUri;
+        }
+        else
+        {
+            return null!;
+        }
+    }
     public async Task<string> UploadFileAsync(Stream streamData, string rootPath, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, CancellationToken cancellationToken = default)
     {
         if (rootPath == null || streamData == null || contentType == null)
@@ -177,6 +230,7 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         return Regex.Replace(str, "[^a-zA-Z0-9_.]+", string.Empty, RegexOptions.Compiled);
     }
 
+    
 }
 
 
