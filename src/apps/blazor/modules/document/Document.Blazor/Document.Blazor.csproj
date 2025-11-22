@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <RootNamespace>FSH.Starter.Blazor.Modules.Document.Blazor</RootNamespace>
+    <AssemblyName>FSH.Starter.Blazor.Modules.Document.Blazor</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Blazor.Shared\Blazor.Shared.csproj" />
+  </ItemGroup>
+
+
+
+</Project>

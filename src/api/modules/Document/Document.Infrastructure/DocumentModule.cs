@@ -42,8 +42,12 @@ public static class DocumentModule
         
         builder.Services.AddKeyedScoped<IRepository<Domain.Document>, DocumentRepository<Domain.Document>>("document:documents");
         builder.Services.AddKeyedScoped<IReadRepository<Domain.Document>, DocumentRepository<Domain.Document>>("document:documents");
-        builder.Services.AddKeyedScoped<IRepository<File>, FileRepository<File>>("document:files");
-        builder.Services.AddKeyedScoped<IReadRepository<File>, FileRepository<File>>("document:files");
+        builder.Services.AddKeyedScoped<IRepository<File>, DocumentRepository<File>>("document:files");
+        builder.Services.AddKeyedScoped<IReadRepository<File>, DocumentRepository<File>>("document:files");
+        builder.Services.AddKeyedScoped<IRepository<Domain.Folder>, DocumentRepository<Domain.Folder>>("document:folders");
+        builder.Services.AddKeyedScoped<IReadRepository<Domain.Folder>, DocumentRepository<Domain.Folder>>("document:folders");
+        builder.Services.AddKeyedScoped<IRepository<Domain.Bucket>, DocumentRepository<Domain.Bucket>>("document:buckets");
+        builder.Services.AddKeyedScoped<IReadRepository<Domain.Bucket>, DocumentRepository<Domain.Bucket>>("document:buckets");
         builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
         builder.Services.AddAWSService<IAmazonS3>();
         builder.Services.AddScoped<IFileStorageService>(provider =>

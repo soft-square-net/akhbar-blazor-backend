@@ -13,13 +13,20 @@ var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432)
+    .WithPgAdmin()
     .WithDataVolume()
-    .AddDatabase("fullstackhero");
+    .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
+// Ahmed Galal
+// Note: Ensure that the database name matches the one used in the API project configuration.
+var cache = builder.AddRedis("redis", port: 6379)
+    .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
 
 var api = builder.AddProject<Projects.Server>("webapi")
+    .WithReference(cache)
     .WaitFor(database);
 
-var blazor = builder.AddProject<Projects.Client>("blazor");
+var blazor = builder.AddProject<Projects.Client>("blazor")
+    .WithReference(api);
 
 using var app = builder.Build();
 

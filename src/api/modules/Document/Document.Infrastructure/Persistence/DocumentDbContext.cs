@@ -17,8 +17,10 @@ public sealed class DocumentDbContext : FshDbContext
     {
     }
 
+    public DbSet<Bucket> Buckets { get; set; } = null!;
     public DbSet<Domain.Document> Documents { get; set; } = null!;
     public DbSet<Domain.File> Files { get; set; } = null!;
+    public DbSet<Folder> Folders { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
