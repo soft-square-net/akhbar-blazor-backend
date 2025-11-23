@@ -9,6 +9,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddClientServices(builder.Configuration);
 builder.Services.ConfigureBlazorModules();
+
 var app = builder.Build();
-   app.UseBlazorModules();
+
+app.UseBlazorModules();
 await   app.RunAsync();
