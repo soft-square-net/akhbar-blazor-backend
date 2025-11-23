@@ -18,14 +18,19 @@ var database = builder.AddPostgres("db", username, password, port: 5432)
     .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
 // Ahmed Galal
 // Note: Ensure that the database name matches the one used in the API project configuration.
-var cache = builder.AddRedis("redis", port: 6379)
-    .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
+// var cache = builder.AddRedis("redis", port: 6379);
+var cache = builder.AddGarnet("cache", port: 6379);
+    // .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
 
 var api = builder.AddProject<Projects.Server>("webapi")
+    // .WithHttpEndpoint(port: 5000)
+    // .WithHttpsEndpoint(port: 7000)
     .WithReference(cache)
     .WaitFor(database);
 
 var blazor = builder.AddProject<Projects.Client>("blazor")
+    // .WithHttpEndpoint(port: 5100)
+    // .WithHttpsEndpoint(port: 7100)
     .WithReference(api);
 
 using var app = builder.Build();
