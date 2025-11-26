@@ -79,6 +79,8 @@ dotnet ef migrations add "Add Identity Schema" --project .././migrations/postgre
 dotnet ef migrations add "Add Tenant Schema" --project .././migrations/postgresql/ --context TenantDbContext -o Tenant
 dotnet ef migrations add "Add Todo Schema" --project .././migrations/postgresql/ --context TodoDbContext -o Todo
 dotnet ef migrations add "Add Catalog Schema" --project .././migrations/postgresql/ --context CatalogDbContext -o Catalog
+dotnet ef migrations add "Add Document Schema" --project .././migrations/postgresql/ --context DocumentDbContext -o Document
+
 ```
 
 ## What's Pending?

@@ -1,4 +1,4 @@
-﻿using FSH.Starter.Blazor.Client.Components;
+﻿using FSH.Starter.BlazorShared.Components;
 using FSH.Starter.Blazor.Infrastructure.Api;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;

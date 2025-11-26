@@ -2,19 +2,24 @@
 using Amazon.S3;
 using Carter;
 using Document.Infrastructure.Services;
-using FSH.Framework.Core.Origin;
 using FSH.Framework.Core.Persistence;
+using FSH.Framework.Core.Storage;
+using FSH.Framework.Core.Storage.Bucket;
 using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Infrastructure.Persistence;
-using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.v1;
+using FSH.Starter.WebApi.Document.Domain;
+using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.Buckets.v1;
+using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.Documents.v1;
+using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.StorageAccounts.v1;
 using FSH.Starter.WebApi.Document.Infrastructure.Persistence;
 using FSH.Starter.WebApi.Document.Infrastructure.Services;
+using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using Shared.Enums;
 using File = FSH.Starter.WebApi.Document.Domain.File;
 
 namespace FSH.Starter.WebApi.Document;
@@ -32,6 +37,16 @@ public static class DocumentModule
             documentGroup.MapGetDocumentListEndpoint();
             documentGroup.MapDocumentUpdateEndpoint();
             documentGroup.MapDocumentDeleteEndpoint();
+            var bucketsGroup = app.MapGroup("buckets").WithTags("buckets");
+            bucketsGroup.MapBucketCreationEndpoint();
+            bucketsGroup.MapBucketDeleteEndpoint();
+
+            var storageAccountGroup = app.MapGroup("storage-ccounts").WithTags("storage-ccounts");
+            storageAccountGroup.MapStorageAccountCreationEndpoint();
+            storageAccountGroup.MapStorageAccountDeleteEndpoint();
+            storageAccountGroup.MapGetStorageAccountEndpoint();
+            storageAccountGroup.MapGetStorageAccountListEndpoint();
+            storageAccountGroup.MapStorageAccountUpdateEndpoint();
         }
     }
     public static WebApplicationBuilder RegisterDocumentServices(this WebApplicationBuilder builder)
@@ -44,33 +59,44 @@ public static class DocumentModule
         builder.Services.AddKeyedScoped<IReadRepository<Domain.Document>, DocumentRepository<Domain.Document>>("document:documents");
         builder.Services.AddKeyedScoped<IRepository<File>, DocumentRepository<File>>("document:files");
         builder.Services.AddKeyedScoped<IReadRepository<File>, DocumentRepository<File>>("document:files");
-        builder.Services.AddKeyedScoped<IRepository<Domain.Folder>, DocumentRepository<Domain.Folder>>("document:folders");
-        builder.Services.AddKeyedScoped<IReadRepository<Domain.Folder>, DocumentRepository<Domain.Folder>>("document:folders");
-        builder.Services.AddKeyedScoped<IRepository<Domain.Bucket>, DocumentRepository<Domain.Bucket>>("document:buckets");
-        builder.Services.AddKeyedScoped<IReadRepository<Domain.Bucket>, DocumentRepository<Domain.Bucket>>("document:buckets");
+        builder.Services.AddKeyedScoped<IRepository<Folder>, DocumentRepository<Folder>>("document:folders");
+        builder.Services.AddKeyedScoped<IReadRepository<Folder>, DocumentRepository<Folder>>("document:folders");
+        builder.Services.AddKeyedScoped<IRepository<Bucket>, DocumentRepository<Bucket>>("document:buckets");
+        builder.Services.AddKeyedScoped<IReadRepository<Bucket>, DocumentRepository<Bucket>>("document:buckets");
+        builder.Services.AddKeyedScoped<IRepository<StorageAccount>, DocumentRepository<StorageAccount>>("document:storage-accounts");
+        builder.Services.AddKeyedScoped<IReadRepository<StorageAccount>, DocumentRepository<StorageAccount>>("document:storage-accounts");
         builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+        builder.Services.AddSingleton<IExternalRefreshingAWSWithBasicCredentials, ExternalRefreshingAWSWithBasicCredentials>();
         builder.Services.AddAWSService<IAmazonS3>();
-        builder.Services.AddScoped<IFileStorageService>(provider =>
-        {
-            switch (builder.Configuration.GetValue<string>("DocumentStorage:Provider"))
-            {
 
-                case "AWS":
-                    return new AWSFileStorageService(new AmazonS3Client(
-                        builder.Configuration.GetValue<string>("AWS:AccessKey"),
-                        builder.Configuration.GetValue<string>("AWS:SecretKey"),
-                        RegionEndpoint.GetBySystemName(builder.Configuration.GetValue<string>("AWS:Region"))
-                        ));
-                case "LOCAL":
-                    OriginOptions localOriginOptions = new OriginOptions();
-                    builder.Configuration.GetSection("LocalOriginOptions").Bind(localOriginOptions);
-                    return new DocumentLocalFileStorageService(Options.Create(localOriginOptions)); 
-                default:
-                    OriginOptions originOptions = new OriginOptions();
-                    builder.Configuration.GetSection("originOptions").Bind(originOptions);
-                    return new DocumentLocalFileStorageService(Options.Create(originOptions));
-            }
-        });
+        builder.Services.AddKeyedSingleton<IFileStorageService, AWSFileStorageService>(nameof(StorageProvider.AmazonS3));
+        builder.Services.AddKeyedSingleton<IBucketStorageService, AWSBucketStorageService>(nameof(StorageProvider.AmazonS3));
+        builder.Services.AddKeyedSingleton<IFileStorageService, DocumentLocalFileStorageService>(nameof(StorageProvider.Local));
+        builder.Services.AddKeyedSingleton<IBucketStorageService, DocumentLocalBucketStorageService>(nameof(StorageProvider.Local));
+        builder.Services.AddSingleton<IStorageServiceFactory, StorageServiceFactory>();
+    //    builder.Services.AddScoped<IFileStorageService>(provider =>
+    //    {
+    //        switch (builder.Configuration.GetValue<string>("DocumentStorage:Provider"))
+    //        {
+
+    //            case "AWS":
+    //                //return new AWSFileStorageService(new AmazonS3Client(
+    //                //    builder.Configuration.GetValue<string>("AWS:AccessKey"),
+    //                //    builder.Configuration.GetValue<string>("AWS:SecretKey"),
+    //                //    RegionEndpoint.GetBySystemName(builder.Configuration.GetValue<string>("AWS:Region"))
+    //                //    ));
+    //                return new AWSFileStorageService(new ExternalRefreshingAWSWithBasicCredentials(), builder.Configuration);
+
+    //            case "LOCAL":
+    //                OriginOptions localOriginOptions = new OriginOptions();
+    //                builder.Configuration.GetSection("LocalOriginOptions").Bind(localOriginOptions);
+    //                return new DocumentLocalFileStorageService(Options.Create(localOriginOptions)); 
+    //            default:
+    //                OriginOptions originOptions = new OriginOptions();
+    //                builder.Configuration.GetSection("originOptions").Bind(originOptions);
+    //                return new DocumentLocalFileStorageService(Options.Create(originOptions));
+    //        }
+    //    });
 
         return builder;
     }

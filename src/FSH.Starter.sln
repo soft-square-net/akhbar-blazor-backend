@@ -81,7 +81,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{61
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Document.Blazor", "apps\blazor\modules\document\Document.Blazor\Document.Blazor.csproj", "{E8805AC0-5A3F-439A-B1DC-B3FCE0CC98E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Shared", "apps\blazor\Blazor.Shared\Blazor.Shared.csproj", "{E35E754E-0D7B-442F-A83A-2C2A92221003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorShared", "apps\blazor\Blazor.Shared\BlazorShared.csproj", "{E35E754E-0D7B-442F-A83A-2C2A92221003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Modules", "apps\blazor\modules\Blazor.Modules\Blazor.Modules.csproj", "{679ACE1B-7D7C-42DB-992D-5CE0F03FD9C0}"
 EndProject

@@ -5,7 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <RootNamespace>FSH.Starter.WebApi.Document.Domain</RootNamespace>
+    <AssemblyName>FSH.Starter.WebApi.Document.Domain</AssemblyName>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\framework\Core\Core.csproj" />
   </ItemGroup>

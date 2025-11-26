@@ -3,7 +3,7 @@
 public enum StorageProvider
 {
     Local,
-    AWS,
+    AmazonS3,
     Azure,
     GCP
 }

@@ -6,25 +6,30 @@ using Shared.Enums;
 namespace FSH.Starter.WebApi.Document.Domain;
 public class Bucket : AuditableEntity, IAggregateRoot
 {
-
-    public StorageProvider Provider { get; private set; }
+    public StorageAccount StorageAccount { get; private set; }
+    public string Region { get; private set; } = string.Empty;
+    public string Key { get; private set; } = string.Empty;
     public string Name { get; private set; } = string.Empty;
+    // public Folder RootFolder { get; private set; }
     public string? Description { get; private set; }
+    public ICollection<Folder>? Folders { get; private set; }
 
     private Bucket() { }
 
-    private Bucket(Guid id, StorageProvider provider, string name, string? description)
+    private Bucket(Guid id, StorageAccount storageAccount, string region, string key, string name, string? description)
     {
         Id = id;
-        Provider = provider;
+        StorageAccount = storageAccount;
+        Region = region;
+        Key = key;
         Name = name;
         Description = description;
         QueueDomainEvent(new BucketCreated { Bucket = this });
     }
 
-    public static Bucket Create(StorageProvider provider, string name, string? description)
+    public static Bucket Create(StorageAccount storageAccount, string region, string key, string name, string? description)
     {
-        return new Bucket(Guid.NewGuid(), provider, name, description);
+        return new Bucket(Guid.NewGuid(), storageAccount, region, key, name, description);
     }
 
     public Bucket Update(string? name, string? description)

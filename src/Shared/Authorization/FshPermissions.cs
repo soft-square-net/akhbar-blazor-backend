@@ -66,6 +66,38 @@ public static class FshPermissions
         new("Delete Documents", FshActions.Delete, FshResources.Documents),
         new("Export Documents", FshActions.Export, FshResources.Documents),
 
+        //StorageAccounts
+        new("View StorageAccounts", FshActions.View, FshResources.StorageAccounts, IsBasic: true),
+        new("Search StorageAccounts", FshActions.Search, FshResources.StorageAccounts, IsBasic: true),
+        new("Create StorageAccounts", FshActions.Create, FshResources.StorageAccounts),
+        new("Update StorageAccounts", FshActions.Update, FshResources.StorageAccounts),
+        new("Delete StorageAccounts", FshActions.Delete, FshResources.StorageAccounts),
+        new("Export StorageAccounts", FshActions.Export, FshResources.StorageAccounts),
+
+        //Buckets
+        new("View Buckets", FshActions.View, FshResources.Buckets, IsBasic: true),
+        new("Search Buckets", FshActions.Search, FshResources.Buckets, IsBasic: true),
+        new("Create Buckets", FshActions.Create, FshResources.Buckets),
+        new("Update Buckets", FshActions.Update, FshResources.Buckets),
+        new("Delete Buckets", FshActions.Delete, FshResources.Buckets),
+        new("Export Buckets", FshActions.Export, FshResources.Buckets),
+
+        //Files
+        new("View Files", FshActions.View, FshResources.Files, IsBasic: true),
+        new("Search Files", FshActions.Search, FshResources.Files, IsBasic:true),
+        new("Create Files", FshActions.Create, FshResources.Files),
+        new("Update Files", FshActions.Update, FshResources.Files),
+        new("Delete Files", FshActions.Delete, FshResources.Files),
+        new("Export Files", FshActions.Export, FshResources.Files),
+
+        //Folders
+        new("View Folders", FshActions.View, FshResources.Folders, IsBasic: true),
+        new("Search Folders", FshActions.Search, FshResources.Folders, IsBasic: true),
+        new("Create Folders", FshActions.Create, FshResources.Folders),
+        new("Update Folders", FshActions.Update, FshResources.Folders),
+        new("Delete Folders", FshActions.Delete, FshResources.Folders),
+        new("Export Folders", FshActions.Export, FshResources.Folders),
+
     ];
 
     public static IReadOnlyList<FshPermission> All { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions);

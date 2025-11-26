@@ -17,17 +17,11 @@
   </ItemGroup>
   
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Shared\Shared.csproj" />
-		<ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
 		<ProjectReference Include="..\modules\Blazor.Modules\Blazor.Modules.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Pages\Document\" />
 	</ItemGroup>
 
 </Project>

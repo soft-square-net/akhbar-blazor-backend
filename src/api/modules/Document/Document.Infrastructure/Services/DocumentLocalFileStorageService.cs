@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FSH.Framework.Core.Origin;
-using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.Dtos;
 using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
@@ -230,7 +223,10 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         return Regex.Replace(str, "[^a-zA-Z0-9_.]+", string.Empty, RegexOptions.Compiled);
     }
 
-    
+    public bool UpdateCredentials(string accessKey, string secretKey)
+    {
+        return false;
+    }
 }
 
 

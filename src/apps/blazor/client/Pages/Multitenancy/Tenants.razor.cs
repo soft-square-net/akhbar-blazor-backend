@@ -1,5 +1,5 @@
-﻿using FSH.Starter.Blazor.Client.Components;
-using FSH.Starter.Blazor.Client.Components.EntityTable;
+﻿using FSH.Starter.BlazorShared.Components;
+using FSH.Starter.BlazorShared.Components.EntityTable;
 using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Blazor.Infrastructure.Auth;
 using FSH.Starter.Shared.Authorization;

@@ -3,25 +3,38 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.RegularExpressions;
+using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using FSH.Framework.Core.Exceptions;
 using FSH.Framework.Core.Storage.Dtos;
 using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
+using Microsoft.Extensions.Configuration;
 
 namespace FSH.Starter.WebApi.Document.Infrastructure.Services;
 public class AWSFileStorageService : IFileStorageService
 {
     private readonly IAmazonS3 _s3Client;
-
-    public AWSFileStorageService(IAmazonS3 amazonS3)
+    private readonly IExternalRefreshingAWSWithBasicCredentials _refreshCeredintials;
+    private string _accessKey = string.Empty;
+    private string _secretKey = string.Empty;
+    public AWSFileStorageService(IExternalRefreshingAWSWithBasicCredentials refreshCeredintials, IConfiguration configuration)
     {
-        _s3Client = amazonS3;
+        AWSCredentials credentials = (AWSCredentials)refreshCeredintials;
+        RegionEndpoint region = RegionEndpoint.GetBySystemName(configuration.GetValue<string>("AWS:Region")); // Specify your desired AWS region
+        _refreshCeredintials = refreshCeredintials;
+        _s3Client = new AmazonS3Client(credentials, region);
     }
 
+    public bool UpdateCredentials(string accessKey, string secretKey)
+    {
+        _accessKey = accessKey;
+        _secretKey = secretKey;
+        return _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
+    }
     public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);

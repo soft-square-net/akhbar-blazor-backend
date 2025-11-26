@@ -1,4 +1,4 @@
-﻿using FSH.Starter.Blazor.Client.Components.EntityTable;
+﻿using FSH.Starter.BlazorShared.Components.EntityTable;
 using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Shared.Authorization;
 using Mapster;

@@ -10,6 +10,7 @@ using FSH.Framework.Core.Storage.File.Features;
 namespace FSH.Framework.Core.Storage.File;
 public interface IFileStorageService
 {
+    public bool UpdateCredentials(string accessKey, string secretKey);
     public Task<Uri> UploadFileAsync<T>(FileUploadCommand? request, FileType supportedFileType, CancellationToken cancellationToken = default)
     where T : class;
     Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, CancellationToken cancellationToken = default);

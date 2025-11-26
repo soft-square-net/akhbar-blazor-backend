@@ -5,7 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <RootNamespace>FSH.Starter.WebApi.Document.Appication</RootNamespace>
+    <AssemblyName>FSH.Starter.WebApi.Document.Appication</AssemblyName>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
     <PackageReference Include="AWSSDK.S3" />
