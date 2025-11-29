@@ -31,21 +31,22 @@ public sealed class CreateBucketHandler(
         }
         IBucketStorageService bucketService = storageServiceFactory.GetBucketStorageService(storageAccount.Provider);
         
-        var onlineBucket = await bucketService.GetAllBucketsAsync(new Framework.Core.Storage.Bucket.Features.GetAllBucketsRequest(
+        var onlineBucket = await bucketService.GetAllBucketsAsync(new GetAllBucketsRequest(
             request.Region,
             storageAccount.AccessKey,
             storageAccount.SecretKey
         ));
-        if (!onlineBucket.BucketsNames.Contains(request.BucketName))
+        if (!onlineBucket.Buckets.Any(b => b.Name == request.BucketName))
         {
-            Framework.Core.Storage.Bucket.Features.CreateBucketResponse response = await bucketService.CreateBucketAsync(new Framework.Core.Storage.Bucket.Features.CreateBucketCommand()
+            SvcCreateBucketResponse response = await bucketService.CreateBucketAsync(new SvcCreateBucketCommand()
             {
                 AccessKey = storageAccount.AccessKey,
                 SecretKey = storageAccount.SecretKey,
                 BucketName = request.BucketName,
-                Region = request.Region
+                Region = request.Region,
+                Tags = request.Tags ?? new Dictionary<string, string>()
             });
-            var bucket = Bucket.Create(storageAccount, request.Region, request.key, request.BucketName!, request.Description);
+            var bucket = Bucket.Create(storageAccount, request.Region, request.key, request.BucketName!,response.ResourceName, request.Description);
             await repository.AddAsync(bucket, cancellationToken);
             logger.LogInformation("bucket created {BrandId}", bucket.Id);
             return new CreateBucketResponse(bucket.Id);
@@ -56,7 +57,7 @@ public sealed class CreateBucketHandler(
             if (DbBucket is null)
             {
                 logger.LogInformation($"The bucket {request.BucketName} exsist but not in the database, now adding it...");
-                var bucket = Bucket.Create(storageAccount, request.Region, request.key, request.BucketName!, request.Description);
+                var bucket = Bucket.Create(storageAccount, request.Region, request.key, request.BucketName!, DbBucket.ResourceName, request.Description);
                 await repository.AddAsync(bucket, cancellationToken);
                 return new CreateBucketResponse(bucket.Id);
             }

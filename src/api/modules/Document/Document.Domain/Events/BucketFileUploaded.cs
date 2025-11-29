@@ -1,0 +1,8 @@
+﻿using FSH.Framework.Core.Domain.Events;
+
+namespace FSH.Starter.WebApi.Document.Domain.Events;
+public sealed record BucketFileUploaded : DomainEvent
+{
+    public Bucket Bucket { get; set; }
+    public File file { get; set; }
+}

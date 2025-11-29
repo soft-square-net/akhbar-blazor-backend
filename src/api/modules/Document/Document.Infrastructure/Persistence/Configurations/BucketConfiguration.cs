@@ -13,7 +13,7 @@ internal class BucketConfiguration : IEntityTypeConfiguration<Bucket>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Region).HasMaxLength(100);
         builder.Property(x => x.Name).HasMaxLength(100);
-        builder.Property(x => x.Key).HasMaxLength(100);
+        builder.Property(x => x.ResourceName).HasMaxLength(100);
         builder.Property(x => x.Description).HasMaxLength(250);
     }
 }

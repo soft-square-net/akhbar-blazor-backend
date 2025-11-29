@@ -13,5 +13,7 @@ public enum FileType
     [Description(".jpg,.png,.jpeg")]
     Image,
     [Description(".mp4,.mov,.avi,.wmv,.mkv,.flv,.webm,.mpg,.mpeg")]
-    Video
+    Video,
+    [Description("Other File Types")]
+    Other
 }

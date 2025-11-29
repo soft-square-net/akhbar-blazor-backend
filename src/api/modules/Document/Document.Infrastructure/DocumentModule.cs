@@ -37,9 +37,12 @@ public static class DocumentModule
             documentGroup.MapGetDocumentListEndpoint();
             documentGroup.MapDocumentUpdateEndpoint();
             documentGroup.MapDocumentDeleteEndpoint();
+
             var bucketsGroup = app.MapGroup("buckets").WithTags("buckets");
             bucketsGroup.MapBucketCreationEndpoint();
             bucketsGroup.MapBucketDeleteEndpoint();
+            bucketsGroup.MapAddBucketFileEndpoint();
+            bucketsGroup.MapAddPucketFolderEndpoint();
 
             var storageAccountGroup = app.MapGroup("storage-ccounts").WithTags("storage-ccounts");
             storageAccountGroup.MapStorageAccountCreationEndpoint();
@@ -69,11 +72,11 @@ public static class DocumentModule
         builder.Services.AddSingleton<IExternalRefreshingAWSWithBasicCredentials, ExternalRefreshingAWSWithBasicCredentials>();
         builder.Services.AddAWSService<IAmazonS3>();
 
-        builder.Services.AddKeyedSingleton<IFileStorageService, AWSFileStorageService>(nameof(StorageProvider.AmazonS3));
-        builder.Services.AddKeyedSingleton<IBucketStorageService, AWSBucketStorageService>(nameof(StorageProvider.AmazonS3));
-        builder.Services.AddKeyedSingleton<IFileStorageService, DocumentLocalFileStorageService>(nameof(StorageProvider.Local));
-        builder.Services.AddKeyedSingleton<IBucketStorageService, DocumentLocalBucketStorageService>(nameof(StorageProvider.Local));
-        builder.Services.AddSingleton<IStorageServiceFactory, StorageServiceFactory>();
+        builder.Services.AddKeyedScoped<IFileStorageService, AWSFileStorageService>(nameof(StorageProvider.AmazonS3));
+        builder.Services.AddKeyedScoped<IBucketStorageService, AWSBucketStorageService>(nameof(StorageProvider.AmazonS3));
+        builder.Services.AddKeyedScoped<IFileStorageService, DocumentLocalFileStorageService>(nameof(StorageProvider.Local));
+        builder.Services.AddKeyedScoped<IBucketStorageService, DocumentLocalBucketStorageService>(nameof(StorageProvider.Local));
+        builder.Services.AddScoped<IStorageServiceFactory, StorageServiceFactory>();
     //    builder.Services.AddScoped<IFileStorageService>(provider =>
     //    {
     //        switch (builder.Configuration.GetValue<string>("DocumentStorage:Provider"))

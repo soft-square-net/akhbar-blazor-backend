@@ -13,7 +13,7 @@ public class DocumentLocalBucketStorageService : IBucketStorageService
         throw new NotImplementedException();
     }
 
-    public async Task<CreateBucketResponse> CreateBucketAsync(CreateBucketCommand command)
+    public async Task<SvcCreateBucketResponse> CreateBucketAsync(SvcCreateBucketCommand command)
     {
         throw new NotImplementedException();
     }

@@ -8,11 +8,12 @@ public class File : AuditableEntity, IAggregateRoot
 {
     public string Key { get; private set; } = string.Empty; 
     public string Name { get; private set; } = string.Empty;
-    public string? Description { get; private set; }
-    public string? Extension { get; private set; }
-    public string? Url { get; private set; }
-    public FileType? FileType { get; private set; }
-    public Folder? Folder { get; private set; }
+    public string Description { get; private set; } = string.Empty;
+    public string Extension { get; private set; } = string.Empty;
+    public string Etag { get; private set; } = string.Empty;
+    public string Url { get; private set; } = string.Empty;
+    public FileType FileType { get; private set; } = FileType.Other;
+    public Folder Folder { get; private set; }
     public long? Size { get; private set; }
     public bool IsPublic { get; private set; } = true;
 
