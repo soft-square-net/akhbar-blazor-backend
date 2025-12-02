@@ -37,13 +37,27 @@ public static class DocumentModule
             documentGroup.MapGetDocumentListEndpoint();
             documentGroup.MapDocumentUpdateEndpoint();
             documentGroup.MapDocumentDeleteEndpoint();
-
+            // Mapping Bucket endpoints
             var bucketsGroup = app.MapGroup("buckets").WithTags("buckets");
             bucketsGroup.MapBucketCreationEndpoint();
+            bucketsGroup.MapBucketFileCreationEndpoint();
+            bucketsGroup.MapPucketFolderCreationEndpoint();
             bucketsGroup.MapBucketDeleteEndpoint();
-            bucketsGroup.MapAddBucketFileEndpoint();
-            bucketsGroup.MapAddPucketFolderEndpoint();
-
+            bucketsGroup.MapBucketDeleteFileEndpoint();
+            bucketsGroup.MapBucketDeleteFolderEndpoint();
+            bucketsGroup.MapBucketGetEndpoint();
+            bucketsGroup.MapBucketGetFileEndpoint();
+            bucketsGroup.MapBucketGetFolderEndpoint();
+            bucketsGroup.MapBucketListEndpoint();
+            bucketsGroup.MapBucketListFilesEndpoint();
+            bucketsGroup.MapBucketListFolderEndpoint();
+            bucketsGroup.MapBucketSearchEndpoint();
+            bucketsGroup.MapBucketSearchFilesEndpoint();
+            bucketsGroup.MapBucketSearchFolderEndpoint();
+            bucketsGroup.MapBucketUpdateEndpoint();
+            bucketsGroup.MapBucketUpdateFileEndpoint();
+            bucketsGroup.MapBucketUpdateFolderEndpoint();
+            // Mapping Storage Account endpoints
             var storageAccountGroup = app.MapGroup("storage-ccounts").WithTags("storage-ccounts");
             storageAccountGroup.MapStorageAccountCreationEndpoint();
             storageAccountGroup.MapStorageAccountDeleteEndpoint();

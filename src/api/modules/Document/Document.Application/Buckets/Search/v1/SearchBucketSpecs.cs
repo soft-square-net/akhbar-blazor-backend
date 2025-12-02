@@ -1,13 +1,13 @@
 ﻿using Ardalis.Specification;
 using FSH.Framework.Core.Paging;
 using FSH.Framework.Core.Specifications;
-using FSH.Starter.WebApi.Document.Application.Buckets.Get.v1;
+using FSH.Framework.Core.Storage.Bucket.Features;
 using FSH.Starter.WebApi.Document.Domain;
 
 namespace FSH.Starter.WebApi.Document.Application.Buckets.Search.v1;
-public class SearchBucketSpecs : EntitiesByPaginationFilterSpec<Bucket, BucketResponse>
+public class SearchBucketSpecs : EntitiesByPaginationFilterSpec<Bucket, SingleBucketResponse>
 {
-    public SearchBucketSpecs(SearchBucketsCommand command)
+    public SearchBucketSpecs(SearchBucketsRequest command)
         : base(command) =>
         Query
             .OrderBy(c => c.Name, !command.HasOrderBy())

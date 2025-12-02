@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Buckets\UpdateFile\v1\" />
-    <Folder Include="Buckets\UpdateFolder\v1\" />
     <Folder Include="Folders\EventHandlers\" />
   </ItemGroup>
 

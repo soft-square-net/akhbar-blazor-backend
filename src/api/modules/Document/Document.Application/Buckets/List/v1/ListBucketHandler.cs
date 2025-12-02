@@ -1,10 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using FSH.Framework.Core.Paging;
+﻿using FSH.Framework.Core.Paging;
 using FSH.Framework.Core.Persistence;
 using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.Bucket;
 using FSH.Framework.Core.Storage.Bucket.Features;
-using FSH.Starter.WebApi.Document.Application.Buckets.Get.v1;
 using FSH.Starter.WebApi.Document.Domain;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,9 +13,9 @@ public sealed class ListAwsBucketHandler(
     IStorageServiceFactory storageServiceFactory,
     [FromKeyedServices("document:buckets")] IReadRepository<Bucket> repository,
     [FromKeyedServices("document:storage-accounts")] IReadRepository<StorageAccount> repositoryStorage)
-    : IRequestHandler<ListBucketCommand, PagedList<SingleBucketResponse>>
+    : IRequestHandler<ListBucketRequest, PagedList<SingleBucketResponse>>
 {
-    public async Task<PagedList<SingleBucketResponse>> Handle(ListBucketCommand request, CancellationToken cancellationToken)
+    public async Task<PagedList<SingleBucketResponse>> Handle(ListBucketRequest request, CancellationToken cancellationToken)
 {
     ArgumentNullException.ThrowIfNull(request);
 
