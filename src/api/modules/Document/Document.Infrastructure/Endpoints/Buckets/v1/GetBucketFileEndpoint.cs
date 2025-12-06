@@ -13,7 +13,8 @@ public static class GetBucketFileEndpoint
             .MapGet("/{id:guid}/Folder/{folderid:guid}/File{fileid:guid}/", async (Guid id, Guid folderid, Guid fileid,ISender mediator) =>
             {
                 var response = await mediator.Send(new GetBucketFileRequest(id,folderid,fileid));
-                return Results.Ok(response);
+                byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");
+                return Results.File(fileBytes, "application/pdf", "document.pdf");
             })
             .WithName(nameof(GetBucketFileEndpoint))
             .WithSummary("Get bucket File by Id")

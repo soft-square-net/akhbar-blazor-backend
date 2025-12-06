@@ -163,4 +163,32 @@ public class AWSFileStorageService : IFileStorageService
         // return NoContent();
     }
 
+
+
+    public async Task CreateEmptyFolderAsync(string bucketName, string folderName)
+    {
+        var putObjectRequest = new PutObjectRequest
+        {
+            BucketName = bucketName,
+            Key = folderName, // Key ending with a slash
+            ContentBody = string.Empty // Empty content for a zero-byte object
+        };
+        await _s3Client.PutObjectAsync(putObjectRequest);
+    }
+
+
+
+    public async Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath)
+    {
+        using (var fileStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
+        {
+            var putObjectRequest = new PutObjectRequest
+            {
+                BucketName = bucketName,
+                Key = fileKeyInS3,
+                InputStream = fileStream
+            };
+            await _s3Client.PutObjectAsync(putObjectRequest);
+        }
+    }
 }

@@ -50,7 +50,8 @@ public class AWSBucketStorageService : IBucketStorageService
                              new Tag { Key = "Tenant", Value = _user.GetTenant() },
                              new Tag { Key = "CreatedOn", Value = DateTime.UtcNow.ToString("o") }
                     },
-                    LocationConstraint = string.IsNullOrWhiteSpace(command.Region)? _region.SystemName : command.Region
+                    LocationConstraint = string.IsNullOrWhiteSpace(command.Region) || command.Region == "us-east-1" || command.Region == "us-east-1" ? null : command.Region,
+                    // LocationConstraint = string.IsNullOrWhiteSpace(command.Region)? _region.SystemName : command.Region
                     // _s3Client.Config.RegionEndpoint.SystemName,
                     // Location = new LocationInfo() { Name = _s3Client.Config.RegionEndpoint.SystemName, Type = new LocationType("your location type") }
                     // BucketInfo = new S3BucketInfo() { }

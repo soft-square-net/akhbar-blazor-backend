@@ -18,6 +18,7 @@ public sealed class GetBucketFileHandler(
         var Bucket = repository.GetByIdAsync(request.BucketId, cancellationToken);
         var service = serviceFactory.GetFileStorageService(StorageProvider.AmazonS3);
 
+        
         return new GetBucketFileResponse(Stream.Null);
     }
 }

@@ -13,9 +13,9 @@ public static class ListBucketEndpoint
     public static RouteHandlerBuilder MapBucketListEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPost("/List", async (ISender mediator, [FromBody] PaginationFilter filter) =>
+            .MapPost("/List", async (ISender mediator, [FromBody] ListBucketRequest request) =>
             {
-                var response = await mediator.Send(new ListBucketRequest(filter));
+                var response = await mediator.Send(request);
                 return Results.Ok(response);
             })
             .WithName(nameof(ListBucketEndpoint))

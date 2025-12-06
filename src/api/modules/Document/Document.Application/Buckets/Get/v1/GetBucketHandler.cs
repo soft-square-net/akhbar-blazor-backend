@@ -1,6 +1,5 @@
 using FSH.Framework.Core.Caching;
 using FSH.Framework.Core.Persistence;
-using FSH.Framework.Core.Storage.Bucket.Features;
 using FSH.Starter.WebApi.Document.Domain;
 using FSH.Starter.WebApi.Document.Domain.Exceptions;
 using MediatR;

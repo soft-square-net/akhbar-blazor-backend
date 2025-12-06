@@ -10,11 +10,10 @@ public sealed record CreateBucketCommand(
     [property: DefaultValue("Sample Bucket Name")] string BucketName,
     string Region,
 
+    [property: DefaultValue("Descriptive Description")] string Description,
+    IDictionary<string, string>? Tags,
     [property: Obsolete("AccessKey and SecretKey are obsolete. Use StorageAccount credentials instead.")]
     string AccessKey,
     [property: Obsolete("AccessKey and SecretKey are obsolete. Use StorageAccount credentials instead.")]
-    string SecretKey,
-
-    [property: DefaultValue("Descriptive Description")] string Description,
-    IDictionary<string, string>? Tags
+    string SecretKey
 ) : IRequest<CreateBucketResponse>;

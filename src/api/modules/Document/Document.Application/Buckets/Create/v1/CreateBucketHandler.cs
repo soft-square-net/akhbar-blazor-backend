@@ -1,12 +1,7 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Ardalis.Specification;
-using FSH.Framework.Core.Paging;
-using FSH.Framework.Core.Persistence;
+﻿using FSH.Framework.Core.Persistence;
 using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.Bucket;
 using FSH.Framework.Core.Storage.Bucket.Features;
-using FSH.Framework.Core.Storage.File;
-using FSH.Starter.WebApi.Document.Application.Documents.Search.v1;
 using FSH.Starter.WebApi.Document.Domain;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
