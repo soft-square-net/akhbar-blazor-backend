@@ -6,91 +6,34 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 {
     /// <inheritdoc />
-    public partial class AddDocumentFilesBucketFoldersStorageAccounts : Migration
+    public partial class AddDocumentSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                schema: "document",
-                table: "Files",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+            migrationBuilder.EnsureSchema(
+                name: "document");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
+            migrationBuilder.CreateTable(
+                name: "Documents",
                 schema: "document",
-                table: "Files",
-                type: "character varying(250)",
-                maxLength: 250,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Extension",
-                schema: "document",
-                table: "Files",
-                type: "text",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "FileType",
-                schema: "document",
-                table: "Files",
-                type: "integer",
-                nullable: true);
-
-            migrationBuilder.AddColumn<Guid>(
-                name: "FolderId",
-                schema: "document",
-                table: "Files",
-                type: "uuid",
-                nullable: true);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsPublic",
-                schema: "document",
-                table: "Files",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Key",
-                schema: "document",
-                table: "Files",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<long>(
-                name: "Size",
-                schema: "document",
-                table: "Files",
-                type: "bigint",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "TenantId",
-                schema: "document",
-                table: "Files",
-                type: "character varying(64)",
-                maxLength: 64,
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Url",
-                schema: "document",
-                table: "Files",
-                type: "text",
-                nullable: true);
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    Deleted = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "StorageAccount",
@@ -124,8 +67,10 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StorageAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     Region = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Key = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    ResourceName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Size = table.Column<long>(type: "bigint", nullable: false),
+                    MaxSize = table.Column<long>(type: "bigint", nullable: false),
                     Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -154,11 +99,13 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Slug = table.Column<string>(type: "text", nullable: false),
                     Icon = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     FullPath = table.Column<string>(type: "text", nullable: true),
                     BucketId = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsRoot = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -185,17 +132,53 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Files_FolderId",
+            migrationBuilder.CreateTable(
+                name: "Files",
                 schema: "document",
-                table: "Files",
-                column: "FolderId");
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
+                    Extension = table.Column<string>(type: "text", nullable: false),
+                    Etag = table.Column<string>(type: "text", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    FileType = table.Column<int>(type: "integer", nullable: false),
+                    FolderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Size = table.Column<long>(type: "bigint", nullable: true),
+                    IsPublic = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    Deleted = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Files_Folders_FolderId",
+                        column: x => x.FolderId,
+                        principalSchema: "document",
+                        principalTable: "Folders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Buckets_StorageAccountId",
                 schema: "document",
                 table: "Buckets",
                 column: "StorageAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_FolderId",
+                schema: "document",
+                table: "Files",
+                column: "FolderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Folders_BucketId",
@@ -208,24 +191,18 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 schema: "document",
                 table: "Folders",
                 column: "ParentId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Files_Folders_FolderId",
-                schema: "document",
-                table: "Files",
-                column: "FolderId",
-                principalSchema: "document",
-                principalTable: "Folders",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Files_Folders_FolderId",
-                schema: "document",
-                table: "Files");
+            migrationBuilder.DropTable(
+                name: "Documents",
+                schema: "document");
+
+            migrationBuilder.DropTable(
+                name: "Files",
+                schema: "document");
 
             migrationBuilder.DropTable(
                 name: "Folders",
@@ -238,72 +215,6 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             migrationBuilder.DropTable(
                 name: "StorageAccount",
                 schema: "document");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Files_FolderId",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "Extension",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "FileType",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "FolderId",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "IsPublic",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "Key",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "Size",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "TenantId",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.DropColumn(
-                name: "Url",
-                schema: "document",
-                table: "Files");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                schema: "document",
-                table: "Files",
-                type: "text",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "character varying(100)",
-                oldMaxLength: 100);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                schema: "document",
-                table: "Files",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "character varying(250)",
-                oldMaxLength: 250,
-                oldNullable: true);
         }
     }
 }

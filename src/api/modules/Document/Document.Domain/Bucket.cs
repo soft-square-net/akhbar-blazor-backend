@@ -24,7 +24,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
 
     private Bucket() { }
 
-    private Bucket(Guid id, StorageAccount storageAccount, string region, string key, string name, string resorceName, string? description, long size=0, long maxSize=0)
+    private Bucket(Guid id, StorageAccount storageAccount, string region, string name, string resorceName, string? description, long size=0, long maxSize=0)
     {
         Id = id;
         StorageAccount = storageAccount;
@@ -39,9 +39,9 @@ public class Bucket : AuditableEntity, IAggregateRoot
         QueueDomainEvent(new BucketCreated { Bucket = this });
     }
 
-    public static Bucket Create(StorageAccount storageAccount, string region, string key, string name, string resorceName, string? description, long size = 0, long maxSize = 0)
+    public static Bucket Create(StorageAccount storageAccount, string region, string name, string resorceName, string? description, long size = 0, long maxSize = 0)
     {
-        var bkt = new Bucket(Guid.NewGuid(), storageAccount, region, key, name,resorceName, description, size, maxSize);
+        var bkt = new Bucket(Guid.NewGuid(), storageAccount, region, name,resorceName, description, size, maxSize);
         bkt.Folders.Add(Folder.Create(bkt, ""));
         return bkt;
     }

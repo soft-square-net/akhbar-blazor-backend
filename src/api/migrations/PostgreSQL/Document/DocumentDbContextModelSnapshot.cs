@@ -45,16 +45,14 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uuid");
+
+                    b.Property<long>("MaxSize")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -65,6 +63,13 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ResourceName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("StorageAccountId")
                         .HasColumnType("uuid");
@@ -147,16 +152,22 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<string>("Extension")
+                    b.Property<string>("Etag")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("FileType")
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FileType")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("FolderId")
+                    b.Property<Guid>("FolderId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsPublic")
@@ -186,6 +197,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         .HasColumnType("character varying(64)");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -229,6 +241,9 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsRoot")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -242,6 +257,10 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -332,8 +351,10 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.File", b =>
                 {
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderId");
+                        .WithMany("Files")
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Folder");
                 });
@@ -363,6 +384,8 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.Folder", b =>
                 {
                     b.Navigation("Children");
+
+                    b.Navigation("Files");
                 });
 
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.StorageAccount", b =>

@@ -10,9 +10,10 @@ public static class CreateBucketFileEndpoint
     public static RouteHandlerBuilder MapBucketFileCreationEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPost("/{bucketId:guid}/folder/{parentFolderId:guid}/CreateFile", async (Guid bucketId, Guid parentFolderId, CreateBucketFileCommand request, ISender mediator) =>
+            .MapPost("/{bucketId:guid}/folder/{parentFolderId:guid}/CreateFile", async (Guid bucketId, Guid parentFolderId, IFormFile file, ISender mediator) =>
             {
-                if (bucketId != request.BucketId || parentFolderId != request.ParentFolderId) return Results.BadRequest();
+                // if (bucketId != request.BucketId || parentFolderId != request.ParentFolderId) return Results.BadRequest();
+                var request = new CreateBucketFileCommand(bucketId, parentFolderId, "", "", "", "", Framework.Core.Storage.File.FileType.Document, Stream.Null);
                 var response = await mediator.Send(request);
                 return Results.Ok(response);
             })

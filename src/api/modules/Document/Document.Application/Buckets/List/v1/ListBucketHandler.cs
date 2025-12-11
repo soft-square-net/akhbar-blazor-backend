@@ -13,9 +13,9 @@ public sealed class ListAwsBucketHandler(
     IStorageServiceFactory storageServiceFactory,
     [FromKeyedServices("document:buckets")] IReadRepository<Bucket> repository,
     [FromKeyedServices("document:storage-accounts")] IReadRepository<StorageAccount> repositoryStorage)
-    : IRequestHandler<ListBucketRequest, PagedList<SingleBucketResponse>>
+    : IRequestHandler<ListBucketRequest, PagedList<BucketDTO>>
 {
-    public async Task<PagedList<SingleBucketResponse>> Handle(ListBucketRequest request, CancellationToken cancellationToken)
+    public async Task<PagedList<BucketDTO>> Handle(ListBucketRequest request, CancellationToken cancellationToken)
 {
     ArgumentNullException.ThrowIfNull(request);
 
@@ -27,22 +27,11 @@ public sealed class ListAwsBucketHandler(
         //     throw new KeyNotFoundException($"StorageAccount with Id {request.StorageAccountId} was not found.");
         // }
         // IBucketStorageService bucketService = storageServiceFactory.GetBucketStorageService(storageAccount.Provider);
-        var storageAccount = await repositoryStorage.GetByIdAsync(request.StorageAccountId, cancellationToken);
-        if (storageAccount is null)
-        {
-            throw new KeyNotFoundException($"StorageAccount with Id {request.StorageAccountId} was not found.");
-        }
-        IBucketStorageService bucketService = storageServiceFactory.GetBucketStorageService(storageAccount.Provider);
+        
+        var items = await repository.ListAsync(spec, cancellationToken).ConfigureAwait(false);
+        var totalCount = await repository.CountAsync(spec, cancellationToken).ConfigureAwait(false);
 
-        GetAllBucketsResponse onlineBucket = await bucketService.GetAllBucketsAsync(new Framework.Core.Storage.Bucket.Features.GetAllBucketsRequest(
-            request.Region,
-            storageAccount.AccessKey,
-            storageAccount.SecretKey
-        ));
-        // var items = await repository.ListAsync(spec, cancellationToken).ConfigureAwait(false);
-    var items = onlineBucket.Buckets.ToList();
-    var totalCount = await repository.CountAsync(spec, cancellationToken).ConfigureAwait(false);
 
-    return new PagedList<SingleBucketResponse>(items, request!.PageNumber, request!.PageSize, totalCount);
+        return new PagedList<BucketDTO>(items, request!.PageNumber, request!.PageSize, totalCount);
 }
 }
