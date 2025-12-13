@@ -93,7 +93,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 });
 
             migrationBuilder.CreateTable(
-                name: "Folders",
+                name: "Folder",
                 schema: "document",
                 columns: table => new
                 {
@@ -116,24 +116,24 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Folders", x => x.Id);
+                    table.PrimaryKey("PK_Folder", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Folders_Buckets_BucketId",
+                        name: "FK_Folder_Buckets_BucketId",
                         column: x => x.BucketId,
                         principalSchema: "document",
                         principalTable: "Buckets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Folders_Folders_ParentId",
+                        name: "FK_Folder_Folder_ParentId",
                         column: x => x.ParentId,
                         principalSchema: "document",
-                        principalTable: "Folders",
+                        principalTable: "Folder",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Files",
+                name: "File",
                 schema: "document",
                 columns: table => new
                 {
@@ -158,14 +158,13 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Files", x => x.Id);
+                    table.PrimaryKey("PK_File", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Files_Folders_FolderId",
+                        name: "FK_File_Folder_FolderId",
                         column: x => x.FolderId,
                         principalSchema: "document",
-                        principalTable: "Folders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Folder",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -175,21 +174,21 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 column: "StorageAccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Files_FolderId",
+                name: "IX_File_FolderId",
                 schema: "document",
-                table: "Files",
+                table: "File",
                 column: "FolderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Folders_BucketId",
+                name: "IX_Folder_BucketId",
                 schema: "document",
-                table: "Folders",
+                table: "Folder",
                 column: "BucketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Folders_ParentId",
+                name: "IX_Folder_ParentId",
                 schema: "document",
-                table: "Folders",
+                table: "Folder",
                 column: "ParentId");
         }
 
@@ -201,11 +200,11 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 schema: "document");
 
             migrationBuilder.DropTable(
-                name: "Files",
+                name: "File",
                 schema: "document");
 
             migrationBuilder.DropTable(
-                name: "Folders",
+                name: "Folder",
                 schema: "document");
 
             migrationBuilder.DropTable(

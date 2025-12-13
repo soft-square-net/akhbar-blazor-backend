@@ -4,7 +4,7 @@ using FSH.Framework.Core.Storage.File;
 using FSH.Starter.WebApi.Document.Domain.Events;
 
 namespace FSH.Starter.WebApi.Document.Domain;
-public class File : AuditableEntity, IAggregateRoot
+public class File : AuditableEntity
 {
     public string Key { get; private set; } = string.Empty; 
     public string Name { get; private set; } = string.Empty;
@@ -13,10 +13,11 @@ public class File : AuditableEntity, IAggregateRoot
     public string Etag { get; private set; } = string.Empty;
     public string Url { get; private set; } = string.Empty;
     public FileType FileType { get; private set; } = FileType.Other;
-    public Folder Folder { get; private set; }
+    public Guid FolderId { get; private set; }
     public long? Size { get; private set; }
     public bool IsPublic { get; private set; } = true;
 
+    public Folder Folder { get; private set; }
     private File() { }
 
     private File(Guid id, Folder folder, string key, string name, string extension,string url, FileType fileType, long size, bool isBublic, string? description)

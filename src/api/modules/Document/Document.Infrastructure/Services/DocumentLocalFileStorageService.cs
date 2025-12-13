@@ -74,7 +74,7 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
             return null!;
         }
     }
-    public async Task<string> UploadFileAsync(Stream streamData, string rootPath, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, CancellationToken cancellationToken = default)
+    public async Task<string> UploadFileAsync(Stream streamData, string rootPath, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         if (rootPath == null || streamData == null || contentType == null)
         {

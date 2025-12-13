@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20251209185641_Add Document Schema")]
+    [Migration("20251213210809_Add Document Schema")]
     partial class AddDocumentSchema
     {
         /// <inheritdoc />
@@ -207,7 +207,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 
                     b.HasIndex("FolderId");
 
-                    b.ToTable("Files", "document");
+                    b.ToTable("File", "document");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -276,7 +276,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Folders", "document");
+                    b.ToTable("Folder", "document");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -356,7 +356,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Folder", "Folder")
                         .WithMany("Files")
                         .HasForeignKey("FolderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Folder");
@@ -372,7 +372,8 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Folder", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Bucket");
 

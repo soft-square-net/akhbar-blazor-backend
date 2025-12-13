@@ -20,7 +20,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
     // Update MaxSize via Update Method or Settings or Configurations
     public long MaxSize { get; private set; }
     public string? Description { get; private set; }
-    public ICollection<Folder> Folders { get; private set; } = new List<Folder>();  
+    public ICollection<Domain.Folder> Folders { get; private set; } = new List<Folder>();  
 
     private Bucket() { }
 
@@ -37,12 +37,13 @@ public class Bucket : AuditableEntity, IAggregateRoot
         // initialize the root folder
         // RootFolder = Folder.Create(this, null, "root",);
         QueueDomainEvent(new BucketCreated { Bucket = this });
+        this.AddFolder(Folder.Create(this));
     }
 
     public static Bucket Create(StorageAccount storageAccount, string region, string name, string resorceName, string? description, long size = 0, long maxSize = 0)
     {
         var bkt = new Bucket(Guid.NewGuid(), storageAccount, region, name,resorceName, description, size, maxSize);
-        bkt.Folders.Add(Folder.Create(bkt, ""));
+       
         return bkt;
     }
 
@@ -91,7 +92,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
         return this;
     }
 
-    public Bucket AddFolder(Folder folder)
+    private Bucket AddFolder(Folder folder)
     {
         Folders.Add(folder);
         return this;

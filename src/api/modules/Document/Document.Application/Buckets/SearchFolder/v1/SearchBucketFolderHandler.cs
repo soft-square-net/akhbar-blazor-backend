@@ -8,7 +8,7 @@ using FSH.Starter.WebApi.Document.Appication.Buckets.GetFolder.v1;
 
 namespace FSH.Starter.WebApi.Document.Application.Buckets.SearchFolder.v1;
 public sealed class SearchBucketFolderHandler(
-    [FromKeyedServices("document:folders")] IReadRepository<Folder> repository)
+    [FromKeyedServices("document:buckets")] IReadRepository<Bucket> repository)
     : IRequestHandler<SearchBucketFolderRequest, PagedList<GetBucketFolderResponse>>
 {
     public async Task<PagedList<GetBucketFolderResponse>> Handle(SearchBucketFolderRequest request, CancellationToken cancellationToken)

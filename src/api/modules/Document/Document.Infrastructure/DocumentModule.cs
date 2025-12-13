@@ -74,10 +74,10 @@ public static class DocumentModule
         
         builder.Services.AddKeyedScoped<IRepository<Domain.Document>, DocumentRepository<Domain.Document>>("document:documents");
         builder.Services.AddKeyedScoped<IReadRepository<Domain.Document>, DocumentRepository<Domain.Document>>("document:documents");
-        builder.Services.AddKeyedScoped<IRepository<File>, DocumentRepository<File>>("document:files");
-        builder.Services.AddKeyedScoped<IReadRepository<File>, DocumentRepository<File>>("document:files");
-        builder.Services.AddKeyedScoped<IRepository<Folder>, DocumentRepository<Folder>>("document:folders");
-        builder.Services.AddKeyedScoped<IReadRepository<Folder>, DocumentRepository<Folder>>("document:folders");
+        //builder.Services.AddKeyedScoped<IRepository<File>, DocumentRepository<File>>("document:files");
+        //builder.Services.AddKeyedScoped<IReadRepository<File>, DocumentRepository<File>>("document:files");
+        //builder.Services.AddKeyedScoped<IRepository<Folder>, DocumentRepository<Folder>>("document:folders");
+        //builder.Services.AddKeyedScoped<IReadRepository<Folder>, DocumentRepository<Folder>>("document:folders");
         builder.Services.AddKeyedScoped<IRepository<Bucket>, DocumentRepository<Bucket>>("document:buckets");
         builder.Services.AddKeyedScoped<IReadRepository<Bucket>, DocumentRepository<Bucket>>("document:buckets");
         builder.Services.AddKeyedScoped<IRepository<StorageAccount>, DocumentRepository<StorageAccount>>("document:storage-accounts");

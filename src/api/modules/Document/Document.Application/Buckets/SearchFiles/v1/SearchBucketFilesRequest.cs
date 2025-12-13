@@ -6,6 +6,7 @@ namespace FSH.Starter.WebApi.Document.Application.Buckets.SearchFiles.v1;
 
 public class SearchBucketFilesRequest : PaginationFilter, IRequest<PagedList<GetBucketFileResponse>>
 {
+    public Guid? BucketId { get; set; }
     public string? Name { get; set; }
     public string? Key { get; set; }
     public string? Description { get; set; }

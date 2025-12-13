@@ -1,4 +1,5 @@
-﻿using FSH.Framework.Infrastructure.Auth.Policy;
+﻿using FSH.Framework.Core.Storage.File;
+using FSH.Framework.Infrastructure.Auth.Policy;
 using FSH.Starter.WebApi.Document.Appication.Buckets.CreateFile.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -10,10 +11,10 @@ public static class CreateBucketFileEndpoint
     public static RouteHandlerBuilder MapBucketFileCreationEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPost("/{bucketId:guid}/folder/{parentFolderId:guid}/CreateFile", async (Guid bucketId, Guid parentFolderId, IFormFile file, ISender mediator) =>
+            .MapPost("/{bucketId:guid}/folder/{parentFolderId:guid}/CreateFile", async (Guid bucketId, Guid parentFolderId, FileType fileType, IFormFile file, ISender mediator) =>
             {
                 // if (bucketId != request.BucketId || parentFolderId != request.ParentFolderId) return Results.BadRequest();
-                var request = new CreateBucketFileCommand(bucketId, parentFolderId, "", "", "", "", Framework.Core.Storage.File.FileType.Document, Stream.Null);
+                var request = new CreateBucketFileCommand(bucketId, parentFolderId, fileType, file.FileName,file.ContentType, file.Length, file.OpenReadStream());
                 var response = await mediator.Send(request);
                 return Results.Ok(response);
             })
@@ -22,6 +23,7 @@ public static class CreateBucketFileEndpoint
             .WithDescription("creates a bucket File")
             .Produces<CreateBucketFileResponse>()
             .RequirePermission("Permissions.Buckets.Create")
+            .DisableAntiforgery()
             .MapToApiVersion(1);
     }
 

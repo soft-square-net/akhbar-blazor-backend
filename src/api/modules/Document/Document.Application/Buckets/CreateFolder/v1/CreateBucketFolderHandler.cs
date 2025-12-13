@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FSH.Framework.Core.Persistence;
 using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.File;
+using FSH.Starter.WebApi.Document.Domain;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ namespace FSH.Starter.WebApi.Document.Appication.Buckets.CreateFolder.v1;
 public sealed class CreateBucketFolderHandler(
         ILogger<CreateBucketFolderHandler> logger,
         IStorageServiceFactory serviceFactory,
-        [FromKeyedServices("document:folders")] IRepository<Domain.Folder> repository
+        [FromKeyedServices("document:buckets")] IRepository<Bucket> repository
     ) : IRequestHandler<CreateBucketFolderCommand,CreateBucketFolderResponse> {
 
 

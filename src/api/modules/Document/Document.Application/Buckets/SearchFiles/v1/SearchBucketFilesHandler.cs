@@ -8,7 +8,7 @@ using FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
 
 namespace FSH.Starter.WebApi.Document.Application.Buckets.SearchFiles.v1;
 public sealed class SearchBucketFilesHandler(
-    [FromKeyedServices("document:files")] IReadRepository<Domain.File> repository)
+    [FromKeyedServices("document:buckets")] IReadRepository<Bucket> repository)
     : IRequestHandler<SearchBucketFilesRequest, PagedList<GetBucketFileResponse>>
 {
     public async Task<PagedList<GetBucketFileResponse>> Handle(SearchBucketFilesRequest request, CancellationToken cancellationToken)

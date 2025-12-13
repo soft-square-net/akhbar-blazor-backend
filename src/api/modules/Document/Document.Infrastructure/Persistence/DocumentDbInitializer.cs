@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FSH.Framework.Core.Persistence;
+using FSH.Starter.WebApi.Document.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Infrastructure.Persistence;
 internal sealed class DocumentDbInitializer(
@@ -31,6 +33,23 @@ internal sealed class DocumentDbInitializer(
             await context.Documents.AddAsync(document, cancellationToken);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             logger.LogInformation("[{Tenant}] seeding default document data", context.TenantInfo!.Identifier);
+        }
+        StorageAccount storageAccount = null;
+        if (await context.StorageAccounts.AnyAsync().ConfigureAwait(false))
+        {
+            storageAccount = StorageAccount.Create(StorageProvider.AmazonS3 ,"AWS","","", "Amazon Web Services Storage Account");
+            await context.StorageAccounts.AddAsync(storageAccount, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        }
+
+        if (storageAccount is not null && await context.Buckets.AnyAsync().ConfigureAwait(false))
+        {
+            var bucket = Bucket.Create(storageAccount, "us-east-1", "akhbar-demo", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
+            bucket.Folders.Add(Domain.Folder.Create(bucket));
+            await context.Buckets.AddAsync(bucket, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
         }
     }
 
