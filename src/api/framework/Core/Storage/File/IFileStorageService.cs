@@ -11,13 +11,16 @@ namespace FSH.Framework.Core.Storage.File;
 public interface IFileStorageService
 {
     public bool UpdateCredentials(string accessKey, string secretKey);
-    public Task<Uri> UploadFileAsync<T>(FileUploadCommand? request, FileType supportedFileType, CancellationToken cancellationToken = default)
+    public Task<Uri> UploadFileAsync<T>(FileUploadCommand? request, FileType supportedFileType, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     where T : class;
     Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default);
-    Task<FileDpwmloadResponse> DownloadFileAsync(string bucketName, string key, CancellationToken cancellationToken = default);
-    Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, CancellationToken cancellationToken = default);
-    Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, CancellationToken cancellationToken = default);
-    Task DeleteFileAsync(string bucketName, string key, CancellationToken cancellationToken = default);
+    Task CreateEmptyFolderAsync(string bucketName, string folderName, string accessKey, string secretKey);
+    Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath, string accessKey, string secretKey);
+    Task<FileDownloadResponse> DownloadFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default);
+    Task<string> GetPreSingedUrlAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default);
+    Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default);
+    Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default);
+    Task DeleteFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default);
 }
 
 /// <param name="fullPath">Blob metadata</param>

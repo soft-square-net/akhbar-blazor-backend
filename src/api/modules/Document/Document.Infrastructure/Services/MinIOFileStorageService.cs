@@ -35,7 +35,7 @@ public class MinIOFileStorageService : IFileStorageService
         _secretKey = secretKey;
         return _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
     }
-    public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
@@ -69,7 +69,7 @@ public class MinIOFileStorageService : IFileStorageService
     /// <param name="key"></param>
     /// <returns></returns>
     /// <exception cref="NotFoundException"></exception>
-    public async Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
@@ -103,7 +103,7 @@ public class MinIOFileStorageService : IFileStorageService
         return $"File {prefix}/{fileName} uploaded to S3 successfully!";
     }
 
-    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? command, FileType supportedFileType, CancellationToken cancellationToken = default) where T : class
+    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? command, FileType supportedFileType, string accessKey, string secretKey, CancellationToken cancellationToken = default) where T : class
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, command.Bucket);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {command.Bucket} does not exist.");
@@ -137,13 +137,13 @@ public class MinIOFileStorageService : IFileStorageService
         // return $"File {command.Prefix}/{command.Name} uploaded to S3 successfully!";
     }
 
-    public async Task<FileDpwmloadResponse> DownloadFileAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task<FileDownloadResponse> DownloadFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
         var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
         // return new Stream (s3Object.ResponseStream, s3Object.Headers.ContentType);
-        return new FileDpwmloadResponse(
+        return new FileDownloadResponse(
             s3Object.ResponseStream,
             s3Object.Headers.ContentType,
             s3Object.Headers.ContentLength,
@@ -155,7 +155,7 @@ public class MinIOFileStorageService : IFileStorageService
             );
     }
 
-    public async Task DeleteFileAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task DeleteFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist");
@@ -163,4 +163,18 @@ public class MinIOFileStorageService : IFileStorageService
         // return NoContent();
     }
 
+    public Task<string> GetPreSingedUrlAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateEmptyFolderAsync(string bucketName, string folderName, string accessKey, string secretKey)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath, string accessKey, string secretKey)
+    {
+        throw new NotImplementedException();
+    }
 }

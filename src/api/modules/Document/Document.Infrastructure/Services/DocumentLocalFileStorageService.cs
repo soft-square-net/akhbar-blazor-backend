@@ -20,8 +20,60 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         FileType.Video => Path.Combine("assets", "video", folder),
         _ => Path.Combine("assets", "others", folder),
     };
+    #region Private_Static
+    private const string NumberPattern = "-{0}";
 
-    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? request, FileType supportedFileType, CancellationToken cancellationToken = default) where T : class
+    private static string NextAvailableFilename(string path)
+    {
+        if (!File.Exists(path))
+        {
+            return path;
+        }
+
+        if (Path.HasExtension(path))
+        {
+            return GetNextFilename(path.Insert(path.LastIndexOf(Path.GetExtension(path), StringComparison.Ordinal), NumberPattern));
+        }
+
+        return GetNextFilename(path + NumberPattern);
+    }
+
+    private static string GetNextFilename(string pattern)
+    {
+        string tmp = string.Format(pattern, 1);
+
+        if (!File.Exists(tmp))
+        {
+            return tmp;
+        }
+
+        int min = 1, max = 2;
+
+        while (File.Exists(string.Format(pattern, max)))
+        {
+            min = max;
+            max *= 2;
+        }
+
+        while (max != min + 1)
+        {
+            int pivot = (max + min) / 2;
+            if (File.Exists(string.Format(pattern, pivot)))
+            {
+                min = pivot;
+            }
+            else
+            {
+                max = pivot;
+            }
+        }
+
+        return string.Format(pattern, max);
+    }
+
+    #endregion
+
+    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? request, FileType supportedFileType, string accessKey, string secretKey, CancellationToken cancellationToken = default) where T : class
     {
         if (request.Bucket == null || request.Data == null || request.ContentType == null)
         {
@@ -128,17 +180,17 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         }
     }
 
-    public async Task<FileDpwmloadResponse> DownloadFileAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task<FileDownloadResponse> DownloadFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var pathString = Path.Combine(bucketName, key);
         if (File.Exists(pathString))
@@ -151,7 +203,7 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         };
     }
 
-    public async Task DeleteFileAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task DeleteFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         // Task<string> preComputedPathTask = Task.FromResult(Path.Combine(bucketName, key));
 
@@ -163,61 +215,6 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
         }
         //return  Task.FromResult<>();
     }
-
-    #region Private_Static
-    private const string NumberPattern = "-{0}";
-
-    private static string NextAvailableFilename(string path)
-    {
-        if (!File.Exists(path))
-        {
-            return path;
-        }
-
-        if (Path.HasExtension(path))
-        {
-            return GetNextFilename(path.Insert(path.LastIndexOf(Path.GetExtension(path), StringComparison.Ordinal), NumberPattern));
-        }
-
-        return GetNextFilename(path + NumberPattern);
-    }
-
-    private static string GetNextFilename(string pattern)
-    {
-        string tmp = string.Format(pattern, 1);
-
-        if (!File.Exists(tmp))
-        {
-            return tmp;
-        }
-
-        int min = 1, max = 2;
-
-        while (File.Exists(string.Format(pattern, max)))
-        {
-            min = max;
-            max *= 2;
-        }
-
-        while (max != min + 1)
-        {
-            int pivot = (max + min) / 2;
-            if (File.Exists(string.Format(pattern, pivot)))
-            {
-                min = pivot;
-            }
-            else
-            {
-                max = pivot;
-            }
-        }
-
-        return string.Format(pattern, max);
-    }
-
-    #endregion
-
-
     public static string RemoveSpecialCharacters(string str)
     {
         return Regex.Replace(str, "[^a-zA-Z0-9_.]+", string.Empty, RegexOptions.Compiled);
@@ -226,6 +223,21 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
     public bool UpdateCredentials(string accessKey, string secretKey)
     {
         return false;
+    }
+
+    public Task<string> GetPreSingedUrlAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateEmptyFolderAsync(string bucketName, string folderName, string accessKey, string secretKey)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath, string accessKey, string secretKey)
+    {
+        throw new NotImplementedException();
     }
 }
 

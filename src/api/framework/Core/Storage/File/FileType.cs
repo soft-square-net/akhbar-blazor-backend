@@ -10,7 +10,7 @@ public enum FileType
     Code,
     [Description(".pdf,.doc,.docx,.pptx,.ppt,.xlsx,.xls,.odt,.txt,.rtf,.html,.htm,.csv")]
     Document,
-    [Description(".jpg,.png,.jpeg")]
+    [Description(".jpg,.png,.jpeg,.webp")]
     Image,
     [Description(".mp4,.mov,.avi,.wmv,.mkv,.flv,.webm,.mpg,.mpeg")]
     Video,

@@ -32,7 +32,7 @@ public class AWSFileStorageService : IFileStorageService
         _secretKey = secretKey;
         return _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
     }
-    public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<S3ObjectDto>> GetAllFilesAsync<T>(string bucketName, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
@@ -66,7 +66,7 @@ public class AWSFileStorageService : IFileStorageService
     /// <param name="key"></param>
     /// <returns></returns>
     /// <exception cref="NotFoundException"></exception>
-    public async Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task<S3ObjectDto> GetFileByKeyAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
@@ -90,19 +90,42 @@ public class AWSFileStorageService : IFileStorageService
         _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {bucketName} does not exist.");
+        
         var request = new PutObjectRequest()
         {
             BucketName = bucketName,
-            Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}",
+            Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimStart('/').TrimEnd('/')}/{fileName}",
             InputStream = fileStream
         };
         request.Metadata.Add("Content-Type", contentType);
-        await _s3Client.PutObjectAsync(request);
-        return $"File {prefix}/{fileName} uploaded to S3 successfully!";
+        PutObjectResponse res = await _s3Client.PutObjectAsync(request, cancellationToken);
+        var eTag = res.ETag;
+        var expires = res.Expiration;
+        _refreshCeredintials.UpdateCredentials("", "");
+        return request.Key;
     }
 
-    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? command, FileType supportedFileType, CancellationToken cancellationToken = default) where T : class
+    public async Task<string> GetPreSingedUrlAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
+        _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
+        var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
+        if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
+
+        
+        var urlRequest = new GetPreSignedUrlRequest()
+        {
+            BucketName = bucketName,
+            Key = key,
+            Expires = DateTime.UtcNow.AddMinutes(1),
+            Verb = HttpVerb.GET
+        };
+        _refreshCeredintials.UpdateCredentials("", "");
+        return await _s3Client.GetPreSignedURLAsync(urlRequest);
+    }
+
+    public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? command, FileType supportedFileType, string accessKey, string secretKey, CancellationToken cancellationToken = default) where T : class
+    {
+        
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, command.Bucket);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {command.Bucket} does not exist.");
 
@@ -117,12 +140,14 @@ public class AWSFileStorageService : IFileStorageService
         };
         request.Metadata.Add("Content-Type", command.ContentType);
         await _s3Client.PutObjectAsync(request);
-       
+
         var urlRequest = new GetPreSignedUrlRequest()
         {
             BucketName = request.BucketName,
             Key = request.Key,
-            Expires = DateTime.UtcNow.AddMinutes(1)
+            Expires = DateTime.UtcNow.AddMinutes(1),
+            ContentType = request.ContentType,
+            Verb = HttpVerb.GET
         };
 
         return new Uri(await _s3Client.GetPreSignedURLAsync(urlRequest));
@@ -135,13 +160,13 @@ public class AWSFileStorageService : IFileStorageService
         // return $"File {command.Prefix}/{command.Name} uploaded to S3 successfully!";
     }
 
-    public async Task<FileDpwmloadResponse> DownloadFileAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task<FileDownloadResponse> DownloadFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
         var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
         // return new Stream (s3Object.ResponseStream, s3Object.Headers.ContentType);
-        return new FileDpwmloadResponse(
+        return new FileDownloadResponse(
             s3Object.ResponseStream,
             s3Object.Headers.ContentType,
             s3Object.Headers.ContentLength,
@@ -153,7 +178,7 @@ public class AWSFileStorageService : IFileStorageService
             );
     }
 
-    public async Task DeleteFileAsync(string bucketName, string key, CancellationToken cancellationToken = default)
+    public async Task DeleteFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist");
@@ -163,7 +188,7 @@ public class AWSFileStorageService : IFileStorageService
 
 
 
-    public async Task CreateEmptyFolderAsync(string bucketName, string folderName)
+    public async Task CreateEmptyFolderAsync(string bucketName, string folderName, string accessKey, string secretKey)
     {
         var putObjectRequest = new PutObjectRequest
         {
@@ -176,7 +201,7 @@ public class AWSFileStorageService : IFileStorageService
 
 
 
-    public async Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath)
+    public async Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath, string accessKey, string secretKey)
     {
         using (var fileStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
         {

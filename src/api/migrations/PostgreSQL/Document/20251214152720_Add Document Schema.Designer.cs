@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20251213210809_Add Document Schema")]
+    [Migration("20251214152720_Add Document Schema")]
     partial class AddDocumentSchema
     {
         /// <inheritdoc />
@@ -29,7 +29,6 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.Bucket", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("Created")
@@ -94,7 +93,6 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.Document", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("Created")
@@ -139,7 +137,6 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.File", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("Created")
@@ -215,7 +212,6 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.Folder", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("BucketId")
@@ -335,7 +331,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 
                     b.HasKey("Id");
 
-                    b.ToTable("StorageAccount", "document");
+                    b.ToTable("StorageAccounts", "document");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -345,7 +341,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.StorageAccount", "StorageAccount")
                         .WithMany("Buckets")
                         .HasForeignKey("StorageAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("StorageAccount");
@@ -367,7 +363,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Bucket", "Bucket")
                         .WithMany("Folders")
                         .HasForeignKey("BucketId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Folder", "Parent")

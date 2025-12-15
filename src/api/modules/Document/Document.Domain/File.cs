@@ -17,13 +17,13 @@ public class File : AuditableEntity
     public long? Size { get; private set; }
     public bool IsPublic { get; private set; } = true;
 
-    public Folder Folder { get; private set; }
+    public Folder Folder { get; private set; } = null!;
     private File() { }
 
-    private File(Guid id, Folder folder, string key, string name, string extension,string url, FileType fileType, long size, bool isBublic, string? description)
+    protected File(Guid id, Guid folderId, string key, string name, string extension,string url, FileType fileType, long size, bool isBublic, string? description)
     {
         Id = id;
-        Folder = folder;
+        FolderId = folderId;
         Key = key;
         Name = name;
         Extension = extension;
@@ -37,10 +37,10 @@ public class File : AuditableEntity
 
     public static File Create(Folder folder, string key, string name, string extension, string url, FileType fileType, long size, bool isBublic, string? description)
     {
-        return new File(Guid.NewGuid(),folder, key, name, extension, url, fileType, size, isBublic, description);
+        return new File(Guid.NewGuid(), folder.Id, key, name, extension, url, fileType, size, isBublic, description);
     }
 
-    public File Update(string? name, string? description)
+    internal File Update(string? name, string? description)
     {
         bool isUpdated = false;
 
@@ -64,7 +64,7 @@ public class File : AuditableEntity
         return this;
     }
 
-    public File UpdateUrl(string url)
+    internal File UpdateUrl(string url)
     {
         bool isUpdated = false;
 

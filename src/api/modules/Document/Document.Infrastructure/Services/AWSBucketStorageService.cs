@@ -76,7 +76,7 @@ public class AWSBucketStorageService : IBucketStorageService
             // response.BucketArn = $"arn:aws:s3:::{command.BucketName}";
             // response.Location = command.BucketName;
             // response.ResponseMetadata.Metadata;
-
+            _refreshCeredintials.UpdateCredentials("", "");
             return new SvcCreateBucketResponse(command.BucketName, response.BucketArn,response.Location,response.ResponseMetadata.Metadata);
         }
         // }
@@ -92,6 +92,8 @@ public class AWSBucketStorageService : IBucketStorageService
         
         _refreshCeredintials.UpdateCredentials(request.AccessKey, request.SecretKey);
         var data = await _s3Client.ListBucketsAsync();
+        _refreshCeredintials.UpdateCredentials("", "");
+
         return new GetAllBucketsResponse
         {
             HttpStatusCode = data.HttpStatusCode,
@@ -112,6 +114,8 @@ public class AWSBucketStorageService : IBucketStorageService
         //{
         _refreshCeredintials.UpdateCredentials(request.AccessKey, request.SecretKey);
         await _s3Client.DeleteBucketAsync(request.BucketName);
+        _refreshCeredintials.UpdateCredentials("", "");
+
         //}
     }
 }

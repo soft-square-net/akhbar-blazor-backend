@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.Framework.Core.Storage.File.Features;
-public record FileDpwmloadResponse(
+public record FileDownloadResponse(
     Stream fileStream,
     string contentType, 
     long contentLength,

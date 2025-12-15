@@ -1,14 +1,18 @@
 ﻿using System.ComponentModel;
+using System.Net.Sockets;
 using System.Xml.Linq;
 using FSH.Framework.Core.Domain;
 using FSH.Framework.Core.Domain.Contracts;
+using FSH.Framework.Core.Storage.File;
 using FSH.Starter.WebApi.Document.Domain.Events;
+using MediatR;
 using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Domain;
 public class Bucket : AuditableEntity, IAggregateRoot
 {
-    public StorageAccount StorageAccount { get; private set; }
+    private readonly List<Domain.Folder> _Folders = new();
+    public Guid StorageAccountId { get; private set; }
     public string Region { get; private set; } = string.Empty;
     public string Name { get; private set; } = string.Empty;
     // public Folder RootFolder { get; private set; }
@@ -20,7 +24,10 @@ public class Bucket : AuditableEntity, IAggregateRoot
     // Update MaxSize via Update Method or Settings or Configurations
     public long MaxSize { get; private set; }
     public string? Description { get; private set; }
-    public ICollection<Domain.Folder> Folders { get; private set; } = new List<Folder>();  
+
+
+    public StorageAccount StorageAccount { get; private set; } = null!;
+    public IReadOnlyList<Domain.Folder> Folders  =>  _Folders.ToList();  
 
     private Bucket() { }
 
@@ -37,9 +44,8 @@ public class Bucket : AuditableEntity, IAggregateRoot
         // initialize the root folder
         // RootFolder = Folder.Create(this, null, "root",);
         QueueDomainEvent(new BucketCreated { Bucket = this });
-        this.AddFolder(Folder.Create(this));
+        this._Folders.Add(Folder.Create(this));
     }
-
     public static Bucket Create(StorageAccount storageAccount, string region, string name, string resorceName, string? description, long size = 0, long maxSize = 0)
     {
         var bkt = new Bucket(Guid.NewGuid(), storageAccount, region, name,resorceName, description, size, maxSize);
@@ -47,7 +53,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
         return bkt;
     }
 
-    public Bucket UpdateSize(long size, long maxSize)
+    private void UpdateSize(long size, long maxSize)
     {
         bool isUpdated = false;
 
@@ -66,7 +72,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
         {
             QueueDomainEvent(new BucketUpdated { Bucket = this });
         }
-        return this;
+        // return this;
     }
     public Bucket Update(string? name, string? description)
     {
@@ -92,11 +98,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
         return this;
     }
 
-    private Bucket AddFolder(Folder folder)
-    {
-        Folders.Add(folder);
-        return this;
-    }
+    
     public Bucket UpdateFolder(Folder folder) { 
         Folder? folderToUpdate =Folders.SingleOrDefault(f => f.Id == folder.Id);
         if (folderToUpdate != null) { 
@@ -104,15 +106,18 @@ public class Bucket : AuditableEntity, IAggregateRoot
         }
         return this;
     }
-    public Bucket AddFile(Folder folder,File file)
-    {
-        Folder? folderToUpdate = Folders.SingleOrDefault(f => f.Id == folder.Id);
-        if (folderToUpdate != null)
-        {
-            folderToUpdate.AddFile(file);
-        }
-        return this;
+    public void AddFile(Guid folderId, string key, string name, string extension, string fileUrl, FileType fileType, long size, bool isPublic, string? description = null) { 
+        // File file = new File(Guid.NewGuid(), folderId, key, name, extension, fileUrl, fileType, size, isPublic, description);
+        // File file = File.Create(Guid.NewGuid(), folderId, key, name, extension, fileUrl, fileType, size, isPublic, description);
+        Folders.SingleOrDefault(f => f.Id == folderId)?
+            .AddFile( key, name, extension, fileUrl, fileType, size, isPublic, description);
+        UpdateSize(Size + size, MaxSize);
     }
+    //public void AddFile(Folder folder,File file)
+    //{
+    //    Folders.SingleOrDefault(f => f.Id == folder.Id)?.Files?.Add(file);
+    //    // return this;
+    //}
     public Bucket UpdateFile(File file)
     {
         if (file.Folder == null) return this;

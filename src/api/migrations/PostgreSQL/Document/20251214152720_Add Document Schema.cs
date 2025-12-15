@@ -36,7 +36,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 });
 
             migrationBuilder.CreateTable(
-                name: "StorageAccount",
+                name: "StorageAccounts",
                 schema: "document",
                 columns: table => new
                 {
@@ -56,7 +56,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StorageAccount", x => x.Id);
+                    table.PrimaryKey("PK_StorageAccounts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -84,12 +84,11 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 {
                     table.PrimaryKey("PK_Buckets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Buckets_StorageAccount_StorageAccountId",
+                        name: "FK_Buckets_StorageAccounts_StorageAccountId",
                         column: x => x.StorageAccountId,
                         principalSchema: "document",
-                        principalTable: "StorageAccount",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "StorageAccounts",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -103,9 +102,9 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     Icon = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     FullPath = table.Column<string>(type: "text", nullable: true),
+                    IsRoot = table.Column<bool>(type: "boolean", nullable: false),
                     BucketId = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsRoot = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -122,8 +121,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         column: x => x.BucketId,
                         principalSchema: "document",
                         principalTable: "Buckets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Folder_Folder_ParentId",
                         column: x => x.ParentId,
@@ -212,7 +210,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                 schema: "document");
 
             migrationBuilder.DropTable(
-                name: "StorageAccount",
+                name: "StorageAccounts",
                 schema: "document");
         }
     }

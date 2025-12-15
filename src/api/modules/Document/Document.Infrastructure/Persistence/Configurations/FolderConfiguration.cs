@@ -13,9 +13,12 @@ internal class FolderConfiguration : IEntityTypeConfiguration<Folder>
     {
         builder.IsMultiTenant();
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.Name).HasMaxLength(100);
         builder.Property(x => x.Description).HasMaxLength(1000);
 
+        builder.Navigation(b => b.Files).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(b => b.Children).UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasOne(m => m.Parent)
             .WithMany(t => t.Children)
