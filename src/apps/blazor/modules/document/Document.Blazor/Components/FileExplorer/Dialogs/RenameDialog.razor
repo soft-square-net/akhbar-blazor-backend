@@ -1,0 +1,9 @@
+﻿
+@{
+  NewName = CurrentName;
+}
+<MudStack Direction="Row" AlignItems="AlignItems.Center" Class="mb-3">
+  <MudTextField @bind-Value="NewName" Placeholder="Folder name" Immediate="true" />
+  <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save" Class="ms-2">Rename Folder</MudButton>
+  <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="Cancel" Class="ms-2">Cancel</MudButton>
+</MudStack>

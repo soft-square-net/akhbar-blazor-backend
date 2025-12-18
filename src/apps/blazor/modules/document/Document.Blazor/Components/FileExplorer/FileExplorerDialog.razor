@@ -1,0 +1,145 @@
+﻿@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
+
+<PageTitle>Document List</PageTitle>
+
+@* <MudText Typo="Typo.h4" Class="mb-4">File Manager</MudText> *@
+<MudDialog Style="height:900px; width:1200px" Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface" ActionsClass="dialog-background-surface">
+  <TitleContent>
+    @* Use MudBlazor components for a custom look and layout *@
+    <MudToolBar>
+      <MudIconButton Icon="@Icons.Material.Outlined.Menu" Size="Size.Medium" Color="Color.Inherit" Class="mr-5" />
+      <MudIconButton Icon="@Icons.Material.Outlined.Add" />
+      <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+      <MudIconButton Icon="@Icons.Material.Outlined.Remove" />
+      <MudSpacer />
+      <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
+      <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
+      <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+      <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="Cancel" Color="Color.Inherit" />
+    </MudToolBar>
+  </TitleContent>
+  <DialogContent>
+    <MudGrid Spacing="1" Style="height:100%">
+      <MudItem xs="12" sm="4" md="3">
+        <MudPaper Outlined="false" Class="pa-0 mud-height-full" Elevation="0">
+          @* <MudText Typo="Typo.subtitle1" Class="mb-2">Folders</MudText> *@
+          <MudTextField IconSize="Size.Small"  T="string" Typo="Typo.subtitle2" @bind-Value="Search" Label="Search" Variant="Variant.Text" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
+
+          <MudList T="FolderModel" Dense="true" Class="mud-height-full">
+            @foreach (var f in Folders)
+            {
+              <MudListItem Selected="@(CurrentFolder == f)" OnClick="() => ChangeFolder(f)">
+
+                <MudText Typo="Typo.body2" Class="mb-0 d-flex align-center">
+                  <MudIcon Icon="@Icons.Material.Filled.Folder" Class="me-2" Size="Size.Small" Color="Color.Primary" />
+                  @f.Name
+                </MudText>
+                @* <MudSpacer />
+                <MudText Typo="Typo.caption">@f.Files.Count</MudText> *@
+              </MudListItem>
+            }
+          </MudList>
+        </MudPaper>
+      </MudItem>
+
+      <MudItem xs="12" sm="8" md="9">
+        <MudPaper Class="pa-1" Elevation="0">
+          <MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween" Class="mb-2">
+            <div>
+              <MudText Typo="Typo.subtitle1">@Breadcrumb</MudText>
+            </div>
+
+            <div class="d-flex align-center">
+              <input type="file" multiple style="display:none" @ref="fileInput" @onchange="HandleUpload" />
+              <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload" OnClick="TriggerFileInput">Upload</MudButton>
+
+              <MudButton Variant="Variant.Outlined" Class="ms-2" OnClick="ToggleNewFolder">
+                <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Class="me-1" /> New Folder
+              </MudButton>
+
+              <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="Refresh" Class="ms-2" />
+
+            </div>
+          </MudStack>
+
+          @if (ShowNewFolderInput)
+          {
+            <MudStack Direction="Row" AlignItems="AlignItems.Center" Class="mb-3">
+              <MudTextField @bind-Value="NewFolderName" Placeholder="Folder name" Immediate="true" />
+              <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateFolder" Class="ms-2">Create</MudButton>
+              <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="ToggleNewFolder" Class="ms-2">Cancel</MudButton>
+            </MudStack>
+          }
+
+          <MudDivider Class="mb-3" />
+
+          @if (!CurrentFolder.Files.Any())
+          {
+            <MudText Typo="Typo.body2">No files in this folder.</MudText>
+          }
+          else
+          {
+            <MudGrid Spacing="1">
+              @foreach (var file in CurrentFolder.Files)
+              {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                  <MudCard Class="ma-1">
+                    <MudCardContent>
+                      <div class="d-flex align-center">
+                        <MudAvatar Size="Size.Large" Icon="@GetFileIcon(file.Name)" Class="me-3" Color="Color.Primary" />
+                        <div>
+                          <MudText Typo="Typo.subtitle2" Class="truncate">@file.Name</MudText>
+                          <MudText Typo="Typo.caption">@FormatSize(file.Size) • @file.Modified.ToString("g")</MudText>
+                        </div>
+                      </div>
+                    </MudCardContent>
+                    <MudCardActions>
+                      <MudIconButton Icon="@Icons.Material.Filled.Download" OnClick="() => DownloadFile(file)" Title="Download" />
+                      <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="() => RenameFilePrompt(file)" Title="Rename" />
+                      <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => DeleteFile(file)" Title="Delete" />
+                    </MudCardActions>
+                  </MudCard>
+                </MudItem>
+              }
+            </MudGrid>
+          }
+        </MudPaper>
+      </MudItem>
+    </MudGrid>
+  </DialogContent>
+  <DialogActions>
+    <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+    <MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
+  </DialogActions>
+</MudDialog>
+
+
+<style>
+  .mud-dialog .mud-dialog-content {
+    padding: 0 6px;
+  }
+  .mud-dialog .mud-dialog-title {
+    padding: 0;
+  }
+
+  .mud-toolbar.mud-toolbar-gutters {
+    padding-left: 5px;
+    padding-right: 5px;
+    --mud-internal-toolbar-height: 32px;
+  }
+
+  .mud-toolbar-gutters .mud-icon-button {
+    border-radius: 0;
+  }
+
+  .mud-toolbar-gutters .mud-icon-button:hover {
+    background-color: red;
+    color: white;
+  }
+
+  .mud-toolbar.mud-toolbar-gutters .mud-button-root.mud-icon-button {
+    padding: 5px;
+  }
+</style>

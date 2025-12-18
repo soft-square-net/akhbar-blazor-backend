@@ -1,10 +1,20 @@
 ﻿@using System.Reflection
-
+@using MudBlazor;
 <CascadingAuthenticationState>
-  <Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="@additionalAssemblies">
+  <MudList T="string">
+    @foreach (var item in additionalAssemblies.Select(a => a.FullName).ToList())
+    {
+      <MudListItem>
+        <MudText Typo="Typo.h6" Class="pa-4" Text="">@item</MudText>
+      </MudListItem>
+    }
+  </MudList>
+  <Router AppAssembly="@typeof(Program).Assembly" 
+          AdditionalAssemblies="@lazyLoadedAssemblies"
+          OnNavigateAsync="OnNavigateAsync">
     <Found Context="routeData">
       <AuthorizeRouteView RouteData="@routeData"
-                          DefaultLayout="@typeof(BaseLayout)" >
+                          DefaultLayout="@typeof(BaseLayout)">
         <NotAuthorized>
           @if (@context.User.Identity?.IsAuthenticated is true)
           {

@@ -6,12 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>FSH.Starter.Blazor.Modules</RootNamespace>
     <AssemblyName>FSH.Starter.Blazor.Modules</AssemblyName>
+    <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IsTrimmable>false</IsTrimmable>-->
   </PropertyGroup>
 
-
-  <ItemGroup>
+  <!--<ItemGroup>
     <SupportedPlatform Include="browser" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
     <!--<PackageReference Include="Microsoft.AspNetCore.Components.Web" />-->
@@ -23,6 +25,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\document\Document.Blazor\Document.Blazor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Update="FSH.Starter.Blazor.Modules.Document.Blazor" PrivateAssets="All" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

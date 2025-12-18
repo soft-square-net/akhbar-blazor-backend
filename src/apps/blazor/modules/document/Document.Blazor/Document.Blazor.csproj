@@ -7,6 +7,10 @@
 
     <RootNamespace>FSH.Starter.Blazor.Modules.Document.Blazor</RootNamespace>
     <AssemblyName>FSH.Starter.Blazor.Modules.Document.Blazor</AssemblyName>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IsTrimmable>false</IsTrimmable>
+    <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +20,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Components\FileExplorer\Components\" />
   </ItemGroup>
 
 
