@@ -11,6 +11,17 @@
     <IsTrimmable>false</IsTrimmable>-->
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="Properties\launchSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Properties\launchSettings.json">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
   <!--<ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>-->

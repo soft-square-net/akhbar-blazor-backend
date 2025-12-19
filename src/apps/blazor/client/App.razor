@@ -10,8 +10,8 @@
     }
   </MudList>
   <Router AppAssembly="@typeof(Program).Assembly" 
-          AdditionalAssemblies="@lazyLoadedAssemblies"
-          OnNavigateAsync="OnNavigateAsync">
+          AdditionalAssemblies="@additionalAssemblies">
+          @* OnNavigateAsync="OnNavigateAsync" *@
     <Found Context="routeData">
       <AuthorizeRouteView RouteData="@routeData"
                           DefaultLayout="@typeof(BaseLayout)">

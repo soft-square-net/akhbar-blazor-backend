@@ -7,7 +7,7 @@
 		<RootNamespace>FSH.Starter.Blazor.Client</RootNamespace>
 		<AssemblyName>FSH.Starter.Blazor.Client</AssemblyName>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-    <PublishTrimmed>false</PublishTrimmed>
+    <!--<PublishTrimmed>false</PublishTrimmed>-->
   </PropertyGroup>
 
   <ItemGroup>

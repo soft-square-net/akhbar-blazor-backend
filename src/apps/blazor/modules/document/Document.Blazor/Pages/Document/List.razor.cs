@@ -13,7 +13,7 @@ public partial class List
     }
     private Task OpenDialogAsync()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraExtraLarge, BackdropClick = true };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraExtraLarge, BackdropClick = false };
 
         return DialogService.ShowAsync<FileExplorerDialog>("File Explorer Dialog", options);
     }

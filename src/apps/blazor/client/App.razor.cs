@@ -1,5 +1,6 @@
 using System.Reflection;
 using FSH.Starter.Blazor.Modules.Configuration;
+using FSH.Starter.BlazorShared.Configurations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
@@ -9,10 +10,13 @@ public partial class App
 {
     private readonly ILogger<App> _logger;
     private readonly IModulesManager _modulesManager;
-    public App(ILogger<App> logger, IModulesManager modulesManager)
+    private readonly ICollection<ModulesConfiguration>? _modules;
+
+    public App(ILogger<App> logger, IModulesManager modulesManager, IConfiguration configuration)
     {
         _logger = logger;
         _modulesManager = modulesManager;
+        _modules = configuration.GetSection("Modules").Get<ICollection<ModulesConfiguration>>();
         additionalAssemblies = _modulesManager.ModulesAssemblies.Values.ToList();
         logger.LogInformation("Registered Modules Assemblies: {Assemblies}", string.Join(", ", additionalAssemblies.Select(a => a.FullName)));
     }
@@ -28,11 +32,16 @@ public partial class App
     {
         try
         {
-            if (args.Path == "{PATH}")
+            // var assemblies = await AssemblyLoader.LoadAssembliesAsync(additionalAssemblies.Select(a => a.FullName));
+            List<Assembly> assemblies = new();
+            foreach (var module in _modules)
             {
-                var assemblies = await AssemblyLoader.LoadAssembliesAsync(additionalAssemblies.Select(a => a.FullName));
-                lazyLoadedAssemblies.AddRange(assemblies);
+                if ( args.Path.StartsWith(module.Path))
+                {
+                    assemblies.AddRange(await AssemblyLoader.LoadAssembliesAsync(new string[] { $"FSH.Starter.Blazor.Modules.{module.Name}" }));
+                }
             }
+            lazyLoadedAssemblies.AddRange(assemblies);
         }
         catch (Exception ex)
         {

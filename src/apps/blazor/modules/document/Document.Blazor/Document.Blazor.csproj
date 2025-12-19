@@ -7,11 +7,15 @@
 
     <RootNamespace>FSH.Starter.Blazor.Modules.Document.Blazor</RootNamespace>
     <AssemblyName>FSH.Starter.Blazor.Modules.Document.Blazor</AssemblyName>
-    <PublishTrimmed>false</PublishTrimmed>
+    <!--<PublishTrimmed>false</PublishTrimmed>
     <IsTrimmable>false</IsTrimmable>
-    <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
+    <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>-->
 
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Properties\launchSettings.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Mapster" />
@@ -25,7 +29,23 @@
   <ItemGroup>
     <Folder Include="Components\FileExplorer\Components\" />
   </ItemGroup>
+  
+  <!--<ItemGroup>
+    <None Include="Properties\launchSettings.json">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 
+  <Target Name="CopyRclAssets" BeforeTargets="Build">
+    <ItemGroup>
+      --><!-- Adjust path to your RCL's wwwroot --><!--
+      <RclStaticAssets Include=".\wwwroot\**\*.*" />
+    </ItemGroup>
 
+    <Copy SourceFiles="@(RclStaticAssets)"
+          DestinationFolder="..\..\..\client\wwwroot\modules\$(ProjectName)\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>-->
 
 </Project>
