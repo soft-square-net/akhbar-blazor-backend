@@ -11,7 +11,7 @@
   </MudList>
   <Router AppAssembly="@typeof(Program).Assembly" 
           AdditionalAssemblies="@additionalAssemblies">
-          @* OnNavigateAsync="OnNavigateAsync" *@
+          @* OnNavigateAsync="OnNavigateAsync"  *@
     <Found Context="routeData">
       <AuthorizeRouteView RouteData="@routeData"
                           DefaultLayout="@typeof(BaseLayout)">

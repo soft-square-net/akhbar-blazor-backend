@@ -19,7 +19,6 @@ public partial class FileExplorerDialog
     private bool ShowNewFolderInput;
     private string NewFolderName = string.Empty;
     private string Search = string.Empty;
-    // Models
     record FileModel(Guid Id, string Name, long Size, DateTime Modified);
     record FolderModel(string Name)
     {

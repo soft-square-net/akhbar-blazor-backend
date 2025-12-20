@@ -20,17 +20,28 @@ var database = builder.AddPostgres("db", username, password, port: 5432)
 // Note: Ensure that the database name matches the one used in the API project configuration.
 // var cache = builder.AddRedis("redis", port: 6379);
 var cache = builder.AddGarnet("cache", port: 6379);
-    // .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
+// .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
+
+var blazor = builder.AddProject<Projects.Client>("blazor")
+    // .WithHttpEndpoint(port: 5100)
+    // .WithHttpsEndpoint(port: 7100)
+    
+    .WithEndpoint(endpointName: "https", callback: static endpoint =>
+    {
+        // Sets the actual port the Blazor WASM app runs on
+        endpoint.TargetPort = 7100;
+        // Sets the port for the Aspire proxy (optional, can be same as TargetPort)
+        endpoint.Port = 7300;
+    }); // Use your desired fixed port;
 
 var api = builder.AddProject<Projects.Server>("webapi")
     // .WithHttpEndpoint(port: 5000)
     // .WithHttpsEndpoint(port: 7000)
     .WithReference(cache)
+    .WithReference(blazor)
     .WaitFor(database);
 
-var blazor = builder.AddProject<Projects.Client>("blazor")
-    // .WithHttpEndpoint(port: 5100)
-    // .WithHttpsEndpoint(port: 7100)
+blazor.WaitFor(api)
     .WithReference(api);
 
 using var app = builder.Build();
