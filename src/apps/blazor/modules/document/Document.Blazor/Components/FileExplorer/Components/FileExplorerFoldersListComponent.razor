@@ -1,0 +1,42 @@
+@using MudBlazor
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
+@using FSH.Starter.Blazor.Infrastructure.Api
+@* <MudText Typo="Typo.subtitle1" Class="mb-2">Folders</MudText> *@
+<MudTextField IconSize="Size.Small" T="string" Typo="Typo.caption" @bind-Value="Search" Label="Search"
+    Variant="Variant.Outlined" Margin="Margin.Dense" Adornment=" Adornment.End"
+    AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
+
+<MudList T="FolderModel" Dense="true" Class="file-explorer-folders-list">
+    @foreach (FolderModel f in Folders)
+    {
+        <MudListItem Selected="@(CurrentFolder == f)" OnClick="() => ChangeFolder(f)">
+
+            <MudText Typo="Typo.body2" Class="mb-0 d-flex align-center">
+                <MudIcon Icon="@Icons.Material.Filled.Folder" Class="me-2" Size="Size.Small" Color="Color.Error" />
+                @f.Name
+            </MudText>
+            @* <MudSpacer />
+                <MudText Typo="Typo.caption">@f.Files.Count</MudText> *@
+        </MudListItem>
+    }
+</MudList>
+
+<style>
+    :root {
+        --file-explorer-search-box-height: 3rem;
+    }
+
+    .file-explorer-folders-list {
+        height: calc(100% - var(--file-explorer-search-box-height));
+
+        /* box-shadow: inset h-offset v-offset blur-radius spread-radius color; */
+        .element-class {
+            @* box-shadow: inset 6px 6px 10px 0 rgba(0, 0, 0, 0.2),
+                inset -6px -6px 10px 0 rgba(255, 255, 255, 0.5); *@
+            box-shadow: var(--inner-shadow);
+        }
+
+        .file-explorer-folders-list .mud-list-item {
+            cursor: pointer;
+        }
+</style>

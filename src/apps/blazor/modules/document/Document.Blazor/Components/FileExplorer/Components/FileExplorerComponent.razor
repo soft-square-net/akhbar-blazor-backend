@@ -1,0 +1,35 @@
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
+
+<CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
+  <MudGrid Spacing="1" Style="height:calc(100% - 70px)">
+    <MudText Typo="Typo.body2" Color="Color.Error">@CurrentFolder</MudText>
+    <MudItem xs="12" sm="4" md="3">
+      <MudPaper Outlined="false" Class="pa-0 mud-height-full" Elevation="0">
+        <FileExplorerFoldersListComponent Folders="Folders" OnFolderSelected="OnFolderSelected" />
+        @* <FileExplorerFoldersListComponent Folders="Folders"/> *@
+      </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" sm="8" md="9">
+      <MudPaper Class="pa-1" Elevation="0">
+        <FileExplorerContentComponent Folders="Folders" OnFolderUpdated="OnFolderUpdated" />
+      </MudPaper>
+    </MudItem>
+  </MudGrid>
+</CascadingValue>
+
+<style>
+  :root {
+    --file-explorer-breadcrumb-height: 3.5rem;
+    --inner-shadow: inset 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  }
+
+  .truncate {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } 
+</style>

@@ -1,11 +1,14 @@
 ﻿@page "/document/list"
 @inject IDialogService DialogService
 
-@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components
 
 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
   Open File Explorer
 </MudButton>
 
 <MudText Typo="Typo.h6">@_content</MudText>
+
+<FileExplorerComponent />
+
 <img src="@_content/Pic01.png" style="width:100%"/>
