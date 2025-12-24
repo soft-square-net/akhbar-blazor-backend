@@ -1,5 +1,5 @@
-﻿using FSH.Framework.Core.Storage.File;
-using FSH.Framework.Core.Storage.File.Features;
+﻿using FSH.Framework.Core.Storage.File.Features;
+using Shared.Enums;
 
 namespace FSH.Framework.Core.Storage;
 

@@ -1,65 +1,147 @@
-<MudStack Direction="Row" AlignItems="AlignItems.Center" JustifyContent="SpaceBetween" Class="mb-2">
-    <div>
-        <MudText Typo="Typo.subtitle1">@Breadcrumb</MudText>
-    </div>
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers
+@using MudBlazor.Utilities
 
-    <div class="d-flex align-center">
+@* <MudAlert Severity="Severity.Info" Elevation="0" Class="mb-3">@(_themePreference != null ? (_themePreference.IsDarkMode ? "Dark Mode" : "Light Mode") : "Unknown")</MudAlert>*@
+<MudStack Direction="Row" AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" Class="@($"{(_themePreference != null ? (_themePreference.IsDarkMode ? "dark-mode" : "") : "")} mb-2")">
+  <MudToolBar Dense="true" Class="px-0 align-self-start">
+    <MudIconButton Class="ms-6" Icon="@Icons.Material.Filled.ArrowRightAlt" Size="Size.Small"
+                   Style="color: var(--file-explorer-Icon-text-color); transform: rotate(180deg);" />
+    <MudIconButton Class="" Icon="@Icons.Material.Filled.ArrowRightAlt" Size="Size.Small"
+                   Style="color: var(--file-explorer-Icon-text-color);" />
+    <MudIconButton Class="" Icon="@Icons.Material.Filled.ArrowRightAlt" Size="Size.Small"
+                   Style="color: var(--file-explorer-Icon-text-color); transform: rotate(-90deg);" />
+    <MudIconButton Icon="@Icons.Material.Outlined.Refresh" Size="Size.Small"
+                   Style="color: var(--file-explorer-Icon-text-color);" Class="me-6" />
+    <MudDivider Vertical="true" FlexItem="true" />
+    <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" Class="ms-6">
+      @if (!ShowNewFolderInput)
+      {
+        <MudIconButton Icon="@Icons.Material.Filled.AccessAlarm"></MudIconButton>
+        <MudToggleIconButton Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
+        ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
+        <MudButton OnClick="ToggleNewFolder" StartIcon="@Icons.Material.Outlined.Add" IconColor="Color.Warning" IconSize="Size.Large">New Folder</MudButton>
         <input type="file" multiple style="display:none" @ref="fileInput" @onchange="HandleUpload" />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload"
-            OnClick="TriggerFileInput">Upload</MudButton>
+        <MudButton OnClick="TriggerFileInput" StartIcon="@Icons.Material.Filled.FileUpload" IconColor="Color.Warning" IconSize="Size.Large">Upload</MudButton>
+      }
+      else
+      {
+      @code {
+        
+        private bool _shrinkLabel = false;
 
-        <MudButton Variant="Variant.Outlined" Class="ms-2" OnClick="ToggleNewFolder">
-            <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Class="me-1" /> New Folder
-        </MudButton>
+        protected string InputClassname =>
+        new CssBuilder("mud-input-slot")
+        .AddClass("mud-input-root")
+        .AddClass($"mud-input-root-{Variant.Outlined.ToDescriptionString()}")
+        .AddClass($"mud-input-root-adorned-{Adornment.End.ToDescriptionString()}")
+        .AddClass($"mud-input-root-margin-{Margin.Normal.ToDescriptionString()}")
+        .Build();
+      }
+        <MudField   Variant="Variant.Text" AdornmentAriaLabel="info icon"
+                  AdornmentIcon="@Icons.Material.Filled.Info" AdornmentColor="Color.Info"
+                ShrinkLabel="@_shrinkLabel" Adornment="Adornment.End" InnerPadding="false" >
+          <MudStack Row Class="mud-input"
+                    Spacing="0" AlignItems="AlignItems.Center" tabindex="-1">
+          <input @bind="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" />
+            
+          <MudIconButton Color="@Color.Default"
+                         Icon="@Icons.Material.Filled.CreateNewFolder"
+                         Size="@Size.Small"
+                         tabindex="-1"
+                         Disabled="string.IsNullOrWhiteSpace(NewFolderName)"
+                         OnClick="CreateFolder"
+                         @onmousedown:stopPropagation />
+          <MudIconButton Color="@Color.Default"
+                         Icon="@Icons.Material.Filled.Clear"
+                         Size="@Size.Small"
+                         tabindex="-1"
+                         OnClick="ToggleNewFolder"
+                         @onmousedown:stopPropagation />
+          @* aria-label="@Localizer[LanguageResource.MudInput_Clear]" *@
+          </MudStack>
+        </MudField>
+      }
+    </MudButtonGroup>
+  </MudToolBar>
 
-        <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="Refresh" Class="ms-2" />
+  <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="1" Class="mud-width-full">
+    <MudIcon Icon="@FileExplorerIcons.DocumentFolder" Class="me-1" Style="font-size: 56px;" Size="Size.Large"
+             Color="Color.Primary" />
+    <MudStack AlignItems="AlignItems.Start" Spacing="0" Dense="true">
+      <MudText Typo="Typo.h6" Class="mb-0 d-flex align-center pt-2" Style="line-height:1.5rem;"> @CurrentFolder.Name </MudText>
+      <MudText Typo="Typo.caption">@Breadcrumb</MudText>
+    </MudStack>
+    <MudSpacer />
+    <MudToolBar Class="px-0 align-self-end h-full" Dense="true">
+      <MudMenu Label="View" Size="Size.Small" Variant="Variant.Filled" StartIcon="@FileExplorerIcons.View"
+               Class="me-1 file-explorer-icon-highlited" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
+        <MudMenuItem Label="Item 1" />
+        <MudMenuItem Label="Item 2" />
+        <MudMenuItem Label="Item 3" />
+      </MudMenu>
+      <MudMenu Label="Sorting" Size="Size.Small" Variant="Variant.Filled" StartIcon="@FileExplorerIcons.SortingASC" Class="me-1 file-explorer-icon-highlited">
+        <MudMenuItem Label="Item 1" />
+        <MudMenuItem Label="Item 2" />
+        <MudMenuItem Label="Item 3" />
+      </MudMenu>
+      <MudMenu Label="Share" Size="Size.Small" Variant="Variant.Filled" StartIcon="@FileExplorerIcons.Share" Class="me-1 file-explorer-icon-highlited">
+        <MudMenuItem Label="Item 1" />
+        <MudMenuItem Label="Item 2" />
+        <MudMenuItem Label="Item 3" />
+      </MudMenu>
+      <MudMenu Label="Properties" Size="Size.Small" Variant="Variant.Filled" StartIcon="@FileExplorerIcons.Properties" Class="me-1 file-explorer-icon-highlited">
+        <MudMenuItem Label="Item 1" />
+        <MudMenuItem Label="Item 2" />
+        <MudMenuItem Label="Item 3" />
+      </MudMenu>
+    </MudToolBar>
+  </MudStack>
 
-    </div>
+
+
+  @* <div class="d-flex align-center">
+    <input type="file" multiple style="display:none" @ref="fileInput" @onchange="HandleUpload" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload"
+               OnClick="TriggerFileInput">Upload</MudButton>
+
+    <MudButton Variant="Variant.Outlined" Class="ms-2" OnClick="ToggleNewFolder">
+      <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Class="me-1" /> New Folder
+    </MudButton>
+
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="Refresh" Class="ms-2" />
+
+  </div> *@
 </MudStack>
 
-@if (ShowNewFolderInput)
+@* @if (ShowNewFolderInput)
 {
-    <MudStack Direction="Row" AlignItems="AlignItems.Center" Class="mb-3">
-        <MudTextField @bind-Value="NewFolderName" Placeholder="Folder name" Immediate="true" />
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateFolder" Class="ms-2">Create
-        </MudButton>
-        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="ToggleNewFolder" Class="ms-2">Cancel
-        </MudButton>
-    </MudStack>
+  <MudStack Direction="Row" AlignItems="AlignItems.Center" Class="mb-3">
+    <MudTextField @bind-Value="NewFolderName" Placeholder="Folder name" Immediate="true" />
+    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateFolder" Class="ms-2">
+      Create
+    </MudButton>
+    <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="ToggleNewFolder" Class="ms-2">
+      Cancel
+    </MudButton>
+  </MudStack>
 }
-
+ *@
 <MudDivider Class="mb-3" />
 
-@if (!CurrentFolder.Files.Any())
-{
-    <MudText Typo="Typo.body2">No files in this folder.</MudText>
-}
-else
-{
-    <MudGrid Spacing="1">
-        @foreach (var file in CurrentFolder.Files)
-        {
-            <MudItem xs="12" sm="6" md="4" lg="3">
-                <MudCard Class="ma-1">
-                    <MudCardContent>
-                        <div class="d-flex align-center">
-                            <MudAvatar Size="Size.Large" Icon="@GetFileIcon(file.Name)" Class="me-3" Color="Color.Primary" />
-                            <div>
-                                <MudText Typo="Typo.subtitle2" Class="truncate">@file.Name</MudText>
-                                <MudText Typo="Typo.caption">@FormatSize(file.Size) • @file.Modified.ToString("g")</MudText>
-                            </div>
-                        </div>
-                    </MudCardContent>
-                    <MudCardActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Download" OnClick="() => DownloadFile(file)"
-                            Title="Download" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="() => RenameFilePrompt(file)"
-                            Title="Rename" />
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => DeleteFile(file)"
-                            Title="Delete" />
-                    </MudCardActions>
-                </MudCard>
-            </MudItem>
-        }
-    </MudGrid>
-}
+<Explorer ExplorerType="EnumExplorerType.DefaultExplorer" />
+
+  <style>
+  :root {
+    --file-explorer-breadcrumb-height: 3.5rem;
+    --file-explorer-Icon-text-color: rgb(0, 0, 0);
+    --inner-shadow: inset 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  }
+
+  .dark-mode {
+    --file-explorer-Icon-text-color: rgb(255, 255, 255);
+  }
+
+  .file-explorer-icon-highlited .mud-button-label .mud-button-icon-start svg {
+    color: rgb(37.64706%, 80.392158%, 100%);
+  }
+  </style>

@@ -28,10 +28,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="Components\FileExplorer\Components\" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <None Include="Properties\launchSettings.json">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>

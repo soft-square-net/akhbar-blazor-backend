@@ -1,7 +1,6 @@
 ﻿using FSH.Framework.Core.Domain;
-using FSH.Framework.Core.Domain.Contracts;
-using FSH.Framework.Core.Storage.File;
 using FSH.Starter.WebApi.Document.Domain.Events;
+using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Domain;
 public class File : AuditableEntity

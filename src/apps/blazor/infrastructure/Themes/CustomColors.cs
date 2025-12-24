@@ -27,6 +27,8 @@ public static class CustomColors
         public const string Background = "#FFF";
         public const string AppbarBackground = "#FFF";
         public const string AppbarText = "#6e6e6e";
+        public const string IiconText = "#000000";
+        public const string IiconHighlight = "#60CDFF";
     }
 
     public static class Dark
@@ -38,5 +40,7 @@ public static class CustomColors
         public const string DrawerBackground = "#121212";
         public const string Surface = "#202528";
         public const string Disabled = "#545454";
+        public const string IiconText = "#FFFFFF";
+        public const string IiconHighlight = "#FF3D00";
     }
 }

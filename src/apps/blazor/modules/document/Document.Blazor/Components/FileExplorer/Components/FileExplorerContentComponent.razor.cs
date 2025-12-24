@@ -1,4 +1,7 @@
 
+
+using FSH.Starter.Blazor.Infrastructure.Preferences;
+using FSH.Starter.Blazor.Infrastructure.Themes;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 using Microsoft.AspNetCore.Components;
@@ -13,8 +16,8 @@ public partial class FileExplorerContentComponent
     [Parameter] public required ICollection<FolderModel> Folders { get; set; }
     [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
-    [Inject] ISnackbar Snackbar { get; set; } = default!;
     [Inject] IJSRuntime JSRuntime { get; set; } = default!;
+
 
     private string Breadcrumb => $"/{CurrentFolder.Name}";
 
@@ -23,6 +26,30 @@ public partial class FileExplorerContentComponent
     private bool ShowNewFolderInput;
     private string NewFolderName = string.Empty;
 
+    // [Inject] IClientPreferenceManager ClientPreferences { get; set; } = default!;
+
+    private ClientPreference? _themePreference;
+
+    protected override async Task OnInitializedAsync()
+    {
+       _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+       if (_themePreference == null) _themePreference = new ClientPreference();
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) {
+            _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+        }
+        ClientPreferences.SetPreference(_themePreference);
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    private async Task<bool> IsDarkModeAsync()
+    {
+        _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+        if (_themePreference == null) _themePreference = new ClientPreference();
+        return  _themePreference.IsDarkMode;
+    }
     async Task TriggerFileInput()
     {
         // focus click the hidden input to show native file picker
@@ -42,13 +69,13 @@ public partial class FileExplorerContentComponent
         var name = (NewFolderName ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
-            Snackbar.Add("Enter a valid folder name.", Severity.Warning);
+            Toast.Add("Enter a valid folder name.", Severity.Warning);
             return;
         }
 
         if (Folders.Any(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)))
         {
-            Snackbar.Add("A folder with that name already exists.", Severity.Warning);
+            Toast.Add("A folder with that name already exists.", Severity.Warning);
             return;
         }
 
@@ -56,7 +83,7 @@ public partial class FileExplorerContentComponent
         Folders.Add(folder);
         CurrentFolder = folder;
         ShowNewFolderInput = false;
-        Snackbar.Add($"Folder '{name}' created.", Severity.Success);
+        Toast.Add($"Folder '{name}' created.", Severity.Success);
     }
 
 
@@ -66,13 +93,13 @@ public partial class FileExplorerContentComponent
         // For richer usage use InputFile component with InputFileChangeEventArgs
         // We'll try to cast: in Blazor wasm you'll likely use InputFile; this minimal handler simulates
         // NOTE: If you prefer InputFile, replace markup to <InputFile OnChange="OnInputFileChange" /> and implement OnInputFileChange(InputFileChangeEventArgs)
-        Snackbar.Add("Files selected (simulate upload). Implement backend upload in HandleUpload.", Severity.Info);
+        Toast.Add("Files selected (simulate upload). Implement backend upload in HandleUpload.", Severity.Info);
     }
 
     void Refresh()
     {
         // Replace with re-fetch from server
-        Snackbar.Add("Refreshed.", Severity.Info);
+        Toast.Add("Refreshed.", Severity.Info);
         StateHasChanged();
     }
 
@@ -93,7 +120,7 @@ public partial class FileExplorerContentComponent
     async Task DownloadFile(FileModel f)
     {
         // Replace with actual file download logic (link to blob or invoking API).
-        Snackbar.Add($"Simulated download: {f.Name}", Severity.Info);
+        Toast.Add($"Simulated download: {f.Name}", Severity.Info);
     }
 
     async Task DeleteFile(FileModel f)
@@ -109,7 +136,7 @@ public partial class FileExplorerContentComponent
         if (result == true)
         {
             CurrentFolder.Files.Remove(f);
-            Snackbar.Add($"Deleted {f.Name}", Severity.Success);
+            Toast.Add($"Deleted {f.Name}", Severity.Success);
             StateHasChanged();
         }
     }
@@ -124,8 +151,9 @@ public partial class FileExplorerContentComponent
             var idx = CurrentFolder.Files.FindIndex(x => x.Id == f.Id);
             if (idx >= 0)
             {
-                CurrentFolder.Files[idx] = f with { Name = newName };
-                Snackbar.Add($"Renamed to {newName}", Severity.Success);
+                // CurrentFolder.Files[idx] = f with { Name = newName };
+                CurrentFolder.Files[idx].Name = newName;
+                Toast.Add($"Renamed to {newName}", Severity.Success);
             }
         }
     }

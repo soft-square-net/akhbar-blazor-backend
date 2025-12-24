@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using FSH.Framework.Core.Storage.Dtos;
 using FSH.Framework.Core.Storage.File.Features;
+using Shared.Enums;
 
 namespace FSH.Framework.Core.Storage.File;
 public interface IFileStorageService

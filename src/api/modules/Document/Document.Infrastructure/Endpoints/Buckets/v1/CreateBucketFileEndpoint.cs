@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Shared.Enums;
 namespace FSH.Starter.WebApi.Document.Infrastructure.Endpoints.Buckets.v1;
 public static class CreateBucketFileEndpoint
 {

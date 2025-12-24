@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
+using Shared.Enums;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components;
 
@@ -29,16 +30,16 @@ public partial class FileExplorerComponent
             {
                 Files =
                 {
-                    new FileModel(Guid.NewGuid(), "Report.pdf", 245_760, DateTime.Now.AddDays(-2)),
-                    new FileModel(Guid.NewGuid(), "Photo.jpg", 1_048_576, DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), "Notes.txt", 1024, DateTime.Now.AddHours(-5))
+                    new FileModel(Guid.NewGuid(), "Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
+                    new FileModel(Guid.NewGuid(), "Photo.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), "Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
                 }
             },
             new FolderModel("Shared")
             {
                 Files =
                 {
-                    new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20))
+                    new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
                 }
             },
             new FolderModel("Archive")
@@ -62,7 +63,7 @@ public partial class FileExplorerComponent
     {
         foreach (var browserFile in e.GetMultipleFiles())
         {
-            var model = new FileModel(Guid.NewGuid(), browserFile.Name, browserFile.Size, DateTime.Now);
+            var model = new FileModel(Guid.NewGuid(), browserFile.Name, browserFile.Size, DateTime.Now, DateTime.Now);
             CurrentFolder.Files.Add(model);
         }
         Snackbar.Add($"Uploaded {e.GetMultipleFiles().Count} file(s).", Severity.Success);

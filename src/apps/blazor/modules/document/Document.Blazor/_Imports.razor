@@ -1,18 +1,23 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using FSH.Starter.Blazor.Infrastructure.Preferences
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.Extensions.Configuration
 @using Microsoft.JSInterop
 @using MudBlazor
 @using Mapster;
 @using static FSH.Starter.Blazor.Modules.Document.Blazor.Constants;
 @using Microsoft.AspNetCore.Authorization
 
+
 @attribute [Authorize]
 
 @inject NavigationManager Navigation
 @inject ISnackbar Toast
 @inject IDialogService DialogService
+@inject IConfiguration Config
+@inject IClientPreferenceManager ClientPreferences

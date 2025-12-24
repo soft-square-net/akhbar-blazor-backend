@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -13,6 +9,7 @@ using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
 using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
 using Microsoft.Extensions.Configuration;
+using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Infrastructure.Services;
 public class MinIOFileStorageService : IFileStorageService

@@ -1,0 +1,13 @@
+:root {
+    --file-explorer-breadcrumb-height: 3.5rem;
+    --file-explorer-Icon-text-color: rgb(0, 0, 0);
+    --inner-shadow: inset 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+        0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+.dark-mode {
+    --file-explorer-Icon-text-color: rgb(255, 255, 255);
+}
+
+.file-explorer-icon-highlited .mud-button-label .mud-button-icon-start svg {
+    color: rgb(37.64706%, 80.392158%, 100%);
+}

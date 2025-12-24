@@ -6,6 +6,7 @@ using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
 using FSH.Framework.Infrastructure.Common.Extensions;
 using Microsoft.Extensions.Options;
+using Shared.Enums;
 
 namespace Document.Infrastructure.Services;
 public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSettings) : IFileStorageService

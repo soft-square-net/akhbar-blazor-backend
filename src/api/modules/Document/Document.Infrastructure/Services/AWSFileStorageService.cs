@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 using System.Text.RegularExpressions;
 using Amazon;
 using Amazon.Runtime;
@@ -10,6 +10,7 @@ using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
 using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
 using Microsoft.Extensions.Configuration;
+using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Infrastructure.Services;
 public class AWSFileStorageService : IFileStorageService

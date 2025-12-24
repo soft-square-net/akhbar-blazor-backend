@@ -2,11 +2,10 @@
 using System.Text.RegularExpressions;
 using FSH.Framework.Core.Origin;
 using FSH.Framework.Core.Storage;
-using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Core.Storage.File.Features;
 using FSH.Framework.Infrastructure.Common.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Shared.Enums;
 namespace FSH.Framework.Infrastructure.Storage.Files
 {
     public class LocalFileStorageService(IOptions<OriginOptions> originSettings) : IStorageService

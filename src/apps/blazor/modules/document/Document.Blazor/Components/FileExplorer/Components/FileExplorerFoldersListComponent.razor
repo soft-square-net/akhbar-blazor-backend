@@ -3,10 +3,10 @@
 @using FSH.Starter.Blazor.Infrastructure.Api
 @* <MudText Typo="Typo.subtitle1" Class="mb-2">Folders</MudText> *@
 <MudTextField IconSize="Size.Small" T="string" Typo="Typo.caption" @bind-Value="Search" Label="Search"
-    Variant="Variant.Outlined" Margin="Margin.Dense" Adornment=" Adornment.End"
+    Variant="Variant.Text" Margin="Margin.Dense" Adornment=" Adornment.End"
     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
 
-<MudList T="FolderModel" Dense="true" Class="file-explorer-folders-list">
+<MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list">
     @foreach (FolderModel f in Folders)
     {
         <MudListItem Selected="@(CurrentFolder == f)" OnClick="() => ChangeFolder(f)">

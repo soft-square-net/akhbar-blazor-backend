@@ -3,17 +3,17 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
 
 <CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
-  <MudGrid Spacing="1" Style="height:calc(100% - 70px)">
-    <MudText Typo="Typo.body2" Color="Color.Error">@CurrentFolder</MudText>
+  <MudGrid Spacing="1" Style="height:calc(100% - 70px); min-height:400px;">
+    @* <MudText Typo="Typo.body2" Color="Color.Error">@CurrentFolder</MudText> *@
     <MudItem xs="12" sm="4" md="3">
-      <MudPaper Outlined="false" Class="pa-0 mud-height-full" Elevation="0">
+      <MudPaper Outlined="false" Class="pa-0 px-2 mud-height-full" Elevation="0">
         <FileExplorerFoldersListComponent Folders="Folders" OnFolderSelected="OnFolderSelected" />
         @* <FileExplorerFoldersListComponent Folders="Folders"/> *@
       </MudPaper>
     </MudItem>
 
     <MudItem xs="12" sm="8" md="9">
-      <MudPaper Class="pa-1" Elevation="0">
+      <MudPaper Class="pa-1 mt-1" Style="height:calc(100% - 0px);" Elevation="0">
         <FileExplorerContentComponent Folders="Folders" OnFolderUpdated="OnFolderUpdated" />
       </MudPaper>
     </MudItem>

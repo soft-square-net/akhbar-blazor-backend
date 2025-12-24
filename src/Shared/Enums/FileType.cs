@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace FSH.Framework.Core.Storage.File;
+namespace Shared.Enums;
 
 public enum FileType
 {
@@ -17,3 +17,5 @@ public enum FileType
     [Description("Other File Types")]
     Other
 }
+
+

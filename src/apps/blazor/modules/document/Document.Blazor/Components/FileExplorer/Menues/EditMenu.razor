@@ -1,0 +1,17 @@
+@using MudBlazor;
+<MudMenu PositionAtCursor @ref="_contextMenu">
+    <MudMenuItem>
+        <MudToolBar Dense="true" Class="px-0 align-self-start">
+            <MudIconButton Icon="@FileExplorerIcons.EllipseBlue" />
+            <MudIconButton Icon="@FileExplorerIcons.EllipseGreen" />
+            <MudIconButton Icon="@FileExplorerIcons.EllipsePinc" />
+            <MudIconButton Icon="@FileExplorerIcons.EllipseYellow" />
+        </MudToolBar>
+    </MudMenuItem>
+    <MudMenuItem Label="Undo" />
+    <MudMenuItem Label="Redo" Disabled />
+    <MudDivider />
+    <MudMenuItem Label="Cut" />
+    <MudMenuItem Label="Copy" />
+    <MudMenuItem Label="Paste" />
+</MudMenu>

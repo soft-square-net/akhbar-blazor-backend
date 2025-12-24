@@ -1,0 +1,98 @@
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using MudBlazor;
+
+namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers;
+
+public partial class DefaultExplorer: IExplorerFactory
+{
+[CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
+
+    FolderModel IExplorerFactory.CurrentFolder => throw new NotImplementedException();
+
+    string GetFileIcon(string fileName)
+    {
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        return ext switch
+        {
+            ".jpg" or ".jpeg" or ".png" or ".gif" => Icons.Material.Filled.Image,
+            ".pdf" => Icons.Material.Filled.PictureAsPdf,
+            ".mp4" or ".mov" => Icons.Material.Filled.Movie,
+            ".txt" or ".md" => Icons.Material.Filled.Description,
+            ".doc" or ".docx" => Icons.Material.Filled.Article,
+            _ => Icons.Material.Filled.InsertDriveFile
+        };
+    }
+
+    async Task DownloadFile(FileModel f)
+    {
+        // Replace with actual file download logic (link to blob or invoking API).
+        Toast.Add($"Simulated download: {f.Name}", Severity.Info);
+    }
+
+    async Task DeleteFile(FileModel f)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Delete file '{f.Name}'?",
+            yesText: "Delete",
+            noText: "Cancel",
+            options: new DialogOptions { CloseButton = true }
+        );
+
+        if (result == true)
+        {
+            CurrentFolder.Files.Remove(f);
+            Toast.Add($"Deleted {f.Name}", Severity.Success);
+            StateHasChanged();
+        }
+    }
+
+    async Task RenameFilePrompt(FileModel f)
+    {
+        var parameters = new DialogParameters { ["CurrentName"] = f.Name };
+        var dialog = DialogService.Show<RenameDialog>("Rename file", parameters);
+        var res = await dialog.Result;
+        if (!res.Canceled && res.Data is string newName && !string.IsNullOrWhiteSpace(newName))
+        {
+            var idx = CurrentFolder.Files.FindIndex(x => x.Id == f.Id);
+            if (idx >= 0)
+            {
+                // CurrentFolder.Files[idx] = f with { Name = newName };
+                CurrentFolder.Files[idx].Name = newName ;
+                Toast.Add($"Renamed to {newName}", Severity.Success);
+            }
+        }
+    }
+
+    string FormatSize(long size)
+    {
+        if (size >= 1 << 30) return $"{size / (1 << 30)} GB";
+        if (size >= 1 << 20) return $"{size / (1 << 20)} MB";
+        if (size >= 1 << 10) return $"{size / (1 << 10)} KB";
+        return $"{size} B";
+    }
+
+    public static IExplorerFactory Create(FolderModel folder)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int CreateFolder(ref RenderTreeBuilder b,ref int sequence, FolderModel folder)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int CreateFile(ref RenderTreeBuilder b,ref int sequence, FileModel file)
+    {
+        throw new NotImplementedException();
+    }
+
+    public RenderFragment Render()
+    {
+        throw new NotImplementedException();
+    }
+}
