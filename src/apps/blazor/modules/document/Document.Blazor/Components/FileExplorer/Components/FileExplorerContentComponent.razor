@@ -37,21 +37,21 @@
         .AddClass($"mud-input-root-margin-{Margin.Normal.ToDescriptionString()}")
         .Build();
       }
-        <MudField   Variant="Variant.Text" AdornmentAriaLabel="info icon"
-                  AdornmentIcon="@Icons.Material.Filled.Info" AdornmentColor="Color.Info"
+      <MudField Variant="Variant.Text" AdornmentAriaLabel="Create New Folder icon"
+                AdornmentIcon="@Icons.Material.Filled.CreateNewFolder" AdornmentColor="Color.Warning" IconSize="Size.Large"
                 ShrinkLabel="@_shrinkLabel" Adornment="Adornment.End" InnerPadding="false" >
           <MudStack Row Class="mud-input"
                     Spacing="0" AlignItems="AlignItems.Center" tabindex="-1">
           <input @bind="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" />
             
-          <MudIconButton Color="@Color.Default"
-                         Icon="@Icons.Material.Filled.CreateNewFolder"
+          <MudIconButton Color="@Color.Tertiary"
+                         Icon="@Icons.Material.Filled.Check"
                          Size="@Size.Small"
                          tabindex="-1"
                          Disabled="string.IsNullOrWhiteSpace(NewFolderName)"
                          OnClick="CreateFolder"
                          @onmousedown:stopPropagation />
-          <MudIconButton Color="@Color.Default"
+          <MudIconButton Color="@Color.Error"
                          Icon="@Icons.Material.Filled.Clear"
                          Size="@Size.Small"
                          tabindex="-1"

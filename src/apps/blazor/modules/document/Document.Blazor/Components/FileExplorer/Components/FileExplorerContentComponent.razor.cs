@@ -83,6 +83,7 @@ public partial class FileExplorerContentComponent
         Folders.Add(folder);
         CurrentFolder = folder;
         ShowNewFolderInput = false;
+        OnFolderUpdated.InvokeAsync(Folders);
         Toast.Add($"Folder '{name}' created.", Severity.Success);
     }
 

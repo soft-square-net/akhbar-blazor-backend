@@ -12,7 +12,7 @@ namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Com
 
 public partial class FileExplorerComponent
 {
-    [Inject] ISnackbar Snackbar { get; set; } = default!;
+    //[Inject] ISnackbar Snackbar { get; set; } = default!;
 
     
 
@@ -66,7 +66,7 @@ public partial class FileExplorerComponent
             var model = new FileModel(Guid.NewGuid(), browserFile.Name, browserFile.Size, DateTime.Now, DateTime.Now);
             CurrentFolder.Files.Add(model);
         }
-        Snackbar.Add($"Uploaded {e.GetMultipleFiles().Count} file(s).", Severity.Success);
+        Toast.Add($"Uploaded {e.GetMultipleFiles().Count} file(s).", Severity.Success);
     }
 
     

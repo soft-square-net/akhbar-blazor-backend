@@ -1,6 +1,8 @@
-﻿using System;
+﻿
 using System.Diagnostics.CodeAnalysis;
-using FSH.Starter.Blazor.Shared;
+using FSH.Starter.BlazorShared;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor;
@@ -37,5 +39,19 @@ public class DocumentModule : IBlazorModule
             _logger.LogInformation(Description);
         }
         return Task.CompletedTask;
+    }
+
+    public Task ConfigureModule(IServiceCollection services)
+    {
+        Console.WriteLine("Configuring Document Blazor Module...");
+        _logger.LogInformation("Configuring Document Blazor Module...");
+        
+        return Task.CompletedTask;
+    }
+
+    public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
+    {
+        _logger.LogWarning("Using Document Module ^^^^^ ");
+        return await Task.FromResult(app);
     }
 }
