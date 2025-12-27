@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FSH.Starter.Blazor.Modules.Configuration;
+using FSH.Starter.Blazor.Modules.Services;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.Configurations;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -17,11 +18,13 @@ public static class ModulesExtensions
 
         // await new DocumentModule().InitializeAsync();
         services.AddSingleton<IModulesManager>(new ModulesManager(RegisteredModules));
+        services.AddSingleton<IModulesLoader>(new ModulesLoader());
         return services;
     }
 
     public  static async Task<WebAssemblyHost> UseBlazorModules(this WebAssemblyHost app)
     {
+        var ModuleLoaderService = app.Services.GetService<IModulesLoader>();
         RegisteredModules.ToList().ForEach(kv =>
         {
             var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
@@ -29,8 +32,10 @@ public static class ModulesExtensions
             logger.LogInformation($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
             Console.WriteLine($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
         });
+
         ModulesCache.ToList().ForEach(async kv =>
         {
+            ModuleLoaderService?.AddComponent(kv.Value.ModuleMenu);
             await kv.Value.UseModuleAsync(app);
         });
 

@@ -1,4 +1,5 @@
 ﻿using FSH.Starter.Blazor.Infrastructure.Auth;
+using FSH.Starter.Blazor.Modules.Services;
 using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,8 @@ public partial class NavMenu
     protected Task<AuthenticationState> AuthState { get; set; } = default!;
     [Inject]
     protected IAuthorizationService AuthService { get; set; } = default!;
+    [Inject]
+    protected IModulesLoader ModulesLoaderService { get; set; } = default!;
 
     private bool _canViewHangfire;
     private bool _canViewDashboard;
