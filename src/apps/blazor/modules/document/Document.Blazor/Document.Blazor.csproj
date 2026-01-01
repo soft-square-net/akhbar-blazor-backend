@@ -34,6 +34,16 @@
     </None>
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="Components\FileExplorer\Components\Explorers\Views\Tabular\FolderCards\" />
+    <Folder Include="wwwroot\img\extensions\document\" />
+    <Folder Include="wwwroot\img\extensions\audio\" />
+    <Folder Include="wwwroot\img\extensions\code\" />
+    <Folder Include="wwwroot\img\extensions\video\" />
+    <Folder Include="wwwroot\img\vacations\" />
+    <Folder Include="wwwroot\img\projects\" />
+  </ItemGroup>
+  
   <!--<ItemGroup>
     <None Include="Properties\launchSettings.json">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

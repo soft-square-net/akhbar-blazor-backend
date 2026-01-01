@@ -1,6 +1,8 @@
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers.Base;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers.Views.Default.FileCards;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers.Factories;
 
@@ -11,42 +13,39 @@ public class DefaultExplorerFactory : BaseExplorerFactory
             
     }
 
-    public static IExplorerFactory Create(FolderModel folder)
+    public static IExplorerFilesView Create(FolderModel folder)
     {
         return new DefaultExplorerFactory(folder);
     }
 
-    
-
-    
-
-    protected override RenderFragment<IExplorerFile> CreateAudioFile(FileModel folderModel)
+    protected override void CreateAudioFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel)
     {
-        throw new NotImplementedException();
+        RenderItem<DefaultAudioFileCard,FileModel>(ref b,ref sequence, folderModel);
     }
 
-    protected override RenderFragment<IExplorerFile> CreateCodeFile(FileModel folderModel)
+    protected override void CreateCodeFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel)
     {
-        throw new NotImplementedException();
+        RenderItem<DefaultCodeFileCard, FileModel>(ref b, ref sequence, folderModel);
     }
 
-    protected override RenderFragment<IExplorerFile> CreateDocumentFile(FileModel folderModel)
+    protected override void CreateDocumentFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel)
     {
-        throw new NotImplementedException();
+        RenderItem<DefaultDocumentFileCard, FileModel>(ref b, ref sequence, folderModel);
     }
 
-    protected override RenderFragment<IExplorerFile> CreateImageFile(FileModel folderModel)
+    protected override void CreateImageFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel)
     {
-        throw new NotImplementedException();
+        RenderItem<DefaultImageFileCard, FileModel>(ref b, ref sequence, folderModel);
     }
 
-    protected override RenderFragment<IExplorerFile> CreateOtherFile(FileModel folderModel)
+    protected override void CreateOtherFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel)
     {
-        throw new NotImplementedException();
+        RenderItem<DefaultOtherFileCard, FileModel>(ref b, ref sequence, folderModel);
     }
 
-    protected override RenderFragment<IExplorerFile> CreateVideoFile(FileModel folderModel)
+    protected override void CreateVideoFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel)
     {
-        throw new NotImplementedException();
+        RenderItem<DefaultVideoFileCard, FileModel>(ref b, ref sequence, folderModel);
     }
+
 }

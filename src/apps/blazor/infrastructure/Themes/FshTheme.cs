@@ -17,7 +17,11 @@ public class FshTheme : MudTheme
             DrawerText = "rgba(0,0,0, 0.7)",
             Success = CustomColors.Light.Primary,
             TableLines = "#e0e0e029",
-            OverlayDark = "hsl(0deg 0% 0% / 75%)"
+            OverlayDark = "hsl(0deg 0% 0% / 75%)",
+            Tertiary = CustomColors.Light.IconHighlight,
+            TertiaryContrastText = CustomColors.Light.IconText,
+            // IconText = "",
+            // IconHighlight = ""
         };
 
         PaletteDark = new PaletteDark()
@@ -42,7 +46,10 @@ public class FshTheme : MudTheme
             Dark = CustomColors.Dark.DrawerBackground,
             Divider = "#e0e0e036",
             OverlayDark = "hsl(0deg 0% 0% / 75%)",
-            TextDisabled = CustomColors.Dark.Disabled
+            TextDisabled = CustomColors.Dark.Disabled,
+
+            Tertiary = CustomColors.Dark.IconHighlight,
+            TertiaryContrastText = CustomColors.Dark.IconText,
         };
 
         LayoutProperties = new LayoutProperties()

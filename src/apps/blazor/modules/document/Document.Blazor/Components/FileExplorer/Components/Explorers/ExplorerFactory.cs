@@ -9,17 +9,17 @@ public class ExplorerFactory : IDisposable
 {
     private readonly EnumExplorerType _explorerType;
     private readonly FolderModel? _folder;
-    private readonly IExplorerFactory _explorerFactory;
+    private readonly IExplorerFilesView _explorerFilesView;
 
     public ExplorerFactory(EnumExplorerType explorerType, FolderModel? folder)
     {
         _explorerType = explorerType;
         _folder = folder;
-        _explorerFactory = CreateInstance;
+        _explorerFilesView = CreateInstance;
     }
 
-    public IExplorerFactory GetInstance => _explorerFactory;
-    private IExplorerFactory CreateInstance => _explorerType switch
+    public IExplorerFilesView GetInstance => _explorerFilesView;
+    private IExplorerFilesView CreateInstance => _explorerType switch
      {
           EnumExplorerType.DefaultExplorer => DefaultExplorerFactory.Create(_folder),
           EnumExplorerType.TabularExplorer => TabularExplorerFactory.Create(_folder),
@@ -28,7 +28,7 @@ public class ExplorerFactory : IDisposable
 
     public RenderFragment Render()
     {
-        return _explorerFactory.Render();
+        return _explorerFilesView.Render();
     }
     public void Dispose()
     {

@@ -102,12 +102,12 @@ public static partial class FileExplorerIcons
     """;
     public const string EllipseGreen = """
         <defs>
-            <linearGradient id="linear0" gradientUnits="userSpaceOnUse" x1="1.75" y1="-0.000000365078" x2="13.125" y2="13.125" gradientTransform="matrix(1.714286,0,0,1.714286,0,0)">
+            <linearGradient id="linearGradientGreen" gradientUnits="userSpaceOnUse" x1="1.75" y1="-0.000000365078" x2="13.125" y2="13.125" gradientTransform="matrix(1.714286,0,0,1.714286,0,0)">
             <stop offset="0" style="stop-color:rgb(42.352941%,79.607843%,37.254902%);stop-opacity:1;"/>
             <stop offset="1" style="stop-color:rgb(16.078431%,69.019608%,9.019608%);stop-opacity:1;"/>
             </linearGradient>
         </defs>
-        <path style=" stroke:none;fill-rule:nonzero;fill:url(#linear0);" d="M 24 12 C 24 5.371094 18.628906 0 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 Z M 24 12 "/>
+        <path style=" stroke:none;fill-rule:nonzero;fill:url(#linearGradientGreen);" d="M 24 12 C 24 5.371094 18.628906 0 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 Z M 24 12 "/>
     """;
     public const string EllipseBlue = """
         <defs>
@@ -120,21 +120,23 @@ public static partial class FileExplorerIcons
     """;
     public const string EllipsePinc = """
         <defs>
-            <linearGradient id="linear0" gradientUnits="userSpaceOnUse" x1="1.75" y1="1.75" x2="15.75" y2="15.75" gradientTransform="matrix(1.714286,0,0,1.714286,0,0)">
+            <linearGradient id="linearGradientPinc" gradientUnits="userSpaceOnUse" x1="1.75" y1="1.75" x2="15.75" y2="15.75" gradientTransform="matrix(1.714286,0,0,1.714286,0,0)">
             <stop offset="0" style="stop-color:rgb(100%,60%,64.313725%);stop-opacity:1;"/>
             <stop offset="1" style="stop-color:rgb(97.254902%,24.705882%,17.647059%);stop-opacity:1;"/>
             </linearGradient>
         </defs>
-        <path style=" stroke:none;fill-rule:nonzero;fill:url(#linear0);" d="M 24 12 C 24 5.371094 18.628906 0 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 Z M 24 12 "/>
+        <path style=" stroke:none;fill-rule:nonzero;fill:url(#linearGradientPinc);" d="M 24 12 C 24 5.371094 18.628906 0 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 Z M 24 12 "/>
     """;
     public const string EllipseYellow = """
         <defs>
-            <linearGradient id="linear0" gradientUnits="userSpaceOnUse" x1="3.5" y1="3.5" x2="14.875" y2="15.75" gradientTransform="matrix(1.714286,0,0,1.714286,0,0)">
-            <stop offset="0" style="stop-color:rgb(98.823529%,88.235294%,0%);stop-opacity:1;"/>
-            <stop offset="1" style="stop-color:rgb(91.764706%,71.372549%,0%);stop-opacity:1;"/>
+            <linearGradient id="linearGradientYellow" gradientUnits="userSpaceOnUse" x1="3.5" y1="3.5" x2="14.875" y2="15.75" gradientTransform="matrix(1.714286,0,0,1.714286,0,0)">
+                <stop offset="0" style="stop-color:rgb(98.823529%,88.235294%,0%);stop-opacity:1;"/>
+                <stop offset="1" style="stop-color:rgb(91.764706%,71.372549%,0%);stop-opacity:1;"/>
             </linearGradient>
         </defs>
-        <path style=" stroke:none;fill-rule:nonzero;fill:url(#linear0);" d="M 24 12 C 24 5.371094 18.628906 0 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 Z M 24 12 "/>
+        <g id="surface1">
+            <path style=" stroke:none;fill-rule:nonzero;fill:url(#linearGradientYellow);" d="M 24 12 C 24 5.371094 18.628906 0 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 Z M 24 12 "/>
+        </g>
     """;
     public const string MoveFile = """
         <path style="fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke:var(--file-explorer-Icon-text-color);stroke-opacity:1;stroke-miterlimit:4;" d="M 9.5 7.5 L 9.5 4.5 C 9.5 3.395833 8.604166 2.5 7.5 2.5 L 5.828125 2.5 C 5.296875 2.5 4.789062 2.710938 4.414062 3.085938 L 3.085937 4.414062 C 2.710937 4.789062 2.5 5.296875 2.5 5.828125 L 2.5 11.5 C 2.5 12.604167 3.395833 13.5 4.5 13.5 L 7.5 13.5 C 8.604166 13.5 9.5 12.604167 9.5 11.5 " transform="matrix(1.5,0,0,1.5,0.000000357628,0)"/>

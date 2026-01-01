@@ -1,0 +1,66 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Menues
+@if (DataLoaded)
+{
+  <div  @onclick="@(OpenContextMenu)" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+    @FileViewContent
+  </div>
+}
+else
+{
+  @FileViewSkeleton
+}
+
+<EditMenu @ref="_editMenu"></EditMenu>
+
+@* <MudMenu PositionAtCursor @ref="_contextMenu">
+  <MudMenuItem Label="Undo" />
+  <MudMenuItem Label="Redo" Disabled />
+  <MudDivider />
+  <MudMenuItem Label="Cut" />
+  <MudMenuItem Label="Copy" />
+  <MudMenuItem Label="Paste" />
+</MudMenu> *@
+
+
+@code {
+
+  [Parameter, EditorRequired] public bool DataLoaded { get; set; } = false;
+  [Parameter] public RenderFragment? FileViewContent { get; set; }
+  [Parameter] public RenderFragment? FileViewSkeleton { get; set; }
+
+#nullable enable
+  private EditMenu _editMenu = null;
+
+  private async Task OpenContextMenu(MouseEventArgs args)
+  {
+    await _editMenu.OpenContextMenuAsync(args);
+  }
+
+  private async Task CloseContextMenu()
+  {
+    await _editMenu.CloseContextMenuAsync();
+  }
+
+
+  // [Parameter, EditorRequired] public FileModel Model { get; set; } = default!;
+
+  //[Parameter] public RenderFragment? SkeletonHeader { get; set; }
+  //[Parameter] public RenderFragment? SkeletonContent { get; set; }
+  //[Parameter] public RenderFragment? SkeletonActions { get; set; }
+
+  //[Parameter] public RenderFragment? FileHeader { get; set; }
+  //[Parameter] public RenderFragment? FileContent { get; set; }
+  //[Parameter] public RenderFragment? FileActions { get; set; }
+
+
+
+
+
+  //[Parameter]
+  //public RenderFragment? Slot3 { get; set; } = (__builder) =>
+  //{
+  //    __builder.AddMarkupContent(0,
+  //        "<div> Default Slot 3 </div>"
+  //    );
+  //};
+}

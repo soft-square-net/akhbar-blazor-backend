@@ -26,23 +26,54 @@ public partial class FileExplorerComponent
         // Seed sample data - replace with real backend loading
         Folders = new List<FolderModel>
         {
-            new FolderModel("Root")
+            new FolderModel($"Root")
             {
+                Path = $"{Constants._content}/img/",
+                Folders =
+                {
+                    new FolderModel("Projects")
+                    {
+                        Path = $"{Constants._content}/img/projects",
+                        Files =
+                        {
+                            new FileModel(Guid.NewGuid(), "project1.png", 512_000, DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-10)),
+                            new FileModel(Guid.NewGuid(), "project2.png", 768_000, DateTime.Now.AddDays(-12), DateTime.Now.AddDays(-8))
+                        }
+                    },
+                    new FolderModel("Vacations")
+                    {
+                        Path = $"{Constants._content}/img/vacations",
+                        Files =
+                        {
+                            new FileModel(Guid.NewGuid(), "beach.png", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
+                            new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
+                        }
+                    }
+                },
                 Files =
                 {
-                    new FileModel(Guid.NewGuid(), "Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
-                    new FileModel(Guid.NewGuid(), "Photo.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), "Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/iceland.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/tractor.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/castle.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/pilars.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/sweden.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"{Constants._content}/img/Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
                 }
             },
             new FolderModel("Shared")
             {
+                Path = $"{Constants._content}/",
                 Files =
                 {
                     new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
                 }
             },
-            new FolderModel("Archive")
+            new FolderModel("Archive"){
+                Path = $"{Constants._content}/archive",
+                Files = { }
+            }
         };
 
         // _currentFolder = Folders.First();

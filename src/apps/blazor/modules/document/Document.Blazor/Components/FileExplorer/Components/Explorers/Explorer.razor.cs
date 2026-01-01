@@ -7,8 +7,7 @@ public partial class Explorer
 {
     [CascadingParameter(Name ="CurrentFolder")] FolderModel CurrentFolder { get; set; }
 
-    [EditorRequired]
-    [Parameter] 
+    [Parameter, EditorRequired] 
     public EnumExplorerType ExplorerType {get; set;} = EnumExplorerType.DefaultExplorer;
 
     private ExplorerFactory _factory;

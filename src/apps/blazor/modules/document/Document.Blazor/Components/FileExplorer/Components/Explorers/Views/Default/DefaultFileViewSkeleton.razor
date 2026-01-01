@@ -1,0 +1,30 @@
+﻿
+<MudCardHeader>
+  <CardHeaderAvatar>
+    <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="40px" Width="40px" />
+  </CardHeaderAvatar>
+  <CardHeaderContent>
+    <MudSkeleton Animation="Animation.Wave" Width="40%" />
+    <MudSkeleton Animation="Animation.Wave" Width="60%" />
+  </CardHeaderContent>
+  <CardHeaderActions>
+    <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="40px" Width="40px" />
+  </CardHeaderActions>
+</MudCardHeader>
+<MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+<MudCardContent>
+  <MudSkeleton Width="30%" Height="42px;" />
+  <MudSkeleton Width="80%" />
+  <MudSkeleton Width="100%" />
+</MudCardContent>
+<MudCardActions>
+  <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+  <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+</MudCardActions>
+<MudOverlay Visible="false" DarkBackground="true" Absolute="true">
+  <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+</MudOverlay>
+
+@code {
+  // [Parameter, EditorRequired] public bool Visible { get; set; } = true;
+}
