@@ -1,5 +1,7 @@
-<MudMenu @ref="_contextMenu" Class="@($"mb-2 file-explorer-icon-highlited")">
-  <MudToolBar Dense="true" Class="@($"px-0 align-self-start { (_themePreference.IsDarkMode ? "dark-mode" : "") }")">
+<div @onclick="e => ChangeTab(0)" @onclick:stopPropagation="true" @onclick:preventDefault="true">
+  <MudIcon Class="file-explorer-icon-highlited" Icon="@Icons.Material.Filled.ArrowBack" Style="padding:6px;" /> The Second Panel
+</div>
+<MudToolBar Dense="true" Class="@($"px-0 align-self-start {(_themePreference.IsDarkMode ? "dark-mode" : "")}")">
     <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Copy"  Style="padding:6px;" />
     <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Past" Style="padding:6px;" />
     <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Cut" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
@@ -26,10 +28,11 @@
   <MudDivider />
   <MudButton FullWidth StartIcon="@Icons.Material.Filled.ContentPaste" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Paste</span></MudButton>
   <MudDivider />
-</MudMenu>
 
 @code {
   #nullable enable
+  [Parameter, EditorRequired] public EventCallback<int> OnActiveTabChanged { get; set; }
+
   private MudMenu _contextMenu = null;
   private string Search = string.Empty;
   private ClientPreference? _themePreference;
@@ -57,6 +60,11 @@
   public async Task CloseContextMenuAsync()
   {
     await _contextMenu.CloseMenuAsync();
+  }
+
+  private void ChangeTab(int index)
+  {
+    OnActiveTabChanged.InvokeAsync(index);
   }
 }
 

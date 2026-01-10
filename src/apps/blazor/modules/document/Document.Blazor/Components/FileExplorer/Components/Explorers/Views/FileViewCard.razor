@@ -1,7 +1,8 @@
 ﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Menues
 @if (DataLoaded)
 {
-  <div  @onclick="@(OpenContextMenu)" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+  @* <div @onclick="@(OpenContextMenu)" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
+  <div  @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
     @FileViewContent
   </div>
 }
@@ -10,7 +11,7 @@ else
   @FileViewSkeleton
 }
 
-<EditMenu @ref="_editMenu"></EditMenu>
+    <EditMenu @ref="_editMenu"></EditMenu>
 
 @* <MudMenu PositionAtCursor @ref="_contextMenu">
   <MudMenuItem Label="Undo" />

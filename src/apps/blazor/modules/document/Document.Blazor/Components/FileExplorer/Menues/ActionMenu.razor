@@ -1,0 +1,61 @@
+<MudToolBar Dense="true" Class="@($"px-0 align-self-start {((_themePreference != null && _themePreference.IsDarkMode) ? "dark-mode" : "")}")">
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Copy" Style="padding:6px;" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Past" Style="padding:6px;" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Cut" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Star" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipsePinc" Style="padding:6px;" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseGreen" Style="padding:6px;" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseYellow" Style="padding:6px;" />
+  <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseBlue" Style="padding:6px;" />
+</MudToolBar>
+
+<MudDivider />
+@* <MudField Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Money"> *@
+<MudTextField @bind-Value="Search" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
+@* </MudField> *@
+
+<MudButton FullWidth StartIcon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Success" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">New</span></MudButton>
+<MudDivider />
+<MudButton FullWidth StartIcon="@Icons.Material.Filled.DriveFileRenameOutline" IconColor="Color.Info" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Rename</span></MudButton>
+<MudDivider />
+<MudButton FullWidth Disabled StartIcon="@Icons.Material.Filled.DriveFileMove" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Move</span></MudButton>
+<MudDivider />
+<MudButton FullWidth StartIcon="@Icons.Material.Filled.Compress" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Compress</span></MudButton>
+<MudDivider />
+<MudButton FullWidth StartIcon="@Icons.Material.Filled.Share" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Share</span></MudButton>
+<MudDivider />
+<div class="mud-button-root mud-button mud-button-text mud-button-text-default mud-button-text-size-medium mud-width-full mud-ripple mud-button-label" @onclick="e => ChangeTab(1)" @onclick:stopPropagation="true" @onclick:preventDefault="true" style="padding:6px 8px; display:inline-flex;">
+  <MudIcon Class="mud-button-icon-start mud-button-icon-size-medium" Icon="@Icons.Material.Filled.PanTool" Size="Size.Small" />
+  <span style="width:calc(100% - 3rem);text-align:start">Properties</span>
+  <MudIcon Class="mud-button-icon-end mud-button-icon-size-medium" Icon="@Icons.Material.Filled.ArrowForwardIos" Size="Size.Small" />
+
+  @*  <MudButton ButtonType="ButtonType.Reset"
+                     @onclick:stopPropagation="true"
+                     FullWidth
+                     StartIcon="@Icons.Material.Filled.PanTool"
+                     EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Properties</span></MudButton> *@
+</div>
+<MudDivider />
+<MudButton FullWidth StartIcon="@Icons.Material.Filled.DeleteSweep" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Delete</span></MudButton>
+<MudDivider />
+
+@code {
+  [Parameter, EditorRequired]public EventCallback<int> OnActiveTabChanged { get; set; }
+  private string Search = string.Empty;
+  private ClientPreference? _themePreference = null;
+  // private Palette currentPalete;
+
+  protected override async Task OnParametersSetAsync()
+  {
+    _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+    if (_themePreference == null) _themePreference = new ClientPreference();
+
+    // var theme = await ClientPreferences.GetCurrentThemeAsync();
+    // currentPalete = _themePreference.IsDarkMode ? theme.PaletteDark : theme.PaletteLight;
+  }
+
+  private void ChangeTab(int index)
+  {
+    OnActiveTabChanged.InvokeAsync(index);
+  }
+}

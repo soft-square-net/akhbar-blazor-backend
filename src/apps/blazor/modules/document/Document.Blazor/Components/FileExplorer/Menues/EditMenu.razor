@@ -1,55 +1,25 @@
 <MudMenu @ref="_contextMenu" Class="@($"mb-2 file-explorer-icon-highlited")">
-  <MudToolBar Dense="true" Class="@($"px-0 align-self-start { (_themePreference.IsDarkMode ? "dark-mode" : "") }")">
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Copy"  Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Past" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Cut" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Star" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipsePinc" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseGreen" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseYellow" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseBlue" Style="padding:6px;" />
-  </MudToolBar>
-  <MudDivider />
-  @* <MudField Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Money"> *@
-    <MudTextField @bind-Value="Search" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
-  @* </MudField> *@
-
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Success" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">New</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.DriveFileRenameOutline" IconColor="Color.Info" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Rename</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth Disabled StartIcon="@Icons.Material.Filled.DriveFileMove" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Move</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.Compress" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Compress</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.Share" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Share</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.PanTool" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Properties</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.DeleteSweep" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem);text-align:start">Delete</span></MudButton>
-  <MudDivider />
+  <MudTabs @bind-ActivePanelIndex="activeTabIndex" Elevation="1" TabHeaderClass="d-none">
+    <MudTabPanel>
+      <ActionMenu OnActiveTabChanged="ChangeTab" />
+    </MudTabPanel>
+    <MudTabPanel Text="Second">
+      <PropertyMenu OnActiveTabChanged="ChangeTab" />
+    </MudTabPanel>
+  </MudTabs>
 </MudMenu>
 
 @code {
-  #nullable enable
+#nullable enable
+
+  private int activeTabIndex { get; set; } = 0;
+
   private MudMenu _contextMenu = null;
-  private string Search = string.Empty;
-  private ClientPreference? _themePreference;
-  private Palette currentPalete;
 
-  protected override async Task OnParametersSetAsync()
-  {
-    _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
-    if (_themePreference == null) _themePreference = new ClientPreference();
 
-    var theme = await ClientPreferences.GetCurrentThemeAsync();
-    currentPalete = _themePreference.IsDarkMode ? theme.PaletteDark : theme.PaletteLight;
-  }
 
-  protected override async Task OnInitializedAsync()
-  {
-   
-  }
+  // private MudTabs _menuTabs = null;
+
 
   public async Task OpenContextMenuAsync(MouseEventArgs args)
   {
@@ -60,9 +30,15 @@
   {
     await _contextMenu.CloseMenuAsync();
   }
+
+  private void ChangeTab(int index)
+  {
+    activeTabIndex = index;
+  }
+
 }
 
-  <style>
+<style>
   :root {
     --file-explorer-Icon-text-color: rgb(0, 0, 0);
   }
@@ -71,7 +47,7 @@
     --file-explorer-Icon-text-color: rgb(255, 255, 255);
   }
 
-  .file-explorer-icon-highlited  svg {
+  .file-explorer-icon-highlited svg {
     color: rgb(37.64706%, 80.392158%, 100%);
   }
-  </style>
+</style>
