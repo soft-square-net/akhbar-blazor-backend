@@ -16,11 +16,15 @@ public class FileModel : BaseExplorerItemModel
         Size = size;
         Created = created;
         Modified = modified;
-
     }
 
     public Uri? Url { get; set; }
     public string? MimeType { get; set; }
+    
+
+    
+
+    
     //public string Extension
     //{
     //    get { return Name.Split('.').Last(); }

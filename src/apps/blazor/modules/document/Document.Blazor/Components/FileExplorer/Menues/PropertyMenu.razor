@@ -1,74 +1,116 @@
-<div @onclick="e => ChangeTab(0)" @onclick:stopPropagation="true" @onclick:preventDefault="true">
-  <MudIcon Class="file-explorer-icon-highlited" Icon="@Icons.Material.Filled.ArrowBack" Style="padding:6px;" /> The Second Panel
+<div class="mud-button-root mud-button mud-button-text mud-button-text-default mud-button-text-size-medium mud-width-full mud-ripple mud-button-label" @onclick="e => ChangeTab(0)" @onclick:stopPropagation="true" @onclick:preventDefault="true" style="padding:6px 8px; display:inline-flex; min-width:21rem;">
+  <MudIcon Class="mud-button-icon-start mud-button-icon-size-medium file-explorer-icon-highlited" Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+  <span style="width:calc(100% - 3rem);text-align:start">Actions Menu</span>
+  <MudIcon Class="mud-button-icon-end mud-button-icon-size-medium" Icon="@Icons.Material.Filled.Menu" Size="Size.Small" />
 </div>
-<MudToolBar Dense="true" Class="@($"px-0 align-self-start {(_themePreference.IsDarkMode ? "dark-mode" : "")}")">
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Copy"  Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Past" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Cut" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Star" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipsePinc" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseGreen" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseYellow" Style="padding:6px;" />
-    <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseBlue" Style="padding:6px;" />
-  </MudToolBar>
-  <MudDivider />
-  @* <MudField Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Money"> *@
-    <MudTextField @bind-Value="Search" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
-  @* </MudField> *@
+<MudDivider />
 
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.ManageAccounts" IconColor="Color.Success" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Users</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.Security" IconColor="Color.Info" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Security</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth Disabled StartIcon="@Icons.Material.Filled.ContentCut" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Redo</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.ContentCut" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Cut</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.FileCopy" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Copy</span></MudButton>
-  <MudDivider />
-  <MudButton FullWidth StartIcon="@Icons.Material.Filled.ContentPaste" EndIcon="@Icons.Material.Filled.ArrowForwardIos"><span style="width:calc(100% - 3rem)">Paste</span></MudButton>
-  <MudDivider />
+<MudTabs Outlined="true" MinimumTabWidth="20px" Position="Position.Left" Style="max-width:21rem" Class="@($" {((_themePreference !=null && _themePreference.IsDarkMode) ? "dark-mode" : "" )}")">
+  <MudTabPanel Icon="@FileExplorerIcons.Copy">
+    <MudGrid Spacing="0">
+      <MudItem xs="12">
+        <MudField Class="mt-4" Variant="Variant.Text" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.FolderCopy" AdornmentColor="Color.Success">Folder Name</MudField>
+      </MudItem>
+      <MudItem xs="4" Class="mt-4 mb-2">
+        <MudProgressCircular Color="Color.Secondary" StrokeWidth="3" Value="@_value" Size="Size.Large">
+          <ChildContent>
+            @_value %
+          </ChildContent>
+        </MudProgressCircular>
+      </MudItem>
+      <MudItem xs="8" Class="mt-2 mb-2">
+        <MudText>File size 265 KB</MudText>
+        <MudText>Used Space 30 GB</MudText>
+        <MudText>Free Space 70 GB</MudText>
+      </MudItem>
+      <MudItem xs="12">
+        <MudDivider />
+        <MudButton FullWidth StartIcon="@Icons.Material.Filled.Favorite"><span style="width:calc(100% - 1.5rem);text-align:start">Add to favorites</span></MudButton>
+        <MudDivider />
+        <MudButton FullWidth StartIcon="@Icons.Material.Filled.LocationCity"><span style="width:calc(100% - 1.5rem);text-align:start">Pin to start</span></MudButton>
+        <MudDivider />
+      </MudItem>
+      <MudItem xs="12">
+        <MudToolBar Dense="true" Class="@($" px-0 align-self-start {((_themePreference != null && _themePreference.IsDarkMode) ? "dark-mode" : "")}")">
+          @* <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Copy" Style="padding:6px;" />
+          <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Past" Style="padding:6px;" />
+          <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Cut" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
+          <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Star" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
+           *@<MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipsePinc" Style="padding:6px;" />
+          <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseGreen" Style="padding:6px;" />
+          <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseYellow" Style="padding:6px;" />
+          <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.EllipseBlue" Style="padding:6px;" />
+        </MudToolBar>
+      </MudItem>
+      <MudItem xs="12">
+        <MudSimpleTable Dense="true" Style="overflow-x: auto;">
+          <tbody>
+            <tr>
+              <td>Type</td>
+              <td> Document Folder <MudIcon Class="pt-1" Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" /></td>
+            </tr>
+            <tr>
+              <td>Open with </td>
+              <td><MudIcon Class="pt-1" Color="Color.Warning" Icon="@Icons.Material.Filled.Folder" Size="Size.Small" />Explorer <MudIcon Class="pt-1" Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" /></td>
+            </tr>
+            <tr>
+              <td>Location</td>
+              <td>
+                <span style="display:inline-block; width:calc(100% - 1.8rem);overflow: hidden; white-space: nowrap;text-overflow: ellipsis;">Document\new folder </span><MudIcon  Class="pt-1" Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" />
+              </td>
+            </tr>
+          </tbody>
+        </MudSimpleTable>
+
+      </MudItem>
+    </MudGrid>
+  </MudTabPanel>
+  <MudTabPanel Text="" Icon="@FileExplorerIcons.Past" Class="file-explorer-icon-highlited">
+
+  </MudTabPanel>
+  <MudTabPanel Icon="@FileExplorerIcons.Cut" Class="file-explorer-icon-highlited">
+
+  </MudTabPanel>
+</MudTabs>
+
+
+
+
 
 @code {
-  #nullable enable
+#nullable enable
   [Parameter, EditorRequired] public EventCallback<int> OnActiveTabChanged { get; set; }
-
-  private MudMenu _contextMenu = null;
-  private string Search = string.Empty;
-  private ClientPreference? _themePreference;
-  private Palette currentPalete;
+  private int _value = 46;
+  private ClientPreference? _themePreference = null;
+  // private Palette currentPalete;
 
   protected override async Task OnParametersSetAsync()
   {
     _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
     if (_themePreference == null) _themePreference = new ClientPreference();
 
-    var theme = await ClientPreferences.GetCurrentThemeAsync();
-    currentPalete = _themePreference.IsDarkMode ? theme.PaletteDark : theme.PaletteLight;
-  }
-
-  protected override async Task OnInitializedAsync()
-  {
-   
-  }
-
-  public async Task OpenContextMenuAsync(MouseEventArgs args)
-  {
-    await _contextMenu.OpenMenuAsync(args);
-  }
-
-  public async Task CloseContextMenuAsync()
-  {
-    await _contextMenu.CloseMenuAsync();
+    // var theme = await ClientPreferences.GetCurrentThemeAsync();
+    // currentPalete = _themePreference.IsDarkMode ? theme.PaletteDark : theme.PaletteLight;
   }
 
   private void ChangeTab(int index)
   {
     OnActiveTabChanged.InvokeAsync(index);
   }
+
+
+  // public async Task OpenContextMenuAsync(MouseEventArgs args)
+  // {
+  //   await _contextMenu.OpenMenuAsync(args);
+  // }
+
+  // public async Task CloseContextMenuAsync()
+  // {
+  //   await _contextMenu.CloseMenuAsync();
+  // }
 }
 
-  <style>
+<style>
   :root {
     --file-explorer-Icon-text-color: rgb(0, 0, 0);
   }
@@ -77,7 +119,7 @@
     --file-explorer-Icon-text-color: rgb(255, 255, 255);
   }
 
-  .file-explorer-icon-highlited  svg {
+  .file-explorer-icon-highlited svg {
     color: rgb(37.64706%, 80.392158%, 100%);
   }
-  </style>
+</style>

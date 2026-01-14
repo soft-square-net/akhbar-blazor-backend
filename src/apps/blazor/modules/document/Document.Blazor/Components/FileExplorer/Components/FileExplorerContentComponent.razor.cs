@@ -136,7 +136,7 @@ public partial class FileExplorerContentComponent
 
         if (result == true)
         {
-            CurrentFolder.Files.Remove(f);
+            CurrentFolder.RemoveFile(f);
             Toast.Add($"Deleted {f.Name}", Severity.Success);
             StateHasChanged();
         }
@@ -149,11 +149,12 @@ public partial class FileExplorerContentComponent
         var res = await dialog.Result;
         if (!res.Canceled && res.Data is string newName && !string.IsNullOrWhiteSpace(newName))
         {
-            var idx = CurrentFolder.Files.FindIndex(x => x.Id == f.Id);
-            if (idx >= 0)
+            var folder = CurrentFolder.Files.First(x => x.Id == f.Id);
+            if (folder is not null)
             {
                 // CurrentFolder.Files[idx] = f with { Name = newName };
-                CurrentFolder.Files[idx].Name = newName;
+                // CurrentFolder.Files[idx].Name = newName;
+                folder.Name = newName;
                 Toast.Add($"Renamed to {newName}", Severity.Success);
             }
         }

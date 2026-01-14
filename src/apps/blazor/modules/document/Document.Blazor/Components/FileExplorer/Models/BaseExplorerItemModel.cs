@@ -17,4 +17,25 @@ public class BaseExplorerItemModel : IExplorerItemModel
     public bool IsFolder { get; set; } = false;
     public DateTime Created { get; set; } = DateTime.Now;
     public DateTime Modified { get; set; } = DateTime.Now;
+    public FolderModel Folder { get; set; }
+    protected bool _selected { get; set; }
+    public bool IsSelected => _selected;
+
+
+    public void Select()
+    {
+        foreach (var folder in Folder.Folders)
+        {
+            folder.UnSelect();
+        }
+        foreach (var file in Folder.Files)
+        {
+            file.UnSelect();
+        }
+        _selected = true;
+    }
+    protected void UnSelect()
+    {
+        _selected = false;
+    }
 }

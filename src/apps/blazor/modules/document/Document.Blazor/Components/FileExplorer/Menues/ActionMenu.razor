@@ -1,4 +1,7 @@
+@* <MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" />
+ *@
 <MudToolBar Dense="true" Class="@($"px-0 align-self-start {((_themePreference != null && _themePreference.IsDarkMode) ? "dark-mode" : "")}")">
+@* <MudToolBar Dense="true" Class="@($"px-0 align-self-start {(_isDarkMode ? "dark-mode" : "")}")"> *@
   <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Copy" Style="padding:6px;" />
   <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Past" Style="padding:6px;" />
   <MudIconButton Class="file-explorer-icon-highlited" Icon="@FileExplorerIcons.Cut" Style="padding:6px; color: var(--file-explorer-Icon-text-color);" />
@@ -42,6 +45,10 @@
 @code {
   [Parameter, EditorRequired]public EventCallback<int> OnActiveTabChanged { get; set; }
   private string Search = string.Empty;
+
+  // private bool _isDarkMode;
+  // private MudThemeProvider _mudThemeProvider;
+
   private ClientPreference? _themePreference = null;
   // private Palette currentPalete;
 
@@ -59,3 +66,19 @@
     OnActiveTabChanged.InvokeAsync(index);
   }
 }
+
+
+
+<style>
+  :root {
+    --file-explorer-Icon-text-color: rgb(0, 0, 0);
+  }
+
+  .dark-mode {
+    --file-explorer-Icon-text-color: rgb(255, 255, 255);
+  }
+
+  .file-explorer-icon-highlited svg {
+    color: rgb(37.64706%, 80.392158%, 100%);
+  }
+</style>
