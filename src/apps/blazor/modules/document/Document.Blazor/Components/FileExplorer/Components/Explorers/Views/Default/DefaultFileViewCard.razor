@@ -1,6 +1,6 @@
 ﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 <MudItem xs="6" sm="4" md="3" lg="2">
-  <MudCard Style="text-align:center">
+  <MudPaper @onclick="ToggleSelected" Class="@($"mud-height-full default-file-view {(Model.IsSelected ? " selected" : "")}")" Style="text-align:center">
     <FileViewCard DataLoaded="DataLoaded">
       <FileViewSkeleton>
         <DefaultFileViewSkeleton />
@@ -9,12 +9,49 @@
         @ChildContent
       </FileViewContent>
     </FileViewCard>
-  </MudCard>
+  </MudPaper>
 </MudItem>
 
-@code{
+@code {
+  [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
   [Parameter, EditorRequired] public bool DataLoaded { get; set; } = false;
   [Parameter] public RenderFragment? ChildContent { get; set; } // The default slot
   [Parameter] public FileModel? Model { get; set; }
+  [Parameter] public EventCallback SelectionChanged { get; set; }
+
+  private void ToggleSelected()
+  {
+    if (Model.IsSelected)
+    {
+      Model.UnSelect();
+    }
+    else
+    {
+      Model.Select();
+    }
+  }
+
+  private void UpdateView()
+  {
+    // Blazor automatically re-renders the parent after an event handler is invoked.
+  }
 }
+
+<style>
+  .default-file-view {
+    cursor: pointer;
+    padding: 8px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+
+    .default-file-view:hover {
+      border-color: var(--mud-palette-primary);
+    }
+
+    .default-file-view.selected {
+      border-color: var(--mud-palette-secondary);
+      background-color: var(--mud-palette-secondary-lighten-5);
+    }
+</style>
 

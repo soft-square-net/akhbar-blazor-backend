@@ -34,7 +34,7 @@ public class BaseExplorerItemModel : IExplorerItemModel
         }
         _selected = true;
     }
-    protected void UnSelect()
+    public void UnSelect()
     {
         _selected = false;
     }
