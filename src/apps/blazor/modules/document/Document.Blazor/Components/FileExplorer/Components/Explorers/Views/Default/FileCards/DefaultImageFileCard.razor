@@ -5,6 +5,6 @@
 
 
 <DefaultFileViewCard Model="Model" DataLoaded="dataLoaded">
-  <MudImage Src="@($"{Model.Folder.Path}{Model.Name}")" Width="80" ObjectFit="ObjectFit.Cover" Height="null" />
-  <MudText Typo="Typo.body2">@Model.Name</MudText>
+  <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@($"{Model.Folder.Path}{Model.Name}")" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
+  <MudText Typo="Typo.body2" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Model.Name</MudText>
 </DefaultFileViewCard>

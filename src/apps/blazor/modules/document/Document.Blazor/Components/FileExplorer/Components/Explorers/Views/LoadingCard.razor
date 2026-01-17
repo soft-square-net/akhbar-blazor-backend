@@ -3,12 +3,12 @@
 {
   @* <div @onclick="@(OpenContextMenu)" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
   <div  @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
-    @FileViewContent
+    @ContentView
   </div>
 }
 else
 {
-  @FileViewSkeleton
+  @SkeletonView
 }
 
     <EditMenu @ref="_editMenu"></EditMenu>
@@ -26,8 +26,8 @@ else
 @code {
 
   [Parameter, EditorRequired] public bool DataLoaded { get; set; } = false;
-  [Parameter] public RenderFragment? FileViewContent { get; set; }
-  [Parameter] public RenderFragment? FileViewSkeleton { get; set; }
+  [Parameter] public RenderFragment? ContentView { get; set; }
+  [Parameter] public RenderFragment? SkeletonView { get; set; }
 
 #nullable enable
   private EditMenu _editMenu = null;

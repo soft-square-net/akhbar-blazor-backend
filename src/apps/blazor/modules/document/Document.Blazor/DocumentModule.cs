@@ -1,7 +1,8 @@
 ﻿
 using System.Diagnostics.CodeAnalysis;
-using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.interfaces;
 using FSH.Starter.Shared.Authorization;
@@ -53,6 +54,9 @@ public sealed class DocumentModule : IBlazorModule
     public Task ConfigureModule(IServiceCollection services)
     {
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
+        services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
+        services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
+        services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
         _logger.LogInformation("Configuring Document Blazor Module...");
         FshPermissions.Instance.LoadPermisions(Permissions.ToArray());
         return Task.CompletedTask;

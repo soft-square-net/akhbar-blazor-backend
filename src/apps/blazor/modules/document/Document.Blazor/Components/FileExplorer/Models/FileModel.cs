@@ -30,7 +30,5 @@ public class FileModel : BaseExplorerItemModel
     //    get { return Name.Split('.').Last(); }
     //}
     public string Extension { get { return System.IO.Path.GetExtension(Name).ToLowerInvariant(); } }
-            
-
 
 }

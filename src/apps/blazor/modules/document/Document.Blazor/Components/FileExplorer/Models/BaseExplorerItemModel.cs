@@ -2,11 +2,14 @@
 using System.Net.Mime;
 
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
+using Microsoft.AspNetCore.Components;
 using Shared.Enums;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public class BaseExplorerItemModel : IExplorerItemModel
 {
+    // [Inject] public IFileExplorerStateService StateService { get; set; }
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; }
@@ -18,21 +21,16 @@ public class BaseExplorerItemModel : IExplorerItemModel
     public DateTime Created { get; set; } = DateTime.Now;
     public DateTime Modified { get; set; } = DateTime.Now;
     public FolderModel Folder { get; set; }
-    protected bool _selected { get; set; }
+    private bool _selected { get; set; }
     public bool IsSelected => _selected;
 
 
     public void Select()
     {
-        foreach (var folder in Folder.Folders)
-        {
-            folder.UnSelect();
-        }
-        foreach (var file in Folder.Files)
-        {
-            file.UnSelect();
-        }
+        
         _selected = true;
+        // StateService.NotifyFileSelectionChanged();
+        // StateService.NotifyStateChanged();
     }
     public void UnSelect()
     {

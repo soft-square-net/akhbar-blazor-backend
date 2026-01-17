@@ -59,4 +59,34 @@ public class TabularExplorerFactory : BaseExplorerFactory
     {
         RenderItem<DefaultVideoFileCard, FileModel>(ref b, ref sequence, folderModel);
     }
+
+    protected override void CreateAudioFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void CreateCodeFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void CreateDocumentFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void CreateImageFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void CreateOtherFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void CreateVideoFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel)
+    {
+        throw new NotImplementedException();
+    }
 }

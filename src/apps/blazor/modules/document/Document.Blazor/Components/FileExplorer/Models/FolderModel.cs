@@ -20,6 +20,7 @@ public class FolderModel: BaseExplorerItemModel
     private List<FolderModel> _folders { get; init; } = new();
     public IReadOnlyList<FolderModel> Folders => _folders.AsReadOnly();
 
+    public string AllowedExtensions { get; set; } = string.Empty;
     public void AddFolder(FolderModel folder)
     {
         folder.Folder = this;

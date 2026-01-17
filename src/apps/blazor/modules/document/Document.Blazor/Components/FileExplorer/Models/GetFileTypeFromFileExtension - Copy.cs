@@ -6,7 +6,7 @@ using Shared.Enums;
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public static class GetFileTypeFromFileExtension
 {
-    public static FileType GetFileType( this  FileModel f)
+    public static FileType GetFileType(this FileModel f)
     {
         foreach (FileType fileType in Enum.GetValues(typeof(FileType)))
         {
@@ -14,6 +14,34 @@ public static class GetFileTypeFromFileExtension
             {
                 return fileType;
             }
+        }
+        return FileType.Other;
+    }
+
+    public static FileType GetFileType(this FolderModel f)
+    {
+        if (string.IsNullOrWhiteSpace(f.AllowedExtensions))
+        {
+            return FileType.Other;
+        }
+        List<FileType> fileTypes = new();
+        foreach (var fldrExt in f.AllowedExtensions.Split(','))
+        {
+            foreach (FileType fileType in Enum.GetValues(typeof(FileType)))
+            {
+                if (fileType.GetDescription().Split(',').Any(ext => string.Equals(ext.Trim().TrimStart('.'), fldrExt, StringComparison.OrdinalIgnoreCase)))
+                {
+                    if(fileTypes.Contains(fileType))
+                    {
+                        continue;
+                    }
+                    fileTypes.Add(fileType);
+                }
+            }
+        }
+        if (fileTypes.Count == 1)
+        {
+            return fileTypes[0];
         }
         return FileType.Other;
     }

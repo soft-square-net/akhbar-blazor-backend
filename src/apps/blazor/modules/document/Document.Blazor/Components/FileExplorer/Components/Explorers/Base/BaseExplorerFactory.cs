@@ -11,7 +11,7 @@ namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Com
 public abstract class BaseExplorerFactory : IExplorerFilesView, IDisposable
 {
     private bool _disposedValue;
-
+    
     protected BaseExplorerFactory(FolderModel folder)
     {
         CurrentFolder = folder;
@@ -53,6 +53,13 @@ public abstract class BaseExplorerFactory : IExplorerFilesView, IDisposable
     protected abstract void CreateVideoFile(ref RenderTreeBuilder b, ref int sequence, FileModel folderModel);
 
 
+    protected abstract void CreateAudioFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel);
+    protected abstract void CreateCodeFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel);
+    protected abstract void CreateDocumentFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel);
+    protected abstract void CreateImageFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel);
+    protected abstract void CreateOtherFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel);
+    protected abstract void CreateVideoFolder(ref RenderTreeBuilder b, ref int sequence, FolderModel folderModel);
+
     public virtual RenderFragment Render()
     {
         RenderFragment explorer = new RenderFragment(b =>
@@ -62,9 +69,26 @@ public abstract class BaseExplorerFactory : IExplorerFilesView, IDisposable
             // b.OpenElement(sequence++, "div");
             foreach (var item in CurrentFolder.Folders)
             {
-                switch (item)
+                switch (item.GetFileType())
                 {
-
+                    case FileType.Audio:
+                        CreateAudioFolder(ref b, ref sequence, item);
+                        break;
+                    case FileType.Code:
+                        CreateCodeFolder(ref b, ref sequence, item);
+                        break;
+                    case FileType.Document:
+                        CreateDocumentFolder(ref b, ref sequence, item);
+                        break;
+                    case FileType.Image:
+                        CreateImageFolder(ref b, ref sequence, item);
+                        break;
+                    case FileType.Video:
+                        CreateVideoFolder(ref b, ref sequence, item);
+                        break;
+                    case FileType.Other:
+                        CreateOtherFolder(ref b, ref sequence, item);
+                        break;
                     default:
                         CreateFolder(ref b, ref sequence, item);
                         // sequence++; // For AddComponentParameter sequence number

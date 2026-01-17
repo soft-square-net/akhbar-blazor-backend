@@ -20,18 +20,9 @@
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
   [Parameter, EditorRequired] public bool DataLoaded { get; set; } = false;
   [Parameter] public RenderFragment? ChildContent { get; set; } // The default slot
-  [Parameter] public FileModel? Model { get; set; }
+  [Parameter] public FolderModel? Model { get; set; }
   [Parameter] public EventCallback SelectionChanged { get; set; }
 
-  // private string _class { get; set; } = string.Empty;
-  // private string CssClass 
-  // {
-  //   get{ 
-  //     _class = Model.IsSelected ? "mud-height-full default-file-view selected" : "mud-height-full default-file-view "; 
-  //     return _class;
-  //   }
-  //   set { _class = value; }
-  // }
   private string GetSelectClass()
   {
     return Model.IsSelected ? "mud-height-full default-file-view selected" : "mud-height-full default-file-view ";
@@ -58,27 +49,19 @@
     // {
     //   file.UnSelect();
     // }
-
     StateService.NotifyFileExplorerClearSelection();
-
     if (Model.IsSelected)
     {
-      // CssClass = "mud-height-full default-file-view ";
       Model.UnSelect();
     }
     else
     {
-      // CssClass = "mud-height-full default-file-view selected ";
       Model.Select();
     }
     StateService.NotifyFileSelectionChanged();
     StateService.NotifyStateChanged();
   }
 
-  private void UpdateView()
-  {
-    // Blazor automatically re-renders the parent after an event handler is invoked.
-  }
 
   public void Dispose()
   {
