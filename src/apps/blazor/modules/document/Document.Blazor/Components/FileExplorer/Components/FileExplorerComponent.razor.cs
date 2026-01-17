@@ -34,6 +34,12 @@ public partial class FileExplorerComponent
                     new FileModel(Guid.NewGuid(), $"castle.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
                     new FileModel(Guid.NewGuid(), $"pilars.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
                     new FileModel(Guid.NewGuid(), $"sweden.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_01.docx", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_02.doc", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_03.xlsx", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_04.xls", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_05.mdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_05.accdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
                     new FileModel(Guid.NewGuid(), $"Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
         },
            new[] {

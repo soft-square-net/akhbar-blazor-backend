@@ -5,29 +5,6 @@
 
 
 <DefaultFileViewCard Model="Model" DataLoaded="dataLoaded">
-  @* <div style="width:120px;height:80px; overflow:clip; text-align:center;"> *@
-  <div class="svg-container">
-    <MudIcon Style="font-size: 5.2rem; " Size="Size.Medium" Icon="@FileExplorerIcons.Folders.ClosedBlue" />
-  </div>
+  <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@($"{Constants._content}/img/extensions/document/{Model.Extension.TrimStart('.')}.png")" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
   <MudText Typo="Typo.body2" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Model.Name</MudText>
 </DefaultFileViewCard>
-
-<style>
-  .svg-container {
-    width: 96px;
-    height: 80px;
-    overflow: clip;
-    margin-inline: auto;
-    text-align: center;
-    margin-bottom: 0.3rem;
-    padding-top:0.4rem;
-  }
-
-  .svg-container2 {
-    display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
-    /* Optional: Define a height for the container to see vertical centering */
-    height: 80px;
-  }
-</style>
