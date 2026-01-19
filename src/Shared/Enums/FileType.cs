@@ -8,7 +8,7 @@ public enum FileType
     Audio,
     [Description(".html,.htm,.cshtml,.js,.json,.ts,.tsx,.cs,.php,.css,.scss")]
     Code,
-    [Description(".pdf,.doc,.docx,.pptx,.ppt,.xlsx,.xls,.odt,.txt,.rtf,.html,.htm,.csv")]
+    [Description(".pdf,.doc,.docx,.pptx,.ppt,.xlsx,.xls,.odt,.txt,.rtf,.html,.htm,.csv,.mdb,.accdb")]
     Document,
     [Description(".jpg,.png,.jpeg,.webp")]
     Image,

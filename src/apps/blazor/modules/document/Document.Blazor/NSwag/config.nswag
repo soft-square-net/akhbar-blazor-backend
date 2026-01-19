@@ -1,0 +1,25 @@
+{
+  "runtime": "Net90",
+  "swaggerGenerator": {
+    "openApiDocument": {
+      "url": "https://localhost:7000/swagger/v1/swagger.json"
+    }
+  },
+  "codeGenerators": {
+    "csharpClient": {
+      "className": "MyApiClient",
+      "operationNameGenerator": "RebasingOperationNameGenerator", // Or another specific one
+      "settings": {
+        "operationProcessors": [
+          {
+            "type": "NSwag.CodeGeneration.Processors.OperationIdProcessor",
+            "settings": {
+              "removePathParameters": true, // Example setting to clean up IDs
+              "removeSpecialCharacters": true
+            }
+          }
+        ]
+      }
+    }
+  }
+}

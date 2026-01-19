@@ -1,0 +1,13 @@
+
+        "CreateBucketEndpoint",
+        "CreateBucketFileEndpoint",
+        "DeleteBucketEndpoint",
+        "DeleteBucketFileEndpoint",
+        "DeleteBucketFolderEndpoint",
+        "GetBucketFileEndpoint",
+        "ListBucketEndpoint",
+        "ListBucketFilesEndpoint",
+        "ListBucketFolderEndpoint",
+        "SearchBucketsEndpoint",
+        "SearchBucketFilesEndpoint",
+        "SearchBucketFolderEndpoint"

@@ -13,6 +13,7 @@ public static class Extensions
 {
     public static IServiceCollection ConfigureOpenApi(this IServiceCollection services)
     {
+        
         ArgumentNullException.ThrowIfNull(services);
         services.AddEndpointsApiExplorer();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
@@ -20,6 +21,8 @@ public static class Extensions
             .AddSwaggerGen(options =>
             {
                 options.OperationFilter<SwaggerDefaultValues>();
+                // options.DocumentFilter<DocumentModuleFilterProcessor>();
+
                 options.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.Http,
@@ -49,6 +52,7 @@ public static class Extensions
             .AddApiExplorer(options =>
             {
                 options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
             })
             .EnableApiVersionBinding();
         return services;
@@ -63,18 +67,26 @@ public static class Extensions
             {
                 options.DocExpansion(DocExpansion.None);
                 options.DisplayRequestDuration();
+                options.SwaggerEndpoint("/swagger/identity/swagger.json", "Identity Module");
+                options.SwaggerEndpoint("/swagger/tenants/swagger.json", "Tenants Module");
+                options.SwaggerEndpoint("/swagger/catalog/swagger.json", "Catalog Module");
+                options.SwaggerEndpoint("/swagger/documents/swagger.json", "Document Module");
+                options.SwaggerEndpoint("/swagger/todo/swagger.json", "Todo Module");
 
-                var swaggerEndpoints = app.DescribeApiVersions()
-                    .Select(desc => new
+                var DescribeApiVersions = app.DescribeApiVersions();
+
+                var swaggerEndpoints = DescribeApiVersions.Select(desc => new
                     {
-                        Url = $"../swagger/{desc.GroupName}/swagger.json",
+                        Url = $"/swagger/{desc.GroupName}/swagger.json",
                         Name = desc.GroupName.ToUpperInvariant()
                     });
-
                 foreach (var endpoint in swaggerEndpoints)
                 {
-                    options.SwaggerEndpoint(endpoint.Url, endpoint.Name);
+                    // options.SwaggerEndpoint(endpoint.Url, endpoint.Name);
                 }
+
+                
+
             });
         }
         return app;

@@ -28,17 +28,23 @@ public static class DocumentModule
 {
     public class Endpoints : CarterModule
     {
-        public Endpoints() : base("Document") { }
+        public Endpoints() : base("Document") {
+            this.WithName("Document");
+            this.WithGroupName("doucument");
+            this.WithDisplayName("API Document Module");
+            this.WithDescription("This moudule scope focus on hadeling files distribution throw the framework, inside local folders or even on the cloud Like AWS Buckets");
+            this.WithSummary("Files distribution throw the framework");
+        }
         public override void AddRoutes(IEndpointRouteBuilder app)
         {
-            var documentGroup = app.MapGroup("documents").WithTags("documents");
+            var documentGroup = app.MapGroup("documents").WithGroupName("documents").WithTags("documents");
             documentGroup.MapDocumentCreationEndpoint();
             documentGroup.MapGetDocumentEndpoint();
             documentGroup.MapGetDocumentListEndpoint();
             documentGroup.MapDocumentUpdateEndpoint();
             documentGroup.MapDocumentDeleteEndpoint();
             // Mapping Bucket endpoints
-            var bucketsGroup = app.MapGroup("buckets").WithTags("buckets");
+            var bucketsGroup = app.MapGroup("buckets").WithGroupName("documents").WithTags("buckets");
             bucketsGroup.MapBucketCreationEndpoint();
             bucketsGroup.MapBucketFileCreationEndpoint();
             bucketsGroup.MapPucketFolderCreationEndpoint();
@@ -58,13 +64,15 @@ public static class DocumentModule
             bucketsGroup.MapBucketUpdateFileEndpoint();
             bucketsGroup.MapBucketUpdateFolderEndpoint();
             // Mapping Storage Account endpoints
-            var storageAccountGroup = app.MapGroup("storage-ccounts").WithTags("storage-ccounts");
+            var storageAccountGroup = app.MapGroup("storage-accounts").WithGroupName("documents").WithTags("storage-ccounts");
             storageAccountGroup.MapStorageAccountCreationEndpoint();
             storageAccountGroup.MapStorageAccountDeleteEndpoint();
             storageAccountGroup.MapGetStorageAccountEndpoint();
             storageAccountGroup.MapGetStorageAccountListEndpoint();
             storageAccountGroup.MapStorageAccountUpdateEndpoint();
         }
+    
+        
     }
     public static WebApplicationBuilder RegisterDocumentServices(this WebApplicationBuilder builder)
     {
