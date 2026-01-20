@@ -24,6 +24,11 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
         // add a swagger document for each discovered API version
         // note: you might choose to skip or document deprecated API versions differently
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "All Application API Doc",
+            Version = "v1"
+        });
         foreach (var description in provider.ApiVersionDescriptions)
         {
             options.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description));

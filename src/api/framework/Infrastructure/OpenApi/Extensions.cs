@@ -82,7 +82,7 @@ public static class Extensions
                     });
                 foreach (var endpoint in swaggerEndpoints)
                 {
-                    // options.SwaggerEndpoint(endpoint.Url, endpoint.Name);
+                    options.SwaggerEndpoint(endpoint.Url, endpoint.Name);
                 }
 
                 

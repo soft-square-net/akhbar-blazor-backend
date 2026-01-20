@@ -1,13 +1,18 @@
 ﻿using System.Reflection;
 using FSH.Starter.Blazor.Modules.Configuration;
-using FSH.Starter.Blazor.Modules.Services;
+using FSH.Starter.BlazorShared.Services;
+using FSH.Starter.BlazorShared.Services.Interfaces;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.Configurations;
+using FSH.Starter.BlazorShared.Layout.Services;
+using FSH.Starter.BlazorShared.Layout.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static FSH.Starter.Blazor.Modules.ModulesConstants;
+using Microsoft.AspNetCore.Components;
+using FSH.Starter.Blazor.Client.Layout;
 
 namespace FSH.Starter.Blazor.Modules;
 public static class ModulesExtensions
@@ -19,6 +24,9 @@ public static class ModulesExtensions
         // await new DocumentModule().InitializeAsync();
         services.AddSingleton<IModulesManager>(new ModulesManager(RegisteredModules));
         services.AddSingleton<IModulesLoader>(new ModulesLoader());
+        services.AddScoped<IDynamicComponentService, DynamicComponentService>();
+        services.AddScoped<ILayoutService, LayoutService>();
+
         return services;
     }
 
@@ -33,12 +41,20 @@ public static class ModulesExtensions
             Console.WriteLine($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
         });
 
+        List<Type> layoutTypes = new List<Type>();   
         ModulesCache.ToList().ForEach(async kv =>
         {
             ModuleLoaderService?.AddComponent(kv.Value.ModuleMenu);
             await kv.Value.UseModuleAsync(app);
+            var modulesAssembly = kv.Value.GetType().Assembly;
+            layoutTypes.AddRange(modulesAssembly.GetTypes()
+                    .Where(t => t.IsAssignableTo(typeof(LayoutComponentBase)) && !t.IsAbstract));
         });
 
+
+        // Setup Layouts Modules
+        var layoutService = app.Services.GetRequiredService<ILayoutService>();
+        SetupLayouts(layoutService, layoutTypes);
         return app;
     }
 
@@ -62,6 +78,8 @@ public static class ModulesExtensions
                 var modulesAssembly = Assembly.Load($"{assemblyName}.dll");
                 RegisteredModules.Add(assemblyName, modulesAssembly);
                 object? IsInitialized = await InitializeModule(modulesAssembly, services, logger);
+                // Get Layout Types from Assembly LayoutComponentBase
+                
             }
             catch (Exception ex)
             {
@@ -91,6 +109,19 @@ public static class ModulesExtensions
         //_ = await RunInstanceMethodAsync(instance, type.GetMethod("ConfigureModule"), configParams);
 
         return instance;
+    }
+
+
+    private static async Task SetupLayouts(ILayoutService layoutService, IEnumerable<Type>? layoutTypes)
+    {
+        
+        foreach (var layoutType in layoutTypes)
+        {
+            var layoutInstance = (LayoutComponentBase)Activator.CreateInstance(layoutType);
+            layoutService.RegisterLayout(layoutInstance);
+            layoutService.SetLayout(layoutInstance);
+            Console.WriteLine($"Layout Registered: {layoutType.FullName}");
+        }
     }
 }
 

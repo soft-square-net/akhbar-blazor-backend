@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using FSH.Starter.BlazorShared.interfaces;
-using FSH.Starter.Shared.Authorization;
 
-namespace FSH.Starter.Blazor.Modules.Services;
+namespace FSH.Starter.BlazorShared.Services.Interfaces;
 public interface IModulesLoader
 {
     // A list to hold the types of components to render

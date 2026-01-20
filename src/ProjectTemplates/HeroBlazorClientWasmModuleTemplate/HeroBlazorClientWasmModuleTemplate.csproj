@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>FSH.Starter.Blazor.Modules.HeroBlazorClientWasmModuleTemplate</RootNamespace>
+    <AssemblyName>FSH.Starter.Blazor.Modules.HeroBlazorClientWasmModuleTemplate</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\apps\blazor\Blazor.Shared\BlazorShared.csproj" />
+  </ItemGroup>
+
+</Project>

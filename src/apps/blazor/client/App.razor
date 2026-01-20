@@ -1,5 +1,8 @@
 ﻿@using System.Reflection
+@using FSH.Starter.BlazorShared.Services.Interfaces
 @using MudBlazor;
+
+@inject ILayoutService LayoutSrv ;
 <CascadingAuthenticationState>
   @* <MudList T="string">
     @foreach (var item in additionalAssemblies.Select(a => a.FullName).ToList())
@@ -14,7 +17,7 @@
           @* OnNavigateAsync="OnNavigateAsync"  *@
     <Found Context="routeData">
       <AuthorizeRouteView RouteData="@routeData"
-                          DefaultLayout="@typeof(BaseLayout)">
+                          DefaultLayout="@LayoutSrv.CurrentLayout.GetType()">
         <NotAuthorized>
           @if (@context.User.Identity?.IsAuthenticated is true)
           {

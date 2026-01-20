@@ -1,5 +1,5 @@
 ﻿using FSH.Starter.Blazor.Infrastructure.Auth;
-using FSH.Starter.Blazor.Modules.Services;
+using FSH.Starter.BlazorShared.Services.Interfaces;
 using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;

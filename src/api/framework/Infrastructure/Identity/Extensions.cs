@@ -14,6 +14,7 @@ using FSH.Framework.Infrastructure.Identity.Users;
 using FSH.Framework.Infrastructure.Identity.Users.Endpoints;
 using FSH.Framework.Infrastructure.Identity.Users.Services;
 using FSH.Framework.Infrastructure.Persistence;
+using Mapster;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -52,14 +53,20 @@ internal static class Extensions
 
     public static IEndpointRouteBuilder MapIdentityEndpoints(this IEndpointRouteBuilder app)
     {
-        var users = app.MapGroup("api/users").WithGroupName("identity").WithTags("users");
+        var users = app.MapGroup("api/users")
+            .WithGroupName("v1")
+            .WithGroupName("identity").WithTags("users");
 
         users.MapUserEndpoints();
 
-        var tokens = app.MapGroup("api/token").WithGroupName("identity").WithTags("token");
+        var tokens = app.MapGroup("api/token")
+            .WithGroupName("v1")
+            .WithGroupName("identity").WithTags("token");
         tokens.MapTokenEndpoints();
 
-        var roles = app.MapGroup("api/roles").WithGroupName("identity").WithTags("roles");
+        var roles = app.MapGroup("api/roles")
+            .WithGroupName("v1")
+            .WithGroupName("identity").WithTags("roles");
         roles.MapRoleEndpoints();
 
         return app;

@@ -1,6 +1,7 @@
 using System.Reflection;
 using FSH.Starter.Blazor.Modules.Configuration;
 using FSH.Starter.BlazorShared.Configurations;
+using FSH.Starter.BlazorShared.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
@@ -27,6 +28,7 @@ public partial class App
     protected readonly List<Assembly> additionalAssemblies;
     private List<Assembly> lazyLoadedAssemblies = [];
     [Inject] LazyAssemblyLoader AssemblyLoader { get; set; } = default!;
+    // [Inject] ILayoutService layoutService { get; set; } = default!;
 
     private async Task OnNavigateAsync(NavigationContext args)
     {

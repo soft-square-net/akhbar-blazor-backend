@@ -37,15 +37,15 @@ public partial class MainLayout
     }
     private void Logout()
     {
-        var parameters = new DialogParameters
-        {
-                { nameof(Components.Dialogs.Logout.ContentText), "Do you want to logout from the system?"},
-                { nameof(Components.Dialogs.Logout.ButtonText), "Logout"},
-                { nameof(Components.Dialogs.Logout.Color), Color.Error}
-            };
+        //var parameters = new DialogParameters
+        //{
+        //        { nameof(Components.Dialogs.Logout.ContentText), "Do you want to logout from the system?"},
+        //        { nameof(Components.Dialogs.Logout.ButtonText), "Logout"},
+        //        { nameof(Components.Dialogs.Logout.Color), Color.Error}
+        //    };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-        DialogService.Show<Components.Dialogs.Logout>("Logout", parameters, options);
+        //var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        //DialogService.Show<Components.Dialogs.Logout>("Logout", parameters, options);
     }
 
     private void Profile()

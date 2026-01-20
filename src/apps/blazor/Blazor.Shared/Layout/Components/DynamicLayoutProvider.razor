@@ -1,0 +1,27 @@
+﻿@using FSH.Starter.BlazorShared.Layout.Services.Interfaces
+@inject IDynamicComponentService DynamicComponentService
+@implements IDisposable
+
+@if (DynamicComponentService.CurrentComponentType != null)
+{
+  <div class="dynamic-component-container">
+    <DynamicComponent Type="DynamicComponentService.CurrentComponentType"
+                      Parameters="DynamicComponentService.CurrentParameters">
+      @ChildContent
+    </DynamicComponent>
+  </div>
+}
+
+@code {
+  [Parameter] public RenderFragment? ChildContent { get; set; } // The default slot
+
+  protected override void OnInitialized()
+  {
+    DynamicComponentService.OnChange += StateHasChanged;
+  }
+
+  public void Dispose()
+  {
+    DynamicComponentService.OnChange -= StateHasChanged;
+  }
+}
