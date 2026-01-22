@@ -5,6 +5,7 @@ using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.interfaces;
 using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.Blazor.Modules.HeroBlazorClientWasmModuleTemplate;
 public class HeroBlazorClientWasmModuleTemplateModule : IBlazorModule
@@ -20,6 +21,8 @@ public class HeroBlazorClientWasmModuleTemplateModule : IBlazorModule
     public IModuleMenu ModuleMenu => new NavMenu();
 
     public List<FshPermission> Permissions => [.. ModulePermissions.All];
+
+    public ILogger Logger => throw new NotImplementedException();
 
     public Task ConfigureModule(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
     {

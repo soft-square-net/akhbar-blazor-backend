@@ -26,6 +26,7 @@ public static class ModulesExtensions
         services.AddSingleton<IModulesLoader>(new ModulesLoader());
         services.AddScoped<IDynamicComponentService, DynamicComponentService>();
         services.AddScoped<ILayoutService, LayoutService>();
+        services.AddSingleton<IAppNavigationService, BlazorAppNavigationService>();
 
         return services;
     }
