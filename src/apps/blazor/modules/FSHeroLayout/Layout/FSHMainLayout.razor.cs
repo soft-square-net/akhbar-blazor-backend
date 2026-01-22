@@ -1,5 +1,6 @@
 ﻿using FSH.Starter.Blazor.Infrastructure.Preferences;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
@@ -12,9 +13,11 @@ public partial class FSHMainLayout
     public EventCallback<bool> OnDarkModeToggle { get; set; }
     [Parameter]
     public EventCallback<bool> OnRightToLeftToggle { get; set; }
+    [Inject] public IJSRuntime JS { get; set; } = default!;
 
     private bool _drawerOpen;
     private bool _isDarkMode;
+    private bool _isFullscreen;
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,5 +54,12 @@ public partial class FSHMainLayout
     private void Profile()
     {
         Navigation.NavigateTo("/identity/account");
+    }
+
+    private async Task ToggleFullscreen()
+    {
+        await JS.InvokeVoidAsync("toggleFullScreen");
+        _isFullscreen = !_isFullscreen;
+        StateHasChanged();
     }
 }

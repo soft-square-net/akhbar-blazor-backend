@@ -21,7 +21,12 @@ public partial class FileExplorerComponent
     private List<FolderModel> Folders = new();
     private FolderModel CurrentFolder {get; set;}//=> _currentFolder ??= Folders.First();
                                                  // private FolderModel? _currentFolder;
+    private bool _open = true;
 
+    private void ToggleFileBrowserTree(bool opened)
+    {
+        _open = opened;
+    }
     protected override void OnInitialized()
     {
         StateService.OnFileExplorerClearSelection += ClearSelection;

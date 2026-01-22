@@ -2,8 +2,11 @@
 @using MudBlazor.Utilities
 
 @* <MudAlert Severity="Severity.Info" Elevation="0" Class="mb-3">@(_themePreference != null ? (_themePreference.IsDarkMode ? "Dark Mode" : "Light Mode") : "Unknown")</MudAlert>*@
-<MudStack Direction="Row" AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" Class="@($"{(_themePreference != null ? (_themePreference.IsDarkMode ? "dark-mode" : "") : "")} mb-2")">
+<MudStack Direction="Row" AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" >
+  
   <MudToolBar Dense="true" Class="px-0 align-self-start">
+    <MudIconButton OnClick="ToggleFileBrowserTree" Class="ms-0" Icon="@Icons.Material.Rounded.Notes" 
+                    Style="@($"color:{Colors.Red.Lighten3};")" Size="Size.Medium" />
     <MudIconButton Class="ms-6" Icon="@Icons.Material.Filled.ArrowRightAlt" Size="Size.Small"
                    Style="color: var(--file-explorer-Icon-text-color); transform: rotate(180deg);" />
     <MudIconButton Class="" Icon="@Icons.Material.Filled.ArrowRightAlt" Size="Size.Small"
@@ -130,6 +133,7 @@
 
 <Explorer ExplorerType="EnumExplorerType.DefaultExplorer" />
 
+<MudDivider Class="mb-3" />
   <style>
   :root {
     --file-explorer-breadcrumb-height: 3.5rem;

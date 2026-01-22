@@ -3,8 +3,8 @@
 
 @inject  IFileExplorerStateService StateService
 
-<MudItem xs="6" sm="4" md="3" lg="2">
-  <MudPaper @onclick="ToggleSelected" Class="@GetSelectClass()" Style="text-align:center">
+@* <MudItem xs="6" sm="4" md="3" lg="2"> *@
+<MudPaper @onclick="ToggleSelected" Width="100px" Class="@($" d-flex {GetSelectClass()}")">
     <LoadingCard DataLoaded="DataLoaded">
       <SkeletonView>
         <DefaultFileViewSkeleton />
@@ -14,7 +14,7 @@
       </ContentView>
     </LoadingCard>
   </MudPaper>
-</MudItem>
+@* </MudItem> *@
 
 @code {
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
@@ -89,13 +89,19 @@
 <style>
   .default-file-view {
     cursor: pointer;
-    padding: 8px;
+    padding-block: 8px;
+    padding-inline: 0 !important;
     border: 2px solid transparent;
     transition: border-color 0.3s;
+    text-align: center;
+    height:auto;
   }
 
     .default-file-view:hover {
-      border-color: var(--mud-palette-primary);
+      /* border-color: var(--mud-palette-primary);
+        background-color: var(--mud-palette-secondary-lighten-5);*/
+      border-color: @Color.Primary;
+      background-color: @Colors.Blue.Lighten2;
     }
 
     .default-file-view.selected {

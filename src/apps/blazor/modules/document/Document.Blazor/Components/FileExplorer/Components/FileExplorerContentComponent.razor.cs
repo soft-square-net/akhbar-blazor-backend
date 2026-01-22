@@ -15,6 +15,8 @@ public partial class FileExplorerContentComponent
     [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
     [Parameter] public required ICollection<FolderModel> Folders { get; set; }
     [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
+    [Parameter, EditorRequired] public EventCallback<bool> OnToggleFileBrowserTree { get; set; }
+
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
     [Inject] IJSRuntime JSRuntime { get; set; } = default!;
 
@@ -29,7 +31,12 @@ public partial class FileExplorerContentComponent
     // [Inject] IClientPreferenceManager ClientPreferences { get; set; } = default!;
 
     private ClientPreference? _themePreference;
-
+    bool _isFolersTreeOpen { get; set; } = true;
+    public void ToggleFileBrowserTree()
+    {
+        _isFolersTreeOpen = !_isFolersTreeOpen;
+        OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
+    }
     protected override async Task OnInitializedAsync()
     {
        _themePreference = await ClientPreferences.GetPreference() as ClientPreference;

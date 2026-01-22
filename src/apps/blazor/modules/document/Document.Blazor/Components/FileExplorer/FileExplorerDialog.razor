@@ -5,7 +5,7 @@
 <PageTitle>Document List</PageTitle>
 
 @* <MudText Typo="Typo.h4" Class="mb-4">File Manager</MudText> *@
-<MudDialog Style="height:900px; width:1200px"  Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface" ActionsClass="dialog-background-surface">
+<MudDialogResizable Style="height:900px; width:1200px"  Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface" ActionsClass="dialog-background-surface">
   <TitleContent>
     @* Use MudBlazor components for a custom look and layout *@
     <MudToolBar>
@@ -27,7 +27,7 @@
     <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
     <MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
   </DialogActions>
-</MudDialog>
+</MudDialogResizable>
 
 
 <style>

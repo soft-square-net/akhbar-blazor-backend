@@ -2,7 +2,7 @@
 @if (DataLoaded)
 {
   @* <div @onclick="@(OpenContextMenu)" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
-  <div  @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+  <div class="file-explorer-loading-card"  @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
     @ContentView
   </div>
 }
@@ -43,6 +43,9 @@ else
   }
 
 
+
+
+
   // [Parameter, EditorRequired] public FileModel Model { get; set; } = default!;
 
   //[Parameter] public RenderFragment? SkeletonHeader { get; set; }
@@ -64,4 +67,11 @@ else
   //        "<div> Default Slot 3 </div>"
   //    );
   //};
-}
+    }
+
+<style>
+
+  .file-explorer-loading-card {
+    width: 100%
+  }
+</style>

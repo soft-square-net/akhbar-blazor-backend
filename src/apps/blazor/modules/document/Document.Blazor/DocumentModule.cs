@@ -11,60 +11,35 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor;
-public sealed class DocumentModule : IBlazorModule
+public sealed class DocumentModule : BlazorModuleBase
 {
-    private readonly ILogger _logger;
-
-    public string Name => "Documents";
-
-    public string Description => "Manage Documents, Files, Images ...etc in Varies of storage systems like AmazonS3, Local file system";
-
-    public bool IsEnabled { get; set; } 
-    public bool IsLoaded { get; set; } 
-    public bool IsInitialized { get; set; }
-
-    public List<FshPermission> Permissions => [.. ModulePermissions.All];
-
-    public IModuleMenu ModuleMenu => new NavMenu();
-
-
-    //public DocumentModule()
-    //{
-
-    //}
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(DocumentModule))]
-
-    public DocumentModule(ILogger logger)
+    public DocumentModule(ILogger logger):base(logger)
     {
-        _logger = logger;
-    }
-    public Task InitializeAsync()
-    {
-        this.IsEnabled = true;
-        this.IsLoaded = true;
-        this.IsInitialized = true;
-        if (_logger is not null)
-        {
-            _logger.LogInformation("Blazor Module {ModuleName} is initialized.", Name);
-            _logger.LogInformation("{Description}", Description);
-        }
-        return Task.CompletedTask;
+        _isLayoutModule = false;
+        _name = "Documents";
+        _description = "Module for document management and file exploration.";
+        _permissions = [.. ModulePermissions.All];
+        _moduleMenu = new NavMenu();
     }
 
-    public Task ConfigureModule(IServiceCollection services)
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+    }
+
+    public override Task ConfigureModule(IServiceCollection services)
     {
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
         services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
-        _logger.LogInformation("Configuring Document Blazor Module...");
-        FshPermissions.Instance.LoadPermisions(Permissions.ToArray());
-        return Task.CompletedTask;
+        return base.ConfigureModule(services);
     }
 
     public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
-        _logger.LogWarning("Using Document Module ^^^^^ ");
-        return await Task.FromResult(app);
+       return await base.UseModuleAsync(app);
+        // return await Task.FromResult(app);
     }
 }

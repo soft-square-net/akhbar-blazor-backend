@@ -11,48 +11,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor;
-public sealed class FSHeroLayoutModule : IBlazorModule
+public sealed class FSHeroLayoutModule : BlazorModuleBase
 {
-    private readonly ILogger _logger;
-
-    public string Name => Constants.ModuleName;
-
-    public string Description => $"Manage {Constants.ModuleDisplayName}, Layout for the client admin";
-
-    public bool IsEnabled { get; set; } 
-    public bool IsLoaded { get; set; } 
-    public bool IsInitialized { get; set; }
-
-    public List<FshPermission> Permissions => [.. ModulePermissions.All];
-
-    public IModuleMenu ModuleMenu => new NavMenu();
-
-
-    //public DocumentModule()
-    //{
-
-    //}
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(FSHeroLayoutModule))]
-
-    public FSHeroLayoutModule(ILogger logger)
+    public FSHeroLayoutModule(ILogger logger):base(logger)
     {
-        _logger = logger;
+        _isLayoutModule = true;
+        _name = Constants.ModuleName;
+        _description = $"Manage {Constants.ModuleDisplayName}, Layout for the client admin";
+        _permissions = [.. ModulePermissions.All];
+        _moduleMenu = new NavMenu();
     }
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        this.IsEnabled = true;
-        this.IsLoaded = true;
-        this.IsInitialized = true;
-        if (_logger is not null)
-        {
-            _logger.LogInformation("Blazor Module {ModuleName} is initialized.", Name);
-            _logger.LogInformation("{Description}", Description);
-        }
-        return Task.CompletedTask;
+        _enabled = true;
+        _loaded = true;
+       _initialized = true;
+        await base.InitializeAsync();
     }
 
-    public Task ConfigureModule(IServiceCollection services)
+    public override Task ConfigureModule(IServiceCollection services)
     {
+        base.ConfigureModule(services);
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
         // services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
         _logger.LogInformation("Configuring FSHeroLayout Blazor Module...");
@@ -62,7 +42,7 @@ public sealed class FSHeroLayoutModule : IBlazorModule
 
     public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
-        _logger.LogWarning("Using FSHeroLayout Module ^^^^^ ");
-        return await Task.FromResult(app);
+        
+        return await base.UseModuleAsync(app);
     }
 }
