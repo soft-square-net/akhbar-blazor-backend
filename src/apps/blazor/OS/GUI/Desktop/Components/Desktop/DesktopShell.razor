@@ -1,0 +1,18 @@
+﻿@using FSH.Starter.Blazor.OS.Interfaces
+<!-- DesktopShell.razor -->
+<div class="desktop">
+    <Taskbar OpenApps="@ActiveApps" OnAppClick="LaunchApp" />
+    
+    @foreach (var app in ActiveApps)
+    {
+        <WindowComponent Title="@app.Title" OnClose="() => CloseApp(app)">
+            <DynamicComponent Type="@app.ComponentType" />
+        </WindowComponent>
+    }
+</div>
+
+@code {
+    List<IAppInstance> ActiveApps = new();
+    void LaunchApp(Type appType) { /* Add to ActiveApps */ }
+    void CloseApp(IAppInstance app) { /* Remove from ActiveApps */ }
+}
