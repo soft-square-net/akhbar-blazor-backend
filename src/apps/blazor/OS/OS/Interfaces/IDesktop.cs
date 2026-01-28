@@ -5,6 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.Starter.Blazor.OS.Interfaces;
-public interface IWindow
+internal interface IDesktop
 {
 }

@@ -1,0 +1,28 @@
+﻿@page "/{**path}"
+@page "/catch-all/{*pageRoute}"
+@page "/app/{AppName}/action/{ActionName}"
+
+<h3>AppRouter</h3>
+
+<h1>Catch All Parameters Example</h1>
+
+<p>Add some URI segments to the route and request the page again.</p>
+
+@foreach (var kvp in CurrentRouteData.RouteValues.ToList())
+{
+  <p><strong>@(kvp.Key):</strong> @(kvp.Value) </p>
+}
+PageType:@CurrentRouteData.PageType.FullName
+<p>
+  PageRoute: <span style="display:inline">@_fullPath</span>
+</p>
+<AppLuncher></AppLuncher>
+@{
+
+  var uri = new Uri(NavigationManager.Uri);
+  var queryParams = uri.Query;
+}
+
+<p>
+  Query Parameters: <span style="display:inline">@queryParams</span>
+</p>

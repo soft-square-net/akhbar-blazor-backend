@@ -9,18 +9,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.LocalStorage" />
     <PackageReference Include="Mapster" />
+    <!--<PackageReference Include="Blazored.LocalStorage" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" />
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="MudBlazor" />
+    <PackageReference Include="MudBlazor.Extensions" />-->
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\OS\OS\OS.csproj" />
     <ProjectReference Include="..\shared\Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Types\" />
   </ItemGroup>
 
 

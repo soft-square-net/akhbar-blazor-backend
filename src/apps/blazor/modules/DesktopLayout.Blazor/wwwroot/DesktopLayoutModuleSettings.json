@@ -1,0 +1,10 @@
+{
+  "DesktopLayoutSettings": {
+    "ShowTaskbar": true,
+    "ShowStartMenu": true,
+    "ShowDesktopIcons": true,
+    "WallpaperPath": "images/wallpapers/default.jpg",
+    "IconSize": "medium",
+    "TaskbarPosition": "bottom"
+  }
+}

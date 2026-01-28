@@ -12,10 +12,13 @@
       </MudListItem>
     }
   </MudList> *@
+
   <Router AppAssembly="@typeof(Program).Assembly" 
           AdditionalAssemblies="@additionalAssemblies">
           @* OnNavigateAsync="OnNavigateAsync"  *@
+
     <Found Context="routeData">
+      <CascadingValue Value="@routeData" Name="AppRouteData">
       <AuthorizeRouteView RouteData="@routeData"
                           DefaultLayout="@LayoutSrv.CurrentLayout.GetType()">
         <NotAuthorized>
@@ -29,6 +32,7 @@
           }
         </NotAuthorized>
       </AuthorizeRouteView>
+      </CascadingValue>
     </Found>
     <NotFound>
       <LayoutView Layout="@typeof(NotFound)">

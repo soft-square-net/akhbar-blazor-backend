@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using FSH.Starter.BlazorShared.interfaces;
 using FSH.Starter.Shared.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.BlazorShared;
 public abstract class BlazorModuleBase : IBlazorModule
 {
+    ComponentBase _startupComponent;
     protected ILogger _logger { get; init; }
     protected string _name { get; init; }
     protected string _description { get; init; }
@@ -32,6 +35,7 @@ public abstract class BlazorModuleBase : IBlazorModule
     public ILogger Logger => _logger;
     public virtual List<FshPermission> Permissions => _permissions;
 
+    public Type StartupComponent => _startupComponent.GetType();
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BlazorModuleBase))]
     public BlazorModuleBase(ILogger logger)
@@ -39,7 +43,7 @@ public abstract class BlazorModuleBase : IBlazorModule
         _logger = logger;
     }
 
-    public virtual Task ConfigureModule(IServiceCollection services)
+    public virtual Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
         _logger.LogInformation("Configuring Document Blazor Module...");
         FshPermissions.Instance.LoadPermisions(Permissions.ToArray());
@@ -64,5 +68,10 @@ public abstract class BlazorModuleBase : IBlazorModule
         _logger.LogWarning("Using {Name} Module ^^^^^ ", Name);
         await Task.FromResult(0);
         return app;
+    }
+
+    public void SetStartupComponent<T>(T component) where T : ComponentBase
+    {
+        _startupComponent = component;
     }
 }

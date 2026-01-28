@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Microsoft.AspNetCore.Components;
 
 namespace FSH.Starter.Blazor.OS.Interfaces;
-public interface IAppInstance : IDisposable
+public interface IAppInstance<T>: IDisposable where T : ComponentBase
 {
-    IAppType App { get; }
-    ICollection<string> Categories { get; set; }
+    IAppType<T> App { get; }
+    ICollection<string> Tags { get; set; }
     public string Title { get; set; }
-    public string Description { get; set; }
     public IDictionary<string,object> Params { get; set; }
-    public Type ComponentType { get; set; }
-    public Type OsShell { get; set; }
 
-    void Save();
-    void SaveAs(string filePath);
 }

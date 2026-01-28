@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
+using MudBlazor.Extensions;
 
 namespace FSH.Starter.Blazor.Infrastructure;
 public static class Extensions
@@ -24,6 +25,20 @@ public static class Extensions
             configuration.SnackbarConfiguration.VisibleStateDuration = 3000;
             configuration.SnackbarConfiguration.ShowCloseIcon = false;
         });
+        services.AddMudExtensions(c =>
+        c.WithDefaultDialogOptions(ex =>
+        {
+            ex.MaximizeButton = true;
+            ex.CloseButton = true;
+            ex.CloseOnEscapeKey = true;
+            ex.MaxWidth = MaxWidth.Medium;
+            ex.FullWidth = true;
+            ex.Resizeable = true;
+            ex.DragMode = MudDialogDragMode.SnapDrag;
+            ex.DisableSizeMarginY = true;
+            ex.DisablePositionMargin = true;
+        })
+        );
         services.AddBlazoredLocalStorage();
         services.AddAuthentication(config);
         services.AddTransient<IApiClient, ApiClient>();

@@ -1,0 +1,89 @@
+﻿@using MudBlazor.Extensions.Options
+
+<MudExDialog>
+
+    <DialogContent>
+         <SplitContainer>
+        <Left>
+            <div>
+                <MudNumericField Class="my-dialog-timer-field" Style="margin-top: -8px;max-width: 250px;" FullWidth="false" Min="0" Max="30" Variant="Variant.Text" Disabled="@(OpenDialogTask != null)" @bind-Value="seconds" Label="@($"Dialog opens in {seconds}s")"></MudNumericField>
+                @* <MudButton Disabled="@(OpenDialogTask != null)" OnClick="@ShowSampleDialog" Variant="Variant.Filled" Color="Color.Primary">@L["Show Sample Dialog"]</MudButton> *@
+            </div>
+        </Left>
+        <Right>
+            <MudExObjectEditForm StoreAndReadValueFromUrl="true" T="DialogOptionsEx" AfterImport="@(OnSettingsImported)" AllowExport="true" AllowImport="true" ShowSaveButton="false" ShowCancelButton="false" DefaultGroupName="Other" StickyActionBar="true" Value="@Options">
+                <ActionContent>
+                    @* <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="@SetAsDefaultClick">@L["Set as Default options for all Dialogs"]</MudButton> *@
+                </ActionContent>
+            </MudExObjectEditForm>
+        </Right>
+    </SplitContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" >Close</MudButton>
+  </DialogActions>
+
+</MudExDialog>
+@code {
+
+  private Task OpenDialogTask;
+  private int seconds = 0;
+  MudDialogButton[] GetButtons() => new[] {
+        new MudDialogButton( DotNetObjectReference.Create(this as object), nameof(AlarmClick)) {Icon = Icons.Material.Filled.Alarm},
+        new MudDialogButton( DotNetObjectReference.Create(this as object), nameof(ColorLensClick)) {Icon = Icons.Material.Filled.ColorLens},
+    };
+
+  [JSInvokable]
+  public void AlarmClick()
+  {
+    // JsRuntime.InvokeVoidAsync("alert", L["Alarm Clicked"]);
+  }
+
+  [JSInvokable]
+  public void ColorLensClick()
+  {
+    // JsRuntime.InvokeVoidAsync("alert", L["Color Lens Clicked"]);
+  }
+
+  private async Task ShowSampleDialog(){}
+
+  private async Task SetAsDefaultClick()
+  {
+    // var confirmed = await DialogService.ShowConfirmationDialogAsync(L["Set as Default options for all Dialogs"], L["If you set this options as default. This options will be used for all dialogs where no options are specified. Continue?"]);
+   // if (confirmed)
+      Options.SetAsDefaultDialogOptions();
+  }
+
+  public DialogOptionsEx Options { get; set; } = new()
+  {
+    MaximizeButton = true,
+    CloseButton = true,
+    FullHeight = true,
+    CloseOnEscapeKey = true,
+    MaxWidth = MaxWidth.Medium,
+    MaxHeight = MaxHeight.False,
+    FullWidth = true,
+    DragMode = MudDialogDragMode.Simple,
+    Animations = new[] { AnimationType.SlideIn },
+    Position = DialogPosition.CenterRight,
+    DisableSizeMarginY = true,
+    DisablePositionMargin = true
+  };
+
+  private async Task WaitForDialog()
+  {
+    while (seconds > 0)
+    {
+      await Task.Delay(1000);
+      seconds--;
+      StateHasChanged();
+    }
+  }
+
+  private Task OnSettingsImported(ImportedData<DialogOptionsEx> data)
+  {
+    Options = Newtonsoft.Json.JsonConvert.DeserializeObject<DialogOptionsEx>(data.Json);
+    return Task.CompletedTask;
+  }
+
+}

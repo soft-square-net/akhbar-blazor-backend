@@ -11,7 +11,6 @@ public interface ILayoutService
     // ReadOnlyCollection<RenderFragment> MenuItemsList { get; }
     public LayoutComponentBase CurrentLayout { get; }
     public LayoutProperties LayoutProperties { get; }
-
     IReadOnlyList<LayoutComponentBase> AvailableLayouts { get; }
 
     public void SetLayout<T>() where T : LayoutComponentBase;

@@ -7,6 +7,7 @@ using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.interfaces;
 using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -30,9 +31,9 @@ public sealed class FSHeroLayoutModule : BlazorModuleBase
         await base.InitializeAsync();
     }
 
-    public override Task ConfigureModule(IServiceCollection services)
+    public override Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
-        base.ConfigureModule(services);
+        base.ConfigureModule(services, builder);
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
         // services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
         _logger.LogInformation("Configuring FSHeroLayout Blazor Module...");

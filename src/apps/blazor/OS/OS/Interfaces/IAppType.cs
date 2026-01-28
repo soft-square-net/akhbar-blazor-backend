@@ -1,32 +1,40 @@
-﻿using System.Reflection;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace FSH.Starter.Blazor.OS.Interfaces;
 
-public interface IAppType
+public interface IAppType<T> where T : ComponentBase
 {
     Guid Id { get; }
     string Name { get; init; }
     string Description { get; init; }
     string Version { get; init; }
-    public string IconXl { get; set; }
-    public string IconMd { get; set; }
-    public string IconXs { get; set; }
+    string Icon { get; set; }
+    string Route { get; set; } // e.g., "/App/Calculator"
+    bool IsOpen { get; set; }
     string Author { get; }
     Type AppTypeClass { get; }
     string AppTypeName { get; }
-    public IOsShellApp OsShell { get; }
+    // Reference to the OS Shell
+    // public IOsShell<TDialog, TOptions, TResult> OsShell { get; }  
 
     IEnumerable<Action> Actions { get; set; }
-    IAppInstance ActiveInstances { get; set; }
-    IEnumerable<IAppInstance> Instances { get; set; }
+    IAppInstance<T> ActiveInstances { get; set; }
+    IEnumerable<IAppInstance<T>> Instances { get; set; }
     void Open(string filePath);
     void Lunch(string filePath = "");
+    void GeneratrLuncher(string savePath,string? filePath = "");
 
     void Close();
-    void Minimize();  
-    void Maximize();
-    void Restore();
-    // 
+
+    void Exit();
+
+
+    /* Transfer those variables to IOsWindow
+     * void Minimize();  
+     * void Maximize();
+     * void Restore();
+     * 
+
     /// <summary>
     /// When the app window gets focus
     /// </summary>
@@ -36,7 +44,6 @@ public interface IAppType
     /// </summary>
     void Blur();
 
-    void Reset();
-    void Exit();
+    void Reset(); */
 
 }

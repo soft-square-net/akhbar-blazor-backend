@@ -1,22 +1,21 @@
-﻿
+﻿using FSH.Starter.Blazor.OS.Interfaces;
+using Microsoft.AspNetCore.Components;
 
-using FSH.Starter.Blazor.OS.Interfaces;
-
-namespace FSH.Starter.Blazor.OS.Types;
-public abstract class AppTypeBase : IAppType
+namespace FSH.Starter.Blazor.OS.Abstractions;
+public abstract class AppTypeBase<TDialog, TOptions, TResult> : IAppType<ComponentBase>
 {
-    private readonly IOsShellApp _os;
+    private readonly IOsShell<TDialog, TOptions, TResult> _os;
 
-    protected AppTypeBase(IOsShellApp os)
+    protected AppTypeBase(IOsShell<TDialog, TOptions, TResult> os)
     {
         _os = os;
     }
-    protected static AppTypeBase Create<T>() where T : AppTypeBase, new()
+    protected static AppTypeBase<TDialog, TOptions, TResult> Create<T>() where T : AppTypeBase<TDialog, TOptions, TResult>, new()
     {
         return new T();
     }
 
-   
+
 
     public abstract Guid Id { get; }
     public abstract string Name { get; init; }
@@ -25,18 +24,26 @@ public abstract class AppTypeBase : IAppType
     public abstract string Author { get; }
     public abstract Type AppTypeClass { get; }
     public abstract string AppTypeName { get; }
-   public string IconXl { get; set; }
+    public string IconXl { get; set; }
     public string IconMd { get; set; }
     public string IconXs { get; set; }
     public IEnumerable<Action> Actions { get; set; }
-    public IAppInstance ActiveInstances { get; set; }
-    public IEnumerable<IAppInstance> Instances { get; set; }
+    public IAppInstance<ComponentBase> ActiveInstances { get; set; }
+    public IEnumerable<IAppInstance<ComponentBase>> Instances { get; set; }
 
-    public IOsShellApp OsShell => _os;
+    public IOsShell<TDialog, TOptions, TResult> OsShell => _os;
 
+    public string Icon { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public string Route { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public bool IsOpen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public abstract void Open(string filePath);
 
     public void Lunch(string filePath = "")
+    {
+        throw new NotImplementedException();
+    }
+
+    public void GeneratrLuncher(string savePath, string? filePath = "")
     {
         throw new NotImplementedException();
     }
@@ -80,4 +87,6 @@ public abstract class AppTypeBase : IAppType
     {
         throw new NotImplementedException();
     }
+
+    
 }

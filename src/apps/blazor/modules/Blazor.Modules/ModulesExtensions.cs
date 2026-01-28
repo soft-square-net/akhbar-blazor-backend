@@ -17,9 +17,9 @@ using FSH.Starter.Blazor.Client.Layout;
 namespace FSH.Starter.Blazor.Modules;
 public static class ModulesExtensions
 {
-   public static async  Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services, IConfiguration configuration/*, LazyAssemblyLoader AssemblyLoader*/)
+   public static async  Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services, WebAssemblyHostBuilder builder/*, LazyAssemblyLoader AssemblyLoader*/)
     {
-        await LoadModulesFromConfiguration(services, configuration);
+        await LoadModulesFromConfiguration(services, builder);
 
         // await new DocumentModule().InitializeAsync();
         services.AddSingleton<IModulesManager>(new ModulesManager(RegisteredModules));
@@ -59,7 +59,7 @@ public static class ModulesExtensions
         return app;
     }
 
-    private static async Task LoadModulesFromConfiguration(IServiceCollection services, IConfiguration configuration) {
+    private static async Task LoadModulesFromConfiguration(IServiceCollection services, WebAssemblyHostBuilder builder) {
         // AppDomain currentDomain = AppDomain.CurrentDomain;
         // currentDomain.AssemblyResolve += new ResolveEventHandler(LoadFromSameFolder);
         //var assemplyName = "FSH.Starter.Blazor.Modules.Document.Blazor";
@@ -67,7 +67,7 @@ public static class ModulesExtensions
         //RegisteredModules.Add(assemplyName, dynamicallyLoadedAssembly);
         var serviceProvider = services.BuildServiceProvider();
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("BlazorModules");
-        List<ModulesConfiguration> modules = configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ?? new List<ModulesConfiguration>();
+        List<ModulesConfiguration> modules = builder.Configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ?? new List<ModulesConfiguration>();
         var modulesAssembleyName = Assembly.GetExecutingAssembly().GetName().Name;
         foreach (var module in modules.Where(m => m.IsEnabled))
         {
@@ -78,7 +78,7 @@ public static class ModulesExtensions
                 // System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath("");
                 var modulesAssembly = Assembly.Load($"{assemblyName}.dll");
                 RegisteredModules.Add(assemblyName, modulesAssembly);
-                object? IsInitialized = await InitializeModule(modulesAssembly, services, logger);
+                object? IsInitialized = await InitializeModule(modulesAssembly, services, builder, logger);
                 // Get Layout Types from Assembly LayoutComponentBase
                 
             }
@@ -90,7 +90,7 @@ public static class ModulesExtensions
 
     }
 
-    private static async Task<object?> InitializeModule(Assembly ans, IServiceCollection services, ILogger logger)
+    private static async Task<object?> InitializeModule(Assembly ans, IServiceCollection services, WebAssemblyHostBuilder builder, ILogger logger)
     {
         Type? type = ans.GetTypes()
             .Where(t => typeof(IBlazorModule).IsAssignableFrom(t))
@@ -99,9 +99,8 @@ public static class ModulesExtensions
 
         IBlazorModule instance = (IBlazorModule)Activator.CreateInstance(type, new object[] { logger });
         ModulesCache.Add(instance.Name, instance);
-
         await instance.InitializeAsync();
-        await instance.ConfigureModule(services);
+        await instance.ConfigureModule(services, builder);
 
         //object[] initParams = Array.Empty<object>();
         //_ = await RunInstanceMethodAsync(instance, type.GetMethod("InitializeAsync"), initParams);

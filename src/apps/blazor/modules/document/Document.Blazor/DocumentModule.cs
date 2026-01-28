@@ -3,9 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Document;
 using FSH.Starter.BlazorShared;
-using FSH.Starter.BlazorShared.interfaces;
-using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,6 +20,7 @@ public sealed class DocumentModule : BlazorModuleBase
         _description = "Module for document management and file exploration.";
         _permissions = [.. ModulePermissions.All];
         _moduleMenu = new NavMenu();
+        SetStartupComponent(new List());
     }
 
     public override async Task InitializeAsync()
@@ -28,13 +28,13 @@ public sealed class DocumentModule : BlazorModuleBase
         await base.InitializeAsync();
     }
 
-    public override Task ConfigureModule(IServiceCollection services)
+    public override Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
         services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
-        return base.ConfigureModule(services);
+        return base.ConfigureModule(services, builder);
     }
 
     public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
