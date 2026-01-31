@@ -8,7 +8,7 @@ using FSH.Starter.Blazor.OS.Services.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Components;
 
-namespace FSH.Starter.Blazor.OS.Interfaces;
+namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 public interface IOsShell<TDialog, TOptions, TResult>
 {
     /// <summary>

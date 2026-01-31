@@ -24,8 +24,23 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" />
+    <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" PrivateAssets="All">
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
   </ItemGroup>
+  
+  <Target Name="ZipPlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <!-- Select only the files we actually want in the zip -->
+      <ZipFiles Include="$(OutputPath)\**\*" Exclude="$(OutputPath)\FSH.Starter.Blazor.Modules.Document.Blazor.dll" />
+    </ItemGroup>
+
+    <ZipDirectory SourceDirectory="$(OutputPath)"
+                  DestinationFile="$(MSBuildProjectDirectory)\bin\$(ProjectName).zip"
+                  Overwrite="true" />
+  </Target>
   
   <ItemGroup>
     <None Include="Properties\launchSettings.json">

@@ -36,6 +36,8 @@ public class DesktopLayoutModule : BlazorModuleBase
         await base.InitializeAsync();
     }
 
+
+
     public override Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
         builder.Configuration.AddJsonFile($"{Constants._content}/DesktopLayoutModuleSettings.json", optional: true, reloadOnChange: true);

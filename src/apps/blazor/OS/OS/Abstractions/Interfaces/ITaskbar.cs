@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSH.Starter.Blazor.OS.Interfaces;
+namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 public interface ITaskbar
 {
     IStartMenu StartMenu { get;}

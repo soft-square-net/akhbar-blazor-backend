@@ -1,7 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
-namespace FSH.Starter.Blazor.OS.Interfaces;
+namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 public interface IAppInstance<T>: IDisposable where T : ComponentBase
 {
     IAppType<T> App { get; }

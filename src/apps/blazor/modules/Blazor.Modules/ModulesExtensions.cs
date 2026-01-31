@@ -60,11 +60,7 @@ public static class ModulesExtensions
     }
 
     private static async Task LoadModulesFromConfiguration(IServiceCollection services, WebAssemblyHostBuilder builder) {
-        // AppDomain currentDomain = AppDomain.CurrentDomain;
-        // currentDomain.AssemblyResolve += new ResolveEventHandler(LoadFromSameFolder);
-        //var assemplyName = "FSH.Starter.Blazor.Modules.Document.Blazor";
-        //var dynamicallyLoadedAssembly = Assembly.Load($"{assemplyName}.dll");
-        //RegisteredModules.Add(assemplyName, dynamicallyLoadedAssembly);
+       
         var serviceProvider = services.BuildServiceProvider();
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("BlazorModules");
         List<ModulesConfiguration> modules = builder.Configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ?? new List<ModulesConfiguration>();
@@ -74,8 +70,6 @@ public static class ModulesExtensions
             try
             {
                 var assemblyName = $"{modulesAssembleyName}.{module.Name}";
-                // var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                // System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath("");
                 var modulesAssembly = Assembly.Load($"{assemblyName}.dll");
                 RegisteredModules.Add(assemblyName, modulesAssembly);
                 object? IsInitialized = await InitializeModule(modulesAssembly, services, builder, logger);

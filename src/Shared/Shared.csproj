@@ -10,4 +10,8 @@
     <None Include="Authorization\FshPermissions.old.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Abstractions\Interfaces\" />
+  </ItemGroup>
+
 </Project>

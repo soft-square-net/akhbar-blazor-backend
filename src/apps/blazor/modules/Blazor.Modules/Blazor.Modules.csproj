@@ -35,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlazorOS\BlazorOS.csproj" />
     <ProjectReference Include="..\DesktopLayout.Blazor\DesktopLayout.Blazor.csproj" />
     <ProjectReference Include="..\document\Document.Blazor\Document.Blazor.csproj" />
     <ProjectReference Include="..\FSHeroLayout\FSHeroLayout.Blazor.csproj" />

@@ -1,5 +1,5 @@
 ﻿
-using FSH.Starter.Blazor.OS.Interfaces;
+using FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 using MudBlazor;
 
 namespace FSH.Starter.Blazor.Modules.DesktopLayout.Blazor.OS;

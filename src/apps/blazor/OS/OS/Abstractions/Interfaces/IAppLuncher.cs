@@ -1,8 +1,7 @@
-﻿
-using  FSH.Starter.Blazor.OS.Types;
+﻿using FSH.Starter.Blazor.OS.Types;
 using Microsoft.AspNetCore.Components;
 
-namespace FSH.Starter.Blazor.OS.Interfaces;
+namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 
 public interface ISymlink : IAppLuncher;
 public interface IAppLuncher

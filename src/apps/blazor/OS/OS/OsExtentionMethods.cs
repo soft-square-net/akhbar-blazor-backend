@@ -1,7 +1,7 @@
 ﻿
 
 using FSH.Starter.Blazor.OS.Abstractions;
-using FSH.Starter.Blazor.OS.Interfaces;
+using FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 using FSH.Starter.Blazor.OS.Services;
 using FSH.Starter.Blazor.OS.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

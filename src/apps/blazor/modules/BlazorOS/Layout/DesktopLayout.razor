@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+
+<MudRTLProvider>
+    <MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="_currentTheme" />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+    <MudPopoverProvider />
+    <AuthorizeView>
+        <NotAuthorized>
+            <MudLayout>
+                <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center" Style="height: 100vh;">
+                    <MudPaper Elevation="25" Class="pa-8" Outlined>
+                        <MudText Typo="Typo.h5" Class="mb-4">Please log in to access the application.</MudText>
+                        @Body
+                    </MudPaper>
+                </MudContainer>
+            </MudLayout>
+        </NotAuthorized>
+        <Authorized>
+            <MudLayout>
+                @CurrentRouteData.Template
+                <CatchAll>
+                    @Body
+                </CatchAll>
+                @* <MudText Typo="Typo.h1" Class="mb-4">Desktop Application.</MudText>
+                @Body *@
+            </MudLayout>
+        </Authorized>
+    </AuthorizeView>
+</MudRTLProvider>
+
+
+

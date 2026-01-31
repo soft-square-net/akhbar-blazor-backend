@@ -1,0 +1,30 @@
+﻿@* @page "/launcher" *@
+@using MudBlazor.Extensions.Options
+@inject IDialogService DialogService
+
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Calculate"
+           Color="Color.Primary" OnClick="OpenCalculator">
+  Calculator
+</MudButton>
+
+@code {
+  private void OpenCalculator()
+  {
+    DialogOptionsEx dlgOptions = new()
+    {
+      MaximizeButton = true,
+      CloseButton = true,
+      CloseOnEscapeKey = true,
+      MaxWidth = MaxWidth.Medium,
+      FullWidth = true,
+      Resizeable = true,
+      DragMode = MudDialogDragMode.SnapDrag,
+      DisableSizeMarginY = true,
+      DisablePositionMargin = true
+    };
+    DialogService.ShowExAsync<Window>("Simple Window", dlgOptions);
+   
+
+    // DialogService.Show<CalculatorApp>("Calculator", options);
+  }
+}

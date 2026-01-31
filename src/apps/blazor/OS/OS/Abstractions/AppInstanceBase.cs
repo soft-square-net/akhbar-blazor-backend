@@ -1,4 +1,4 @@
-﻿using FSH.Starter.Blazor.OS.Interfaces;
+﻿using FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Components;
 
 namespace FSH.Starter.Blazor.OS.Abstractions;

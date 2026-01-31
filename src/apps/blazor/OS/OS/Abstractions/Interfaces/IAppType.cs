@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace FSH.Starter.Blazor.OS.Interfaces;
+namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 
 public interface IAppType<T> where T : ComponentBase
 {

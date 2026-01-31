@@ -1,6 +1,4 @@
-﻿
-
-namespace FSH.Starter.Blazor.OS.Interfaces;
+﻿namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 public interface IOsWindowsOptions<TDialogOtions>
 {
     string ActionsClass { get; set; }

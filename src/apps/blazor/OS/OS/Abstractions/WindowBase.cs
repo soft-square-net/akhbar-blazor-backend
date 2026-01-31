@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FSH.Starter.Blazor.OS.Interfaces;
+using FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 using FSH.Starter.Blazor.OS.Types;
 using Microsoft.AspNetCore.Components;
 

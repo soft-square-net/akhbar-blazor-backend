@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FSH.Starter.Blazor.OS.Types;
 using Microsoft.AspNetCore.Components;
 
-namespace FSH.Starter.Blazor.OS.Interfaces;
+namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 public interface IOsWindow<TDialog,TOptions,TResult>
 {
     TDialog Dialog { get; set; }

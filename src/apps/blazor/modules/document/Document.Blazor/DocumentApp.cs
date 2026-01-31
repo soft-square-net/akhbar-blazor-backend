@@ -1,6 +1,6 @@
 ﻿
 using FSH.Starter.Blazor.OS.Abstractions;
-using FSH.Starter.Blazor.OS.Interfaces;
+using FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 using MudBlazor;
 using MudBlazor.Extensions.Components;
 using MudBlazor.Extensions.Options;
