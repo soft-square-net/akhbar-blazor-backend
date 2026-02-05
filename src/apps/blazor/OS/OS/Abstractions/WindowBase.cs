@@ -30,5 +30,8 @@ internal abstract class WindowBase<TDialog, TOptions, TResult> : ComponentBase ,
     public TDialog Dialog { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public TOptions Options { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public TResult Result { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public Action<TResult> OnClose { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public Action OnCancel { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public Action OnOpen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     IOsWindow<TDialog, TOptions, TResult> IOsWindow<TDialog, TOptions, TResult>.OpenerWindow { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 }
