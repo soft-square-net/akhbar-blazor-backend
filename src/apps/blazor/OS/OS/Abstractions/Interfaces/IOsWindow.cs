@@ -13,6 +13,9 @@ public interface IOsWindow<TDialog,TOptions,TResult>
     TOptions Options { get; set; }
     TResult Result { get; set; }
     public IAppInstance<ComponentBase> App { get; set; }
+    Action<TResult> OnClose { get; set; }
+    Action OnCancel { get; set; }
+    Action OnOpen { get; set; }
     IOsWindow<TDialog, TOptions, TResult> OpenerWindow { get; set; }
     public Guid Id { get; set; }
     public string Title { get; set; }
