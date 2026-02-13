@@ -3,7 +3,7 @@
 @inject IDialogService DialogService
 
 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Calculate"
-           Color="Color.Primary" OnClick="OpenCalculator">
+           Color="Color.Primary" OnClick="ShowSampleDialogs">
   Calculator
 </MudButton>
 
@@ -27,4 +27,26 @@
 
     // DialogService.Show<CalculatorApp>("Calculator", options);
   }
+
+
+  private Task ShowSampleDialogs()
+  {
+    int count = 1;
+    var rnd = new Random();
+    foreach (var i in Enumerable.Range(1, count))
+    {
+      _ = DialogService.ShowExAsync<Window>($"Simple Dialog {i}", dialog => { dialog.Title = $"{"Hello from dialog"} {i}"; }, new DialogOptionsEx()
+      {
+        Position = (DialogPosition)rnd.Next(0, 9),
+        Animation = (AnimationType)rnd.Next(1, 25),
+        DragMode = MudDialogDragMode.Simple,
+        CloseButton = true,
+        MinimizeButton = true,
+        Resizeable = true,
+        Modal = false
+      });
+    }
+    return Task.CompletedTask;
+  }
+
 }

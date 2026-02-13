@@ -1,19 +1,19 @@
 ﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services
 
-@inject  IFileExplorerStateService StateService
+@inject IFileExplorerStateService StateService
 
 @* <MudItem xs="6" sm="4" md="3" lg="2"> *@
 <MudPaper @onclick="ToggleSelected" Width="100px" Class="@($" d-flex {GetSelectClass()}")">
-    <LoadingCard DataLoaded="DataLoaded">
-      <SkeletonView>
-        <DefaultFileViewSkeleton />
-      </SkeletonView>
-      <ContentView>
-        @ChildContent
-      </ContentView>
-    </LoadingCard>
-  </MudPaper>
+  <LoadingCard DataLoaded="DataLoaded">
+    <SkeletonView>
+      <DefaultFileViewSkeleton />
+    </SkeletonView>
+    <ContentView>
+      @ChildContent
+    </ContentView>
+  </LoadingCard>
+</MudPaper>
 @* </MudItem> *@
 
 @code {
@@ -24,10 +24,10 @@
   [Parameter] public EventCallback SelectionChanged { get; set; }
 
   // private string _class { get; set; } = string.Empty;
-  // private string CssClass 
+  // private string CssClass
   // {
-  //   get{ 
-  //     _class = Model.IsSelected ? "mud-height-full default-file-view selected" : "mud-height-full default-file-view "; 
+  //   get{
+  //     _class = Model.IsSelected ? "mud-height-full default-file-view selected" : "mud-height-full default-file-view ";
   //     return _class;
   //   }
   //   set { _class = value; }
@@ -94,12 +94,12 @@
     border: 2px solid transparent;
     transition: border-color 0.3s;
     text-align: center;
-    height:auto;
+    height: auto;
   }
 
     .default-file-view:hover {
       /* border-color: var(--mud-palette-primary);
-        background-color: var(--mud-palette-secondary-lighten-5);*/
+          background-color: var(--mud-palette-secondary-lighten-5);*/
       border-color: @Color.Primary;
       background-color: @Colors.Blue.Lighten2;
     }

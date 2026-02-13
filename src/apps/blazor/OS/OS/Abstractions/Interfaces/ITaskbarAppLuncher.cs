@@ -1,5 +1,5 @@
 ﻿namespace FSH.Starter.Blazor.OS.Abstractions.Interfaces;
 
-public interface ITaskbarAppLuncher : IAppLuncher
+public interface ITaskbarAppLuncher<TRESULT> : IAppLuncher<TRESULT>
 {
 }

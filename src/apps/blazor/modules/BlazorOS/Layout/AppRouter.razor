@@ -2,6 +2,12 @@
 @page "/catch-all/{*pageRoute}"
 @page "/app/{AppName}/action/{ActionName}"
 
+@using FSH.Starter.Blazor.Modules.BlazorOS.Components;
+
+<BOS></BOS>
+@* <AppLuncher></AppLuncher> *@
+
+@*
 <h3>AppRouter</h3>
 
 <h1>Catch All Parameters Example</h1>
@@ -16,7 +22,7 @@ PageType:@CurrentRouteData.PageType.FullName
 <p>
   PageRoute: <span style="display:inline">@_fullPath</span>
 </p>
-<AppLuncher></AppLuncher>
+
 @{
 
   var uri = new Uri(NavigationManager.Uri);
@@ -26,3 +32,4 @@ PageType:@CurrentRouteData.PageType.FullName
 <p>
   Query Parameters: <span style="display:inline">@queryParams</span>
 </p>
+*@

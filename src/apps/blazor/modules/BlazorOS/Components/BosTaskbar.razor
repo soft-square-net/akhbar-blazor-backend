@@ -1,0 +1,35 @@
+<div class="bos-taskbar glass-card">
+  <h3>Taskbar</h3>
+</div>
+
+
+
+<style>
+  .bos-taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+  }
+
+  .glass-card {
+    /* The Glassy Background with Linear Gradient */
+    background: linear-gradient( 135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 100% );
+    /* The Blur Effect (Crucial) */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    /* Structural Styles */
+    border-radius: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    /* Optional: Padding/Size */
+    padding: 20px;
+  }
+
+</style>

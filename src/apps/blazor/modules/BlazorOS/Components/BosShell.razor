@@ -1,0 +1,74 @@
+﻿@using FSH.Starter.Blazor.Modules.BlazorOS.Layout
+@using FSH.Starter.Blazor.Modules.BlazorOS.Models
+@using MudBlazor.Extensions.Options
+@inject IJSRuntime JS
+
+<MudPaper Width="100px" Class="@($" d-flex ")" Elevation="1" ondblclick="@ShowSampleDialogs">
+  <div style="width:100%;text-align:center;">
+    <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@($"{Constants._content}/img/extensions/document/txt.png")" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
+    <MudText Typo="Typo.body2" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Shortcut.Name</MudText>
+  </div>
+</MudPaper>
+
+@code {
+  [Parameter] public Shortcut Shortcut { get; set; }
+
+  void open()
+  {
+    int count = 1;
+    var rnd = new Random();
+    DialogOptionsEx dlgOptions = new()
+    {
+      MaximizeButton = true,
+      CloseButton = true,
+      CloseOnEscapeKey = true,
+      MaxWidth = MaxWidth.Medium,
+      FullWidth = true,
+      Resizeable = true,
+      Modal = false,
+      DragMode = MudDialogDragMode.SnapDrag,
+      DisableSizeMarginY = true,
+      DisablePositionMargin = true
+    };
+    DialogOptionsEx dlgOptions2 = new()
+    {
+      Position = (DialogPosition)rnd.Next(0, 9),
+      Animation = (AnimationType)rnd.Next(1, 25),
+      DragMode = MudDialogDragMode.SnapDrag,
+      DisableSizeMarginY = true,
+      DisablePositionMargin = true,
+      MaxWidth = MaxWidth.Large,
+      FullWidth = true,
+      MaximizeButton = true,
+      CloseButton = true,
+      MinimizeButton = true,
+      Resizeable = true,
+      Modal = false
+    };
+    DialogService.ShowExAsync<Window>(Shortcut.Name, dlgOptions);
+    var url = $"{Constants._content}/files/shells/WindowsPowerShell.lnk";
+    //JS.InvokeVoidAsync("open", url, "_blank");
+  }
+
+
+  private Task ShowSampleDialogs()
+  {
+    int count = 1;
+    var rnd = new Random();
+    foreach (var i in Enumerable.Range(1, count))
+    {
+      _ = DialogService.ShowExAsync<Window>($"Simple Dialog {i}", dialog => { dialog.Title = $"{"Hello from dialog"} {i}"; }, new DialogOptionsEx()
+      {
+        Position = (DialogPosition)rnd.Next(0, 9),
+        Animation = (AnimationType)rnd.Next(1, 25),
+        DragMode = MudDialogDragMode.Simple,
+        CloseButton = true,
+        MinimizeButton = true,
+        Resizeable = true,
+        Modal = false
+      });
+    }
+    return Task.CompletedTask;
+  }
+
+}

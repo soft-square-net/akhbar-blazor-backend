@@ -1,0 +1,25 @@
+﻿@using FSH.Starter.Blazor.Modules.BlazorOS.Models
+
+<MudGrid Style="padding:2rem;width:100vw;height:100vh;margin:0;background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);">
+  @foreach (Shortcut item in _shortcuts)
+  {
+    <MudItem>
+      <BosShell Shortcut="item"></BosShell>
+    </MudItem>
+  }
+</MudGrid>
+@code {
+  List<Shortcut> _shortcuts = new List<Shortcut>
+    {
+        new Shortcut("Shell", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/WindowsPowerShell.lnk"),
+        new Shortcut("Notepad", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Calculator", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("File Explorer", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Settings", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Task Manager", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Control Panel", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Paint", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("WordPad", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Command Prompt", "", $"{Constants._content}/img/extensions/document/txt.png", $"{Constants._content}/files/shells/Notepad.lnk"),
+    };
+}
