@@ -1,74 +1,116 @@
 ﻿@using FSH.Starter.Blazor.Modules.BlazorOS.Layout
 @using FSH.Starter.Blazor.Modules.BlazorOS.Models
+@using MudBlazor.Extensions.Core
+@using MudBlazor.Extensions.Helper
 @using MudBlazor.Extensions.Options
+@using MudBlazor.Interop
 @inject IJSRuntime JS
 
-<MudPaper Width="100px" Class="@($" d-flex ")" Elevation="1" ondblclick="@ShowSampleDialogs">
-  <div style="width:100%;text-align:center;">
-    <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@($"{Constants._content}/img/extensions/document/txt.png")" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
-    <MudText Typo="Typo.body2" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Shortcut.Name</MudText>
-  </div>
+<MudPaper Width="80px" Class="@($" d-flex ")" Elevation="0" ondblclick="@ShowSampleDialog" Style="background-color: transparent !important;">
+    <div style="width:100%;text-align:center;">
+        <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@Shortcut.IconPath" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
+        @* <MudText Typo="Typo.body2" Class="truncate-2-lines" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Shortcut.Name</MudText> *@
+        <MudText Typo="Typo.body2" Class="truncate-2-lines">@Shortcut.Name</MudText>
+    </div>
 </MudPaper>
 
 @code {
-  [Parameter] public Shortcut Shortcut { get; set; }
-
-  void open()
-  {
-    int count = 1;
-    var rnd = new Random();
-    DialogOptionsEx dlgOptions = new()
-    {
-      MaximizeButton = true,
-      CloseButton = true,
-      CloseOnEscapeKey = true,
-      MaxWidth = MaxWidth.Medium,
-      FullWidth = true,
-      Resizeable = true,
-      Modal = false,
-      DragMode = MudDialogDragMode.SnapDrag,
-      DisableSizeMarginY = true,
-      DisablePositionMargin = true
-    };
-    DialogOptionsEx dlgOptions2 = new()
-    {
-      Position = (DialogPosition)rnd.Next(0, 9),
-      Animation = (AnimationType)rnd.Next(1, 25),
-      DragMode = MudDialogDragMode.SnapDrag,
-      DisableSizeMarginY = true,
-      DisablePositionMargin = true,
-      MaxWidth = MaxWidth.Large,
-      FullWidth = true,
-      MaximizeButton = true,
-      CloseButton = true,
-      MinimizeButton = true,
-      Resizeable = true,
-      Modal = false
-    };
-    DialogService.ShowExAsync<Window>(Shortcut.Name, dlgOptions);
-    var url = $"{Constants._content}/files/shells/WindowsPowerShell.lnk";
-    //JS.InvokeVoidAsync("open", url, "_blank");
-  }
+    [Parameter] public Shortcut Shortcut { get; set; }
+    // [Inject] private IDialogEventService DialogEventService { get; set; }
+    private MudExDimension? _lastSize;
+    private MudExPosition? _lastPosition;
 
 
-  private Task ShowSampleDialogs()
-  {
-    int count = 1;
-    var rnd = new Random();
-    foreach (var i in Enumerable.Range(1, count))
+    protected override void OnInitialized()
     {
-      _ = DialogService.ShowExAsync<Window>($"Simple Dialog {i}", dialog => { dialog.Title = $"{"Hello from dialog"} {i}"; }, new DialogOptionsEx()
-      {
-        Position = (DialogPosition)rnd.Next(0, 9),
-        Animation = (AnimationType)rnd.Next(1, 25),
-        DragMode = MudDialogDragMode.Simple,
-        CloseButton = true,
-        MinimizeButton = true,
-        Resizeable = true,
-        Modal = false
-      });
+        DialogEventService.Subscribe<DialogDragEndEvent>(HandleDragged);
+        DialogEventService.Subscribe<DialogResizedEvent>(HandleResized);
     }
-    return Task.CompletedTask;
-  }
+
+    private Task HandleDragged(DialogDragEndEvent arg)
+    {
+        return Store(arg.Rect);
+    }
+
+    private Task HandleResized(DialogResizedEvent arg)
+    {
+        return Store(arg.Rect);
+    }
+
+    private Task Store(BoundingClientRect argRect)
+    {
+        if (argRect is { Left: > 0, Top: > 0, Width: > 0, Height: > 0 })
+        {
+            _lastPosition = argRect.ToPosition(CssUnit.Percentage);
+            _lastSize = argRect.ToDimension(CssUnit.Percentage);
+            // _lastPosition = new MudExPosition(_lastPosition.Value.Left + 10, _lastPosition.Value.Top + 10);
+        }
+        return Task.CompletedTask;
+    }
+
+
+    private async Task ShowSampleDialog()
+    {
+        var options = DialogOptionsEx.DefaultDialogOptions.CloneOptions();
+        options.Resizeable = true;
+        options.Modal = false;
+        options.DragMode = MudDialogDragMode.Simple;
+        options.CustomPosition = _lastPosition;
+        // options.Animation = AnimationType.FadeIn;
+        if (_lastSize != null)
+        {
+            options.CustomSize = _lastSize;
+            options.MaxWidth = MaxWidth.ExtraExtraLarge;
+            options.MaxHeight = MaxHeight.ExtraExtraLarge;
+        }
+        IMudExDialogReference<Window>? dlgReference = await DialogService.ShowExAsync<Window>("Simple Dialog", dialog => { dialog.Title = "Hello from dialog sample page"; }, options);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        DialogEventService.Unsubscribe<DialogDragEndEvent>(HandleDragged);
+        DialogEventService.Unsubscribe<DialogResizedEvent>(HandleResized);
+        return ValueTask.CompletedTask;
+    }
+
+ 
+     
+    // private Task ShowSampleDialogs()
+    // {
+    //     int count = 1;
+    //     var rnd = new Random();
+    //     foreach (var i in Enumerable.Range(1, count))
+    //     {
+    //         _ = DialogService.ShowExAsync<Window>($"Simple Dialog {i}", dialog => { dialog.Title = $"{"Hello from dialog"} {i}"; }, new DialogOptionsEx()
+    //         {
+    //             Position = (DialogPosition)rnd.Next(0, 9),
+    //             Animation = (AnimationType)rnd.Next(1, 25),
+    //             DragMode = MudDialogDragMode.Simple,
+    //             CloseButton = true, 
+    //             MinimizeButton = true,
+    //             Resizeable = true,
+    //             Modal = false
+    //         });
+    //     }
+    //     return Task.CompletedTask;
+    // }
 
 }
+
+
+<style>
+    .truncate-2-lines {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Number of lines to show */
+        line-clamp: 2; /* Standard property, but -webkit prefix is the one that works widely */
+        -webkit-box-orient: vertical;
+        /* Optional: Fallback for older/non-webkit browsers */
+        text-overflow: ellipsis;
+        text-wrap-style: balance;
+        overflow-wrap: break-word;
+        /* Optional: set a specific line-height and height to ensure visual consistency */
+        line-height: 1.2em; /* Example line height */
+        height: 2.4em; /* height is 2x the line-height for exactly two lines */
+    }
+</style>

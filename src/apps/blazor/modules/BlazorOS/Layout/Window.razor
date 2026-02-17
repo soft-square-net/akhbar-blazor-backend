@@ -1,22 +1,51 @@
 ﻿<MudExDialog>
-  <DialogContent>
-    <MudExSplitPanel>
-      <Left>
-        <MudExSplitPanelItem Style="width: 50%; min-width:450px; height: 50%; min-height:300px; background-color: forestgreen">
-          <center>Left part in MudExSplitPanel. (Notice you can also use MudExSplitter directly)</center>
-        </MudExSplitPanelItem>
-      </Left>
-      <Right>
-        <MudExSplitPanelItem Style="width: 50%; min-width:450px; height: 50%; min-height:300px; background-color: red">
-          <center>Right part in MudExSplitPanel.</center>
-        </MudExSplitPanelItem>
-      </Right>
-    </MudExSplitPanel>
-  </DialogContent>
-  <DialogActions>
-    <MudButton Color="Color.Primary" Variant="Variant.Filled">Close</MudButton>
-  </DialogActions>
+    <DialogContent>
+        <MudExSplitPanel>
+            <Left>
+                <MudExSplitPanelItem Style="width: 50%; min-width:450px; height: 50%; min-height:300px; background-color: forestgreen">
+                    <center>Left part in MudExSplitPanel. (Notice you can also use MudExSplitter directly)</center>
+                </MudExSplitPanelItem>
+            </Left>
+            <Right>
+                <MudExSplitPanelItem Style="width: 50%; min-width:450px; height: 50%; min-height:300px; background-color: red">
+                    <center>Right part in MudExSplitPanel.</center>
+                    @if (SelectedType != null)
+                    {
+                        <DynamicComponent Type="@SelectedType" Parameters="@ComponentParameters" />
+                    }
+                </MudExSplitPanelItem>
+            </Right>
+        </MudExSplitPanel>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled">Close</MudButton>
+    </DialogActions>
 </MudExDialog>
 @code {
-  public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    // private Type? SelectedType { get; set; } = null;
+    private Type SelectedType { get; set; } //typeof(DefaultComponent);
+    private Dictionary<string, object> ComponentParameters { get; set; } = new();
+
+    private void LoadComponentByName(string fullTypeName)
+    {
+        // Full assembly-qualified name is often required
+        SelectedType = Type.GetType(fullTypeName);
+
+        var targetType = SelectedType;  
+        var foundTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .Where(t => t.FullName == fullTypeName && targetType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+    }
+    public RenderFragment RenderDynamic<T>(Dictionary<string, object> parameters)
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, typeof(DynamicComponent));
+            builder.AddAttribute(1, "Type", typeof(T));
+            builder.AddAttribute(2, "Parameters", parameters);
+            builder.CloseComponent();
+        };
+    }
 }

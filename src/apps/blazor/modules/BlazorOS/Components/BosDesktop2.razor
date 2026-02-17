@@ -32,11 +32,10 @@
     }
     record ViewSize(int height, int width);
     ViewSize _viewSize;
-    private DotNetObjectReference<BosDesktop>? objRef;
+    private DotNetObjectReference<BosDesktop2>? objRef;
     protected override async Task OnInitializedAsync()
     {
-        await LoadApp<BosDesktop>("", []);
-        _viewSize = await JSRuntime.InvokeAsync<ViewSize>("helpers.getWindowDimensions", []);
+        await LoadApp<BosDesktop2>("", []);
         await base.OnInitializedAsync();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -131,9 +130,8 @@
         }
 
             .container .item:hover {
-                border-radius: 5px;
-                border-color: var(--mud-palette-primary);
-                background-color: var(--mud-palette-secondary-lighten-5);
+                /* border-color: var(--mud-palette-primary);
+                  background-color: var(--mud-palette-secondary-lighten-5);*/
                 border-color: @Color.Primary;
                 background-color: @Colors.Blue.Lighten2;
             }

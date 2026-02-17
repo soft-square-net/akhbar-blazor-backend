@@ -17,6 +17,7 @@
 @using Mapster;
 @using static FSH.Starter.Blazor.Modules.BlazorOS.Constants;
 @using Microsoft.AspNetCore.Authorization
+@using MudBlazor.Extensions.Core
 
 
 @attribute [Authorize]
@@ -24,5 +25,6 @@
 @inject NavigationManager Navigation
 @inject ISnackbar Toast
 @inject IDialogService DialogService
+@inject IDialogEventService DialogEventService
 @inject IConfiguration Config
 @inject IClientPreferenceManager ClientPreferences
