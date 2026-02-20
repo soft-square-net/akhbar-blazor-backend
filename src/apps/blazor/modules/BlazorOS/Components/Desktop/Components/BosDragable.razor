@@ -1,0 +1,47 @@
+@using FSH.Starter.Blazor.Modules.BlazorOS.Models
+@using Microsoft.JSInterop;
+@using System.Diagnostics.CodeAnalysis
+@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+<div id="@Id" draggable="true" Class="item desktop-dragable">
+    @ChildContent
+</div>
+
+@code{
+    [Parameter]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    private DotNetObjectReference<BosDragable>? _objectReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _objectReference = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("Bos.Dragable.init", Id, _objectReference);
+        }
+    }
+
+    [JSInvokable]
+    public void OnDrag(string data)
+    {
+        // Handle the drag start event, e.g., update the UI or process the dragged data
+        Console.WriteLine($"Drag run with data: {data}");
+    }
+    [JSInvokable]
+    public void OnDragStart(string data)
+    {
+        // Handle the drag start event, e.g., update the UI or process the dragged data
+        Console.WriteLine($"Drag started with data: {data}");
+    }
+    public void Dispose()
+    {
+        if (_objectReference != null)
+        {
+            JSRuntime.InvokeVoidAsync("BosDragable.dispose", Id);
+            _objectReference.Dispose();
+        }
+    }
+}

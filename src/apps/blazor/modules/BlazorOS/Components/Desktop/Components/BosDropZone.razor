@@ -1,0 +1,70 @@
+@using FSH.Starter.Blazor.Modules.BlazorOS.Models
+@using Microsoft.JSInterop;
+@using System.Diagnostics.CodeAnalysis
+@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+<div @attributes="HtmlAttributes" id="@Id" class="item desktop-dropzone @(Empty?"":"filled")" @ondragover:preventDefault="true">
+    @ChildContent
+</div>
+
+@code{
+    [Parameter]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    [Parameter]
+    public bool Empty { get; set; } = true;
+    private DotNetObjectReference<BosDropZone>? _objectReference;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? HtmlAttributes { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _objectReference = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("Bos.DropZone.init", Id, _objectReference);
+        }
+    }
+
+    [JSInvokable]
+    public void OnDragOver(string data)
+    {
+        // Handle the drop event, e.g., update the UI or process the dropped data
+        Console.WriteLine($"Drag Over data: {data}");
+    }
+    [JSInvokable]
+    public void OnDragEnter(string data)
+    {
+        // Handle the drop event, e.g., update the UI or process the dropped data
+        Console.WriteLine($"Drag Enter data: {data}");
+    }
+    [JSInvokable]
+    public void OnDragLeave(string data)
+    {
+        // Handle the drop event, e.g., update the UI or process the dropped data
+        Console.WriteLine($"Drag Leave data: {data}");
+    }
+    [JSInvokable]
+    public void OnDrop(string data)
+    {
+        // Handle the drop event, e.g., update the UI or process the dropped data
+        Console.WriteLine($"Dropped data: {data}");
+    }
+    [JSInvokable]
+    public void OnDragEnd(string data)
+    {
+        // Handle the drop event, e.g., update the UI or process the dropped data
+        Console.WriteLine($"Drag End data: {data}");
+    }
+    public void Dispose()
+    {
+        if (_objectReference != null)
+        {
+            JSRuntime.InvokeVoidAsync("BosDropZone.dispose", Id);
+            _objectReference.Dispose();
+        }
+    }
+}
