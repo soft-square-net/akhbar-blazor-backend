@@ -6,9 +6,9 @@
 @using MudBlazor.Interop
 @inject IJSRuntime JS
 
-<MudPaper Width="80px" Class="@($" d-flex ")" Elevation="0" ondblclick="@ShowSampleDialog" Style="background-color: transparent !important;">
-    <div style="width:100%;text-align:center;">
-        <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@Shortcut.IconPath" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
+<MudPaper Width="@(Width + "px")" Class="@($" d-flex ")" Elevation="0" ondblclick="@ShowSampleDialog" Style="background-color: transparent !important;">
+    <div style="width:@(Width)px;text-align:center;">
+        <MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@Shortcut.IconPath" Width="@Width" ObjectFit="ObjectFit.Cover" Height="@Width" Style="object-fit:contain !important" />
         @* <MudText Typo="Typo.body2" Class="truncate-2-lines" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Shortcut.Name</MudText> *@
         <MudText Typo="Typo.body2" Class="truncate-2-lines">@Shortcut.Name</MudText>
     </div>
@@ -16,6 +16,7 @@
 
 @code {
     [Parameter] public Shortcut Shortcut { get; set; }
+    [Parameter] public int Width { get; set; } = 0;
     // [Inject] private IDialogEventService DialogEventService { get; set; }
     private MudExDimension? _lastSize;
     private MudExPosition? _lastPosition;

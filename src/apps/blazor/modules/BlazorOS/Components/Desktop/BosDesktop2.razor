@@ -1,0 +1,291 @@
+﻿@using FSH.Starter.Blazor.Modules.BlazorOS.Components.Desktop.Components
+@using FSH.Starter.Blazor.Modules.BlazorOS.Models
+@using Microsoft.JSInterop;
+@using System.Diagnostics.CodeAnalysis
+@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+@* <MudGrid Style="padding:2rem;width:100vw;height:100vh;margin:0;background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);">
+  @foreach (Shortcut item in _shortcuts)
+  {
+    <MudItem>
+      <BosShell Shortcut="item"></BosShell>
+    </MudItem>
+  }
+</MudGrid> *@
+<div class="grid-drop">
+    @for (int i = 0; i < length; i++)
+    {
+        // var ii = i;
+        if (_shortcuts.Count > i)
+        {
+            var item = _shortcuts[i];
+            @* <div @ref="DropRefs[ii]" class="item desktop-dropzone filled" @ondrop="@(e => OnDrop(e, DropRefs[ii]))" @ondragover="@(e => OnDragOver(e, DropRefs[ii]))" @ondragover:preventDefault="true" @ondragenter="@(e => OnDragEnter(e, DropRefs[ii]))" @ondragenter:preventdefault="true" @ondragleave="@(e => OnDragLeave(e, DropRefs[ii]))" @ondragleave:preventdefault="true" @ondragend="@(e => OnDragEnd(e, DropRefs[ii]))"> *@
+            <BosDropZone Empty="false" Index="i">
+                <BosDragable Index="(uint)i">
+                    <BosShell Shortcut="@item"></BosShell>
+                </BosDragable>
+            </BosDropZone>
+        }
+        else
+        {
+            <BosDropZone Index="i"></BosDropZone>
+        }
+
+    }
+</div>
+<div style="width: 200px; height:50px; position:absolute; top:calc(100vh - 100px); left:calc(100vw - 210px); background-color: crimson; color:white">
+    width: @_viewSize?.width, Height: @_viewSize?.height
+</div>
+@* <div class="container">
+
+    @foreach (Shortcut item in _shortcuts)
+    {
+        <MudItem Class="item">
+            <BosShell Shortcut="_shortcuts[i]"></BosShell>
+        </MudItem>
+    } 
+   
+</div> *@
+
+
+
+@code {
+    [Parameter] public int lnkW { get; set; } = 80;
+    [Parameter] public int lnkH { get; set; } = 110;
+    record ViewSize(int height, int width);
+    ViewSize _viewSize;
+    // Property that will hold the refs
+    // ElementReference[] Refs { get; set; } = [];
+    // private Dictionary<int, ElementReference> DragRefs { get; set; } = new Dictionary<int, ElementReference>();
+    // private Dictionary<int, ElementReference> DropRefs { get; set; } = new Dictionary<int, ElementReference>();
+
+    int Cols = 0;
+    int Rows = 0;
+    int length => Cols * Rows;
+    private DotNetObjectReference<BosDesktop2>? objRef;
+
+    //!         public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, object?[]? args);
+    public async ValueTask<TValue> LoadApp<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, object?[]? args)
+    {
+        return await JSRuntime.InvokeAsync<TValue>("helpers.launchApp", identifier, args);
+    }
+
+    #region DragDrop
+    @*
+    public async Task OnDrag(DragEventArgs evt, ElementReference rf)
+    {
+        await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondrag", evt, rf);
+    }
+    public async Task OnDragStart(DragEventArgs evt, ElementReference rf)
+    {
+        await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondragstart", evt, rf);
+    }
+    public async Task OnDrop(DragEventArgs evt, ElementReference rf)
+    {
+        await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondrop", evt, rf);
+        StateHasChanged();
+    }
+    long LastDragOverRun = DateTime.Now.Ticks;
+    public async Task OnDragOver(DragEventArgs evt, ElementReference rf)
+    {
+        long now = DateTime.Now.Ticks;
+        if(now - LastDragOverRun >= 500)
+        {
+            await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondragover", evt, rf);
+            LastDragOverRun = DateTime.Now.Ticks; 
+        }
+    }
+    public async Task OnDragEnter(DragEventArgs evt, ElementReference rf)
+    {
+        await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondragenter", evt, rf);
+        StateHasChanged();
+    }
+    public async Task OnDragLeave(DragEventArgs evt, ElementReference rf)
+    {
+        await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondragleave", evt, rf);
+        StateHasChanged();
+    }
+    public async Task OnDragEnd(DragEventArgs evt, ElementReference rf)
+    {
+        await JSRuntime.InvokeVoidAsync("bos.gridDrop.ondragend", evt, rf);
+    }*@
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApp<BosDesktop>("", []);
+        _viewSize = await JSRuntime.InvokeAsync<ViewSize>("helpers.getWindowDimensions", []);
+        Cols = (_viewSize.width - 20) / lnkW; Cols++;
+        Rows = (_viewSize.height - 100) / lnkH; Rows++;
+        await base.OnInitializedAsync();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // var width = await JSRuntime.InvokeAsync<int>("eval", "'window.innerWidth'");
+
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("helpers.registerResizeCallback", objRef);
+            // await JSRuntime.InvokeVoidAsync("bos.gridDrop.init", ".desktop-dropzone", ".desktop-dragable");
+        }
+    }
+
+    static string imgSrc(string ext) => $"{Constants._content.Replace(Constants.ModuleName, "Document.Blazor")}/img/extensions/document/{ext}.png";
+    // static string imgSrc = $"//plachold.it/80";
+    static int getLastColFirst(BosDesktop2 that) => ((that.Cols - 1) * that.Rows) + 1;
+
+    List<Shortcut> _shortcuts = new List<Shortcut>
+    {
+        new Shortcut("Shell", "", imgSrc("txt"), $"{Constants._content}/files/shells/WindowsPowerShell.lnk"),
+        new Shortcut("Notepad", "", imgSrc("pdf"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Calculator", "", imgSrc("docx"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("File Explorer", "", imgSrc("txt"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Command Prompt Command Prompt", "", imgSrc("txt"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Settings", "", imgSrc("pdf"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Task Manager", "", imgSrc("doc"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Command PromptCommand Prompt", "", imgSrc("xls"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Control Panel", "", imgSrc("xlsx"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Paint", "", imgSrc("doc"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("WordPad", "", imgSrc("txt"), $"{Constants._content}/files/shells/Notepad.lnk"),
+        new Shortcut("Command Prompt", "", imgSrc("txt"), $"{Constants._content}/files/shells/Notepad.lnk"),
+    };
+
+
+    [JSInvokable]
+    public void OnBrowserResize(int width, int height)
+    {
+        _viewSize = new ViewSize(height, width);
+        StateHasChanged();
+    }
+
+    public void Dispose() => objRef?.Dispose();
+
+    private Type? selectedType;
+    private Dictionary<string, object>? componentParameters;
+
+    private void LoadComponentA(object component)
+    {
+        selectedType = component.GetType();
+        componentParameters = new Dictionary<string, object>
+        {
+            { "Message", "Hello from A" }
+        };
+    }
+
+    private void LoadComponentB()
+    {
+        // Example with string-based type loading if necessary
+        selectedType = Type.GetType("YourNamespace.Components.ComponentB");
+        componentParameters = new Dictionary<string, object>
+        {
+            { "Items", new List<string> { "One", "Two" } }
+        };
+    }
+}
+
+<style>
+    .grid-drop {
+        padding-bottom: 3.5rem;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax( @($"{lnkW}px"), 1fr));
+        grid-template-rows: repeat(auto-fit, minmax( @($"{lnkH}px"), 1fr));
+        grid-auto-flow: column;
+        grid-gap: 0 0px;
+        z-index: -1;
+        overflow: hidden;
+        background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+    }
+
+        .grid-drop .item {
+            /* border: 1px dashed white; */
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .grid-drop .desktop-dropzone {
+            transition: transform 0.2s ease-in-out; /* Animation */
+            cursor: grab;
+        }
+
+        .grid-drop .item.filled:hover, .highlighted {
+            border-radius: 5px;
+            border-color: var(--mud-palette-primary);
+            background-color: var(--mud-palette-secondary-lighten-5);
+            border-color: @Color.Primary;
+            background-color: @Colors.Blue.Lighten2;
+        }
+
+
+    /* Class to push item down */
+    .item.push-down {
+        transform: translateY(50px);
+    }
+
+    .dragging {
+        opacity: 0.5;
+    }
+
+
+    /* .highlighted::before{
+                        content:'';
+                        position: absolute;
+                        width:100px;
+                        height:100px;
+                        bottom:0;
+                        left:0;
+                        border: 2px dashed #ff0000;
+                    } */
+    /* .grid-drop .item .drag-placement {
+
+                    border: 2px dashed #ff0000;
+                } */
+
+    .container {
+        /* Minimum width for each column */
+        column-width: 80px;
+        /* Still fill sequentially */
+        column-fill: auto; /* balance for newspaper style */
+        /* Mandatory for the "top-to-bottom" effect */
+        height: 100vh;
+        padding-bottom: 60px;
+        /* Adds a vertical line between columns for better readability */
+        column-rule: 1px solid #ddd;
+        column-gap: 10px;
+        padding: 2rem;
+        /* background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); */
+    }
+
+        .container .item {
+            /* Prevents a child element from splitting across columns */
+            break-inside: avoid;
+            cursor: pointer;
+            padding-block: 8px;
+            padding-inline: 0 !important;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+            text-align: center;
+            height: auto;
+        }
+
+            .container .item:hover {
+                border-radius: 5px;
+                border-color: var(--mud-palette-primary);
+                background-color: var(--mud-palette-secondary-lighten-5);
+                border-color: @Color.Primary;
+                background-color: @Colors.Blue.Lighten2;
+            }
+
+            .container .item.selected {
+                border-color: var(--mud-palette-secondary);
+                background-color: var(--mud-palette-secondary-lighten-5);
+            }
+
+</style>

@@ -5,5 +5,5 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.Starter.Blazor.Modules.BlazorOS.Models;
-public record Shortcut(string Name, string Path, string IconPath, string TargetUrl);
+public record Shortcut(string Name, string Path, string IconPath, string TargetUrl,int col=0, int row=0);
 
