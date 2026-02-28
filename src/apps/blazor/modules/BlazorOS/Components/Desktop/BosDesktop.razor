@@ -30,7 +30,7 @@
 
     #region Parameters
     [Parameter] public string DropZoneId { get; set; } = Guid.NewGuid().ToString();
-    [Parameter] public int lnkW { get; set; } = 80;
+    [Parameter] public int lnkW { get; set; } = 70;
     [Parameter] public int lnkH { get; set; } = 110;
     ViewSize _viewSize = new ViewSize(0, 0);
     int Cols = 0;
@@ -161,6 +161,14 @@
                 .bos-desktop .drop-zone .dragable[selected*='yes'] {
                     transition: none;
                 }
+
+    .bos-placeholder{
+        position: absolute;
+        width: @(lnkW)px;
+        height: @(lnkH)px;
+        border: dashed 1px red;
+        opacity: 0.5;
+    }
 
     .dragging {
         border: dashed 1px red;

@@ -7,17 +7,17 @@ window.Bos = window.Bos || {};
 window.Bos.Helpers = {
     GetPosFromIndex: (index, colSize, lnkWidth, lnkHeight) => {
         return {
-            x: (index / colSize) * lnkWidt,
-            y: (index % colSize) * lnkHeight,
+            x: parseInt((index / colSize) * lnkWidth),
+            y: parseInt(parseInt((index % colSize)) * lnkHeight),
         }
     },
-    GePosColRow: (x, y, lnkWidth, lnkHeight) => {
+    GetPosColRow: (x, y, lnkWidth, lnkHeight) => {
         return {
-            col: (x / lnkWidth),
-            row: (y % lnkHeight),
+            col: parseInt(x / lnkWidth),
+            row: parseInt(y / lnkHeight),
         }
     },
-    GeIndexFromPos: (x, y, lnkWidth, lnkHeight) => {
+    GetIndexFromPos: (x, y, lnkWidth, lnkHeight) => {
         let cr = GePosColRow(x, y, lnkWidth, lnkHeight);
         return cr.x * cr.y;
     }
@@ -33,6 +33,7 @@ window.Bos.Dragging = (() =>
     itemSelector: '.bos-desktop .drop-zone .dragable',
     itemsEle: document.querySelector('.drop-zone'),
     itemsList: [],
+    placeholder: null,
     mouseDown: false,
     resetTransition: false,
     transitionTime: 400,
@@ -57,15 +58,49 @@ window.Bos.Dragging = (() =>
             item.addEventListener('mouseup', function(e) {
                 console.log("Mouse button pressed up!");
                 Bos.Dragging.mouseDown = false;
-                Bos.Dragging.positionItemsInOrder();
+                // Bos.Dragging.positionItemsInOrder();
+                Bos.Dragging.positionItems();
             });
         });
+
+        Bos.Dragging.placeholder = document.createElement('div');
+        Bos.Dragging.placeholder.classList.add('bos-placeholder');
+        document.body.append(Bos.Dragging.placeholder);
     },
     positionItems: (insertIndex = null) => { 
         let indexCounter = 0;
         let currentCol = 0;
+        let carry = 0;
         Bos.Dragging.colsize = parseInt(Bos.Dragging.height / 102);
         Bos.Dragging.itemsList.forEach(function(item) {
+            let order = parseInt(item.getAttribute('order')) || 0;
+            if (order > 0) {
+                if (order < indexCounter) {
+                    indexCounter++; carry++;
+                }
+            } else { 
+                order = indexCounter + carry;
+                indexCounter++
+            }
+            if (insertIndex === indexCounter + 1) {
+                indexCounter++;
+            }
+            let loc = window.Bos.Helpers.GetPosFromIndex(order, Bos.Dragging.colsize, 70, 92);
+            let itemRow = order % Bos.Dragging.colsize;
+            item.style.left = (loc.x) + 'px';
+            item.style.top = (loc.y) + 'px';
+        });
+    },
+    positionItems2: (insertIndex = null) => { 
+        let indexCounter = 0;
+        let currentCol = 0;
+        Bos.Dragging.colsize = parseInt(Bos.Dragging.height / 102);
+         Bos.Dragging.itemsList = Bos.Dragging.itemsList.sort(function(a, b) {
+            return Number(a.getAttribute('order')) > Number(b.getAttribute('order')) ? 1 : -1;
+        });
+        Bos.Dragging.itemsList.forEach(function(item) {
+            // item.setAttribute('order', indexCounter + 1);
+            
             let itemRow = indexCounter % Bos.Dragging.colsize;
             if (itemRow == 0 && indexCounter > 0) {
                 currentCol++;
@@ -77,6 +112,7 @@ window.Bos.Dragging = (() =>
             item.style.left = (60 * currentCol) + (currentCol * 10) + 'px';
             item.style.top = (92 * itemRow) + (itemRow * 10) + 'px';
             item.setAttribute('order', indexCounter + 1);
+             
             indexCounter++;
         });
     },
@@ -87,6 +123,12 @@ window.Bos.Dragging = (() =>
         let offsetY = pos.y - diff.y, offsetX = pos.x - diff.x;
         selectedItem.style.top = offsetY + 'px';
         selectedItem.style.left = offsetX + 'px';
+        
+        var aa = Bos.Helpers.GetPosColRow(offsetX, offsetY, selectedItem.offsetWidth, selectedItem.offsetHeight);
+        Bos.Dragging.placeholder.style.top = (Math.floor(aa.row) * 92) + (Math.floor(aa.row) * 10) + 'px';
+        Bos.Dragging.placeholder.style.left = (Math.floor(aa.col) * 60) /*+ (Math.floor(aa.col) * 10)*/ + 'px';
+        Bos.Dragging.placeholder.setAttribute("order", (aa.row * aa.col));
+        //////////////////////////////
         Bos.Dragging.itemsList = document.querySelectorAll(Bos.Dragging.itemSelector); Bos.Dragging.itemsList = Array.prototype.slice.call(Bos.Dragging.itemsList); Bos.Dragging.itemsList = Bos.Dragging.itemsList.filter(item => item.getAttribute('selected') !== 'yes');
         let orderOfSelectedItem = Number(selectedItem.getAttribute('order'));
         let currentCol = parseInt(pos.x / 70);
