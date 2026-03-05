@@ -85,7 +85,7 @@ window.Bos.Dragging = (() =>
             if (insertIndex === indexCounter + 1) {
                 indexCounter++;
             }
-            let loc = window.Bos.Helpers.GetPosFromIndex(order, Bos.Dragging.colsize, 70, 92);
+            let loc = window.Bos.Helpers.GetPosFromIndex(order, Bos.Dragging.colsize, 70, 102);
             let itemRow = order % Bos.Dragging.colsize;
             item.style.left = (loc.x) + 'px';
             item.style.top = (loc.y) + 'px';

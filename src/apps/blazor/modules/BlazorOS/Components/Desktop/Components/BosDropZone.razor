@@ -9,7 +9,7 @@
 </div>
 
 @code {
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString();
+     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString();
     [Parameter] public int Index { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
