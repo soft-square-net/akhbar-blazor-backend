@@ -21,8 +21,8 @@ public static class UpdateStorageAccountEndpoint
             .WithName(nameof(UpdateStorageAccountEndpoint))
             .WithSummary("update a storage account")
             .WithDescription("update a storage account")
-            .Produces<UpdateDocumentResponse>()
-            .RequirePermission("Permissions.StorageAccount.Update")
+            .Produces<UpdateStorageAccountResponse>()
+            .RequirePermission("Permissions.StorageAccounts.Update")
             .MapToApiVersion(1);
     }
 }

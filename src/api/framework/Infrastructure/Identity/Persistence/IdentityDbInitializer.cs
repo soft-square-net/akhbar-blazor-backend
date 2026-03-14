@@ -52,15 +52,15 @@ internal sealed class IdentityDbInitializer(
             // Assign permissions
             if (roleName == FshRoles.Basic)
             {
-                await AssignPermissionsToRoleAsync(context, FshPermissions.Basic, role);
+                await AssignPermissionsToRoleAsync(context, FshPermissions.Instance.Basic, role);
             }
             else if (roleName == FshRoles.Admin)
             {
-                await AssignPermissionsToRoleAsync(context, FshPermissions.Admin, role);
+                await AssignPermissionsToRoleAsync(context, FshPermissions.Instance.Admin, role);
 
                 if (multiTenantContextAccessor.MultiTenantContext.TenantInfo?.Id == TenantConstants.Root.Id)
                 {
-                    await AssignPermissionsToRoleAsync(context, FshPermissions.Root, role);
+                    await AssignPermissionsToRoleAsync(context, FshPermissions.Instance.Root, role);
                 }
             }
         }

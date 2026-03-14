@@ -1,0 +1,70 @@
+﻿@page "/storage/accounts"
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components
+@using FSH.Starter.BlazorShared.Components.EntityTable;
+@using FSH.Starter.Blazor.Modules.Document.Blazor.API;
+@using FSH.Starter.BlazorShared
+@inherits MobulePageBase
+@inject IDialogService DialogService
+
+
+<PageHeader Title="Products" Header="Products" SubHeader="Manage your Products." />
+
+<EntityTable @ref="_table" TEntity="StorageAccountResponse" TId="Guid" TRequest="StorageAccountVM" Context="@Context">
+
+    <AdvancedSearchContent>
+        <MudSelect T="Guid?" Label="Brand" @bind-Value="SearchStorageAccountId">
+            <MudSelectItem T="Guid?" Value="null">All Brands</MudSelectItem>
+            @foreach (var brand in _storageAccounts)
+            {
+                <MudSelectItem T="Guid?" Value="brand.Id">@brand.AccountName</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSlider T="decimal" @bind-value="SearchMinimumRate" Min="0" Max="9999" Step="100">Minimum Rate: @_searchMinimumRate.ToString()</MudSlider>
+        <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider>
+    </AdvancedSearchContent>
+
+    <EditFormContent>
+        @if (!Context.AddEditModal.IsCreate)
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField Value="context.Id" Underline=false ReadOnly Label="Product Id" />
+            </MudItem>
+        }
+        <MudItem xs="12" md="6">
+            <MudTextField Label="Name" For="@(() => context.AccountName)" @bind-Value="context.AccountName" />
+        </MudItem>
+        <MudItem xs="12" md="12">
+            <MudTextField Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="Access Key" For="@(() => context.AccessKey)" @bind-Value="context.AccessKey" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="Secret Key" For="@(() => context.SecretKey)" @bind-Value="context.SecretKey" />
+        </MudItem>
+        
+
+
+        <MudItem xs="12" md="12">
+            <MudItem>
+                <div>
+                    @if(!Context.AddEditModal.IsCreate)
+                    {
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Target="_blank"
+                            StartIcon="@Icons.Material.Filled.RemoveRedEye" Style="margin-left: 5px;" >
+                            View
+                        </MudButton>
+
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Delete" Style="margin-left: 5px;">
+                            Delete
+                        </MudButton>
+                    }
+                </div>
+            </MudItem>
+        </MudItem>
+    </EditFormContent>
+
+</EntityTable>
+
+

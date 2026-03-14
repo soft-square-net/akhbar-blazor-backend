@@ -37,9 +37,7 @@
       <ZipFiles Include="$(OutputPath)\**\*" Exclude="$(OutputPath)\FSH.Starter.Blazor.Modules.Document.Blazor.dll" />
     </ItemGroup>
 
-    <ZipDirectory SourceDirectory="$(OutputPath)"
-                  DestinationFile="$(MSBuildProjectDirectory)\bin\$(ProjectName).zip"
-                  Overwrite="true" />
+    <ZipDirectory SourceDirectory="$(OutputPath)" DestinationFile="$(MSBuildProjectDirectory)\bin\$(ProjectName).zip" Overwrite="true" />
   </Target>
   
   <ItemGroup>

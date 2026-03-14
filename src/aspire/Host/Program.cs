@@ -13,7 +13,7 @@ var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432)
-    //.WithPgAdmin()
+    .WithPgAdmin()
     .WithDataVolume()
     .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
 // Ahmed Galal

@@ -63,6 +63,13 @@ public class FshPermissions
         //audit
         new("View Audit Trails", FshActions.View, FshResources.AuditTrails),
 
+        //storage accounts
+        new("View storage accounts", FshActions.View, FshResources.StorageAccounts),
+        new("Search storage accounts", FshActions.Search, FshResources.StorageAccounts),
+        new("Create storage accounts", FshActions.Create, FshResources.StorageAccounts),
+        new("Update storage accounts", FshActions.Update, FshResources.StorageAccounts),
+        new("Delete storage accounts", FshActions.Delete, FshResources.StorageAccounts),
+        new("Export storage accounts", FshActions.Export, FshResources.StorageAccounts),
     ];
 
     public static FshPermissions Instance {
@@ -74,12 +81,19 @@ public class FshPermissions
 
     public void LoadPermisions(FshPermission[] permissions)
     {
-        AllPermissions.AddRange(permissions);
+        foreach (var permission in permissions)
+        {
+            if (!AllPermissions.Any(p => p.Name == permission.Name))
+            {
+                AllPermissions.Add(permission);
+            }
+        }
+        // AllPermissions.AddRange(permissions);
     }
-    public static IReadOnlyList<FshPermission> All { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions);
-    public static IReadOnlyList<FshPermission> Root { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions.Where(p => p.IsRoot).ToArray());
-    public static IReadOnlyList<FshPermission> Admin { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions.Where(p => !p.IsRoot).ToArray());
-    public static IReadOnlyList<FshPermission> Basic { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions.Where(p => p.IsBasic).ToArray());
+    public IReadOnlyList<FshPermission> All { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions);
+    public IReadOnlyList<FshPermission> Root { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions.Where(p => p.IsRoot).ToArray());
+    public IReadOnlyList<FshPermission> Admin { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions.Where(p => !p.IsRoot).ToArray());
+    public IReadOnlyList<FshPermission> Basic { get; } = new ReadOnlyCollection<FshPermission>(AllPermissions.Where(p => p.IsBasic).ToArray());
 }
 
 public record FshPermission(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false)

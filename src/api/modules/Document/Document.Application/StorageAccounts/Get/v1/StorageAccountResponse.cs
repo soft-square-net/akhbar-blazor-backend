@@ -1,2 +1,2 @@
 namespace FSH.Starter.WebApi.Document.Application.StorageAccounts.Get.v1;
-public sealed record StorageAccountResponse(Guid? Id, string Name, string? Description);
+public sealed record StorageAccountResponse(Guid? Id, string AccountName, string? Description, string AccessKey, string SecretKey);

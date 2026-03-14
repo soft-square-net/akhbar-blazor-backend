@@ -49,8 +49,8 @@ public partial class RolePermissions
             _description = string.Format("Manage {0} Role Permissions", role.Name);
 
             var permissions = state.User.GetTenant() == TenantConstants.Root.Id
-                ? FshPermissions.All
-                : FshPermissions.Admin;
+                ? FshPermissions.Instance.All
+                : FshPermissions.Instance.Admin;
 
             _groupedRoleClaims = permissions
                 .GroupBy(p => p.Resource)

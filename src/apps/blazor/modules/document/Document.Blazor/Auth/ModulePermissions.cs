@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FSH.Starter.Shared.Authorization;
+using static FSH.Starter.Shared.Authorization.TenantConstants;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 internal class ModulePermissions
@@ -12,16 +13,16 @@ internal class ModulePermissions
     private static readonly FshPermission[] Permissions =
     [
         //documents
-        new("View Documents", ModuleActions.View, ModuleResources.Documents, IsBasic: true),
-        new("Search Documents", ModuleActions.Search, ModuleResources.Documents, IsBasic: true),
+        new("View Documents", ModuleActions.View, ModuleResources.Documents, IsBasic: true, IsRoot:true),
+        new("Search Documents", ModuleActions.Search, ModuleResources.Documents, IsBasic: true, IsRoot:true),
         new("Create Documents", ModuleActions.Create, ModuleResources.Documents),
         new("Update Documents", ModuleActions.Update, ModuleResources.Documents),
         new("Delete Documents", ModuleActions.Delete, ModuleResources.Documents),
         new("Export Documents", ModuleActions.Export, ModuleResources.Documents),
 
         //StorageAccounts
-        new("View StorageAccounts", ModuleActions.View, ModuleResources.StorageAccounts, IsBasic: true),
-        new("Search StorageAccounts", ModuleActions.Search, ModuleResources.StorageAccounts, IsBasic: true),
+        new("View StorageAccounts", ModuleActions.View, ModuleResources.StorageAccounts, IsBasic: true, IsRoot:true),
+        new("Search StorageAccounts", ModuleActions.Search, ModuleResources.StorageAccounts, IsBasic: true, IsRoot:true),
         new("Create StorageAccounts", ModuleActions.Create, ModuleResources.StorageAccounts),
         new("Update StorageAccounts", ModuleActions.Update, ModuleResources.StorageAccounts),
         new("Delete StorageAccounts", ModuleActions.Delete, ModuleResources.StorageAccounts),

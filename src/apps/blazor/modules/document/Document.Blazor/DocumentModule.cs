@@ -1,5 +1,6 @@
 ﻿
 using System.Diagnostics.CodeAnalysis;
+using FSH.Starter.Blazor.Modules.Document.Blazor.API;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
@@ -31,9 +32,11 @@ public sealed class DocumentModule : BlazorModuleBase
     public override Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
+        services.AddTransient<IApiClient, ApiClient>();
         services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
+        
         return base.ConfigureModule(services, builder);
     }
 

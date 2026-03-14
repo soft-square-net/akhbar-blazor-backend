@@ -26,7 +26,7 @@ public static class Extensions
 
     private static void RegisterPermissionClaims(AuthorizationOptions options)
     {
-        foreach (var permission in FshPermissions.All.Select(p => p.Name))
+        foreach (var permission in FshPermissions.Instance.All.Select(p => p.Name))
         {
             options.AddPolicy(permission, policy => policy.RequireClaim(FshClaims.Permission, permission));
         }

@@ -20,7 +20,7 @@ public sealed class GetStorageAccountHandler(
             {
                 var storageAccount = await repository.GetByIdAsync(request.Id, cancellationToken);
                 if (storageAccount == null) throw new StorageAccountNotFoundException(request.Id);
-                return new StorageAccountResponse(storageAccount.Id, storageAccount.AccountName, storageAccount.Description);
+                return new StorageAccountResponse(storageAccount.Id, storageAccount.AccountName, storageAccount.Description, storageAccount.AccessKey, storageAccount.SecretKey);
             },
             cancellationToken: cancellationToken);
         return item!;
