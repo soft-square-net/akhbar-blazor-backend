@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elsa" />
+    <PackageReference Include="Elsa.CSharp" />
+    <PackageReference Include="Elsa.EntityFrameworkCore" />
+    <PackageReference Include="Elsa.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Elsa.Http" />
+    <PackageReference Include="Elsa.Identity" />
+    <PackageReference Include="Elsa.JavaScript" />
+    <PackageReference Include="Elsa.Liquid" />
+    <PackageReference Include="Elsa.Scheduling" />
+    <PackageReference Include="Elsa.Workflows.Api" />
+  </ItemGroup>
+
+</Project>

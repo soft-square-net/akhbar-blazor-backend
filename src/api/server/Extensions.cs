@@ -6,11 +6,12 @@ using FSH.Starter.WebApi.Catalog.Application;
 using FSH.Starter.WebApi.Catalog.Infrastructure;
 using FSH.Starter.WebApi.Document;
 using FSH.Starter.WebApi.Document.Application;
+using FSH.Starter.WebApi.ElsaWorkflow.Infrastructure;
 using FSH.Starter.WebApi.Todo;
 
 namespace FSH.Starter.WebApi.Host;
 
-public static class Extensions
+internal static class Extensions
 {
     public static WebApplicationBuilder RegisterModules(this WebApplicationBuilder builder)
     {
@@ -21,7 +22,8 @@ public static class Extensions
         {
             typeof(CatalogMetadata).Assembly,
             typeof(DocumentMetadata).Assembly,
-            typeof(TodoModule).Assembly
+            typeof(TodoModule).Assembly,
+            typeof(ElsaMetadata).Assembly
         };
 
         //register validators
@@ -37,19 +39,21 @@ public static class Extensions
         builder.RegisterCatalogServices();
         builder.RegisterDocumentServices();
         builder.RegisterTodoServices();
+        builder.RegisterElsaServices();
         //add carter endpoint modules
         builder.Services.AddCarter(configurator: config =>
         {
             config.WithModule<CatalogModule.Endpoints>();
             config.WithModule<DocumentModule.Endpoints>();
             config.WithModule<TodoModule.Endpoints>();
+            config.WithModule<ElsaModule.Endpoints>();
            //  config.WithModule<DocumentModule.Endpoints>();
         });
 
         return builder;
     }
 
-    public static WebApplication UseModules(this WebApplication app)
+    public static async Task<WebApplication> UseModules(this WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
 
@@ -57,7 +61,7 @@ public static class Extensions
         app.UseCatalogModule();
         app.UseDocumentModule();
         app.UseTodoModule();
-
+        await app.UseElsaModule();
         //register api versions
         var versions = app.NewApiVersionSet()
                     .HasApiVersion(1)

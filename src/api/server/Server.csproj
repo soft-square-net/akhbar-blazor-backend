@@ -22,6 +22,7 @@
     <ProjectReference Include="..\migrations\PostgreSQL\PostgreSQL.csproj" />
     <ProjectReference Include="..\modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\modules\Document\Document.Infrastructure\Document.Infrastructure.csproj" />
+    <ProjectReference Include="..\modules\Elsa\ElsaWorkflow.Infrastructure\ElsaWorkflow.Infrastructure.csproj" />
     <ProjectReference Include="..\modules\Todo\Todo.csproj" />
   </ItemGroup>
   <ItemGroup>
