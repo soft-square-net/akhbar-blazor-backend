@@ -24,7 +24,12 @@
     </AdvancedSearchContent>
 
     <EditFormContent>
-        @if (!Context.AddEditModal.IsCreate)
+        @{
+            // bool IsCreate = Context.AddEditModal.IsCreate;
+            bool IsCreate = context.Id == Guid.Empty;
+        }
+        }
+        @if (!IsCreate)
         {
             <MudItem xs="12" md="6">
                 <MudTextField Value="context.Id" Underline=false ReadOnly Label="Product Id" />
@@ -48,7 +53,7 @@
         <MudItem xs="12" md="12">
             <MudItem>
                 <div>
-                    @if(!Context.AddEditModal.IsCreate)
+                    @if (!IsCreate)
                     {
                         <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Target="_blank"
                             StartIcon="@Icons.Material.Filled.RemoveRedEye" Style="margin-left: 5px;" >
