@@ -5,4 +5,5 @@ public static class SchemaNames
     public const string Catalog = "catalog";
     public const string Document = "document";
     public const string Tenant = "tenant";
+    public const string ElsaStore = "elsastore";
 }

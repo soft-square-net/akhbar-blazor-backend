@@ -13,13 +13,16 @@
     <PackageReference Include="Elsa" />
     <PackageReference Include="Elsa.CSharp" />
     <PackageReference Include="Elsa.EntityFrameworkCore" />
+    <PackageReference Include="Elsa.EntityFrameworkCore.PostgreSql" />
     <PackageReference Include="Elsa.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Elsa.Http" />
     <PackageReference Include="Elsa.Identity" />
     <PackageReference Include="Elsa.JavaScript" />
     <PackageReference Include="Elsa.Liquid" />
     <PackageReference Include="Elsa.Scheduling" />
+    <PackageReference Include="Elsa.Tenants" />
     <PackageReference Include="Elsa.Workflows.Api" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
 </Project>

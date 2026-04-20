@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Elsa.Api.Client.Extensions;
 using Elsa.Studio.Contracts;
 using Elsa.Studio.Core.BlazorWasm.Extensions;
 using Elsa.Studio.Dashboard.Extensions;
@@ -6,12 +8,16 @@ using Elsa.Studio.Login.BlazorWasm.Extensions;
 using Elsa.Studio.Login.Extensions;
 using Elsa.Studio.Login.HttpMessageHandlers;
 using Elsa.Studio.Models;
+using Elsa.Studio.Options;
 using Elsa.Studio.Shell;
 using Elsa.Studio.Shell.Extensions;
 using Elsa.Studio.Workflows.Designer.Extensions;
 using Elsa.Studio.Workflows.Extensions;
+using ElsaStudioBlazorWasm;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
 
 // Build the host.
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -28,22 +34,32 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 // Register shell services and modules.
 var backendApiConfig = new BackendApiConfig
 {
-    ConfigureBackendOptions = options => builder.Configuration.GetSection("Backend").Bind(options),
-    ConfigureHttpClientBuilder = options => options.AuthenticationHandler = typeof(AuthenticatingApiHttpMessageHandler)
+    ConfigureBackendOptions = options => {
+        builder.Configuration.GetSection("Backend").Bind(options);
+    },
+    ConfigureHttpClientBuilder = options => { 
+        // options.AuthenticationHandler = typeof(AuthenticatingApiHttpMessageHandler); 
+        options.AuthenticationHandler = typeof(CustomAuthenticationHandler); 
+        options.ApiKey = configuration["ApiKey"];
+        options.BaseAddress = configuration["Backend:BaseAddress"].ConvertTo<Uri>() ?? new Uri("/");
+    }
+    
 };
 
 builder.Services.AddCore();
 builder.Services.AddShell();
 builder.Services.AddRemoteBackend(backendApiConfig);
-builder.Services.AddLoginModule();
-builder.Services.UseElsaIdentity();
+builder.Services.AddLoginModule().UseElsaIdentity();
 builder.Services.AddDashboardModule();
 builder.Services.AddWorkflowsModule();
+builder.Services.UseElsaIdentity();
 
-
-
+// builder.Services.AddShell(x => x.DisableAuthorization = true);
 // Build the application.
 var app = builder.Build();
+
+
+
 
 // Run each startup task.
 var startupTaskRunner = app.Services.GetRequiredService<IStartupTaskRunner>();

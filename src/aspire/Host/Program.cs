@@ -1,3 +1,5 @@
+using static System.Net.WebRequestMethods;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 //builder.AddContainer("grafana", "grafana/grafana")
@@ -13,7 +15,7 @@ var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432)
-    // .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
+    .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
     .WithDataVolume()
     .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
 // Ahmed Galal
@@ -44,6 +46,12 @@ var api = builder.AddProject<Projects.Server>("webapi")
 blazor.WaitFor(api)
     .WithReference(api);
 
+var elsaStudio = builder.AddProject<Projects.ElsaStudioBlazorWasm>("elsaStudio")
+    .WithEndpoint(endpointName: "https", callback: static endpoint =>
+    {
+        endpoint.TargetPort = 7250;
+        endpoint.Port = 7350;
+    });
 using var app = builder.Build();
 
 await app.RunAsync();

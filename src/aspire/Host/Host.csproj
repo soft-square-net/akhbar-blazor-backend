@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\api\server\Server.csproj" />
     <ProjectReference Include="..\..\apps\blazor\client\Client.csproj" />
+    <ProjectReference Include="..\..\apps\blazor\ElsaStudioBlazorWasm\ElsaStudioBlazorWasm.csproj" />
   </ItemGroup>
 
 </Project>
