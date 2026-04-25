@@ -6,4 +6,5 @@ public static class SchemaNames
     public const string Document = "document";
     public const string Tenant = "tenant";
     public const string ElsaStore = "elsastore";
+    public const string ElsaManagment = "elsamanagment";
 }

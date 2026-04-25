@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Asp.Versioning;
 using Asp.Versioning.Conventions;
 using FluentValidation;
 using FSH.Framework.Core;
@@ -43,6 +44,7 @@ public static class Extensions
         builder.Services.ConfigureFileStorage();
         builder.Services.ConfigureJwtAuth();
         builder.Services.ConfigureOpenApi();
+        builder.Services.AddOpenApi();
         builder.Services.ConfigureJobs(builder.Configuration);
         builder.Services.ConfigureMailing();
         builder.Services.ConfigureCaching(builder.Configuration);

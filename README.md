@@ -81,6 +81,16 @@ dotnet ef migrations add "Add Todo Schema" --project .././migrations/postgresql/
 dotnet ef migrations add "Add Catalog Schema" --project .././migrations/postgresql/ --context CatalogDbContext -o Catalog
 dotnet ef migrations add "Add Document Schema" --project .././migrations/postgresql/ --context DocumentDbContext -o Document
 
+# Add a migration
+dotnet ef migrations add "Initialize Elsa Store" --project .././migrations/postgresql/ --context ElsaStoreDbContext -o ElsaStore
+
+# Apply migrations
+dotnet ef database update --context ManagementElsaDbContext
+dotnet ef database update --context RuntimeElsaDbContext
+
+```
+
+
 ```
 
 ## What's Pending?

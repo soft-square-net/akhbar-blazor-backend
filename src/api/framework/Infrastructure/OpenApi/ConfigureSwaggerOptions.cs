@@ -44,6 +44,11 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             Title = "Tenants Module API",
             Version = "v1"
         });
+        options.SwaggerDoc("elsa", new OpenApiInfo
+        {
+            Title = "Elsa Module API",
+            Version = "v1"
+        });
     }
 
     private static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)

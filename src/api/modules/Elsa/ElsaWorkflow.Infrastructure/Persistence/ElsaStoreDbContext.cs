@@ -8,12 +8,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Constants;
+using Elsa.EntityFrameworkCore.Modules.Management;
 
 namespace FSH.Starter.ElsaWorkflow.Infrastructure.Persistence;
 
 public class ElsaStoreDbContext : FshDbContext
 {
-    public ElsaStoreDbContext(IMultiTenantContextAccessor<FshTenantInfo> multiTenantContextAccessor, DbContextOptions options, IPublisher publisher, IOptions<DatabaseOptions> settings) : base(multiTenantContextAccessor, options, publisher, settings)
+    public ElsaStoreDbContext(IMultiTenantContextAccessor<FshTenantInfo> multiTenantContextAccessor, DbContextOptions<ElsaStoreDbContext> options, IPublisher publisher, IOptions<DatabaseOptions> settings) : base(multiTenantContextAccessor, options, publisher, settings)
     {
     }
 

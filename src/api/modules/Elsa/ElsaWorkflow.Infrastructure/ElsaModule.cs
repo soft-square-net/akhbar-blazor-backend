@@ -1,5 +1,6 @@
 ﻿
 
+using System;
 using Acornima.Ast;
 using AspNetCore.Authentication.ApiKey;
 using Carter;
@@ -16,15 +17,21 @@ using Elsa.Identity.Multitenancy;
 using Elsa.Tenants.Extensions;
 using Elsa.Workflows.LogPersistence.Strategies;
 using Elsa.Workflows.Management.Features;
+using Elsa.Workflows.Runtime.Options;
 using ElsaWorkflow.Infrastructure.Services;
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
 using FSH.Framework.Core.Persistence;
+using FSH.Framework.Infrastructure.Persistence;
 using FSH.Framework.Infrastructure.Tenant;
 using FSH.Starter.ElsaWorkflow.Infrastructure.Auth;
 using FSH.Starter.ElsaWorkflow.Infrastructure.Auth.ApiKey;
+using FSH.Starter.ElsaWorkflow.Infrastructure.Endpoints;
 using FSH.Starter.ElsaWorkflow.Infrastructure.Persistence;
 using FSH.Starter.ElsaWorkflow.Infrastructure.Tenants;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -45,13 +52,26 @@ public static class ElsaModule
 {
     public class Endpoints : ICarterModule
     {
-        public Endpoints()
-        {
-
-        }
+        public Endpoints() { }
+        //    : base("Elsa")
+        //{
+        //    this.WithName("Elsa");
+        //    this.WithGroupName("Elsa");
+        //    this.WithDisplayName("Elsa Workflow");
+        //    this.WithDescription("This moudule scope focus on hadeling files distribution throw the framework, inside local folders or even on the cloud Like AWS Buckets");
+        //    this.WithSummary("Files distribution throw the framework");
+        //}
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            // var elsaGroup = app.MapGroup("elsa").WithGroupName("elsa").WithTags("elsa");
+            //// 1. Create your module group
+            //var charterGroup = app.MapGroup("/elsa");
+
+            //// 2. Map the Elsa API endpoints to this group
+            //// This makes endpoints available at /elsa/api/...
+            //charterGroup.MapWorkflowsApi();
+
+            //// 3. Optional: Add a simple health check for your module
+            //charterGroup.MapGet("/status", () => "Charter Module Active");
         }
 
 
@@ -59,7 +79,8 @@ public static class ElsaModule
     public static WebApplicationBuilder RegisterElsaServices(this WebApplicationBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-
+        builder.Services.BindDbContext<ElsaStoreDbContext>();
+        builder.Services.AddRazorPages();
         //builder.Services.AddDbContext<ElsaStoreDbContext>(ef =>
         //{
         //    ef.UseNpgsql(builder.Configuration.GetSection(nameof(DatabaseOptions)).Get<DatabaseOptions>()?.ConnectionString
@@ -91,11 +112,17 @@ public static class ElsaModule
         // Define your custom scheme name
         string customSchemeName = "elsaBearer";
         //// Disable endpoint security
-        Elsa.EndpointSecurityOptions.DisableSecurity();
+        
+        
+        // Elsa.EndpointSecurityOptions.DisableSecurity();
         // ⚠️ DEVELOPMENT ONLY: Disable all endpoint security
 
         builder.Services.AddElsa(elsa =>
         {
+            // Inside Program.cs
+            elsa.AddSwagger();
+            // builder.Services.AddFastEndpoints();
+            // builder.Services.SwaggerDocument();
             // Default Identity features for authentication/authorization.
             //elsa.UseIdentity(identity =>
             //{
@@ -110,7 +137,7 @@ public static class ElsaModule
             // identity.UseEntityFrameworkCore(ef =>
             // {
             //     ef.UsePostgreSql(dbConfig.ConnectionString);
-            //     ef.RunMigrations = true; 
+            //     // ef.RunMigrations = true; 
             // });
             //});
 
@@ -170,20 +197,30 @@ public static class ElsaModule
             }); // Enable multi-tenancy support.
             ****************************************************************************/
             // Configure Management layer to use EF Core.
-            elsa.UseWorkflowManagement(management => management.UseEntityFrameworkCore(ef =>
-            {
-                // ef.UsePostgreSql<WorkflowManagementPersistenceFeature, ManagementElsaDbContext>(dbConfig.ConnectionString); 
-                ef.UsePostgreSql(dbConfig.ConnectionString);
-                ef.RunMigrations = true;
-            }));
+            elsa.UseWorkflowManagement(management => {
+                management.UseEntityFrameworkCore(ef =>
+                {
+                    // ef.UsePostgreSql<WorkflowManagementPersistenceFeature, ManagementElsaDbContext>(dbConfig.ConnectionString); 
+                    ef.UsePostgreSql(dbConfig.ConnectionString);
+
+                    // ef.RunMigrations = true;
+                });
+            });
 
             // Configure Runtime layer to use EF Core.
-            elsa.UseWorkflowRuntime(runtime => runtime.UseEntityFrameworkCore(ef =>
-            {
-                ef.UsePostgreSql(dbConfig.ConnectionString);
-                ef.RunMigrations = true;
-            }));
-
+            elsa.UseWorkflowRuntime(runtime => {
+                runtime.UseEntityFrameworkCore(ef =>
+                    {
+                        ef.UsePostgreSql(dbConfig.ConnectionString);
+                        // ef.RunMigrations = true;
+                    });
+                runtime.WorkflowInboxCleanupOptions = options =>
+                {
+                    // Clean up completed workflow instances after 30 days
+                    options.BatchSize = 100;
+                    options.SweepInterval = TimeSpan.FromMinutes(60);
+                };
+            });
 
 
             // Expose Elsa API endpoints.
@@ -209,8 +246,10 @@ public static class ElsaModule
 
             // Register custom workflows from the application, if any.
             elsa.AddWorkflowsFrom<Program>();
-        });
 
+            // Inside Program.cs
+            // elsa.AddSwagger();
+        });
 
         builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().WithExposedHeaders("*")));
         builder.Services.AddRazorPages(options => options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute()));
@@ -255,10 +294,15 @@ public static class ElsaModule
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        if (app.Environment.IsDevelopment())
+        {
+            // await app.Services.MigrateElsaDatabaseAsync();
+        }
         app.UseWorkflowsApi(); // Use Elsa API endpoints.
         app.UseWorkflows(); // Use Elsa middleware to handle HTTP requests mapped to HTTP Endpoint activities.
         app.UseWorkflowsSignalRHubs(); // Optional SignalR integration. Elsa Studio uses SignalR to receive real-time updates from the server. 
 
+        app.MapRazorPages();
         app.MapFallbackToPage("/_Host");
         return app;
     }

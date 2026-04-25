@@ -1,0 +1,97 @@
+@baseUrl = https://localhost:7000
+@masterkey = QsJbczCNysv/5SGh+U7sxedX8C07TPQPBdsnSDKZ/aE=
+
+### Elsa API - Server
+
+# @name createApiKey
+GET {{baseUrl}}/api/v1/elsa/apikey/
+Accept: application/json
+
+
+### Elsa API Key Create - Server
+# @name createApiKey
+POST {{baseUrl}}/api/v1/elsa/apikey/
+Accept: application/json
+
+{
+    "owner": "Elsa Studio",
+    "roles": ["Admin", "WorkflowDesigner"],
+    "expires": 730,
+}
+
+### Get Workfloe Definition # X-API-Key: {{masterkey}}
+# @name getworkfloedefinition
+GET {{baseUrl}}//elsa/api/workflow-definitions
+X-API-Key: your-api-key-here
+### Login to get the access token
+# @name getlogintoken
+POST {{baseUrl}}/identity/login
+Content-Type: application/json
+// WWW-Authenticate: CustomBearer realm="elsa-api", charset="UTF-8"
+{
+  "email": "admin@root.com",
+  "password": "123Pa$$word!"
+}
+
+
+### Create Apikey
+# @name createapikey
+POST {{baseUrl}}/api/apikeys/CreateApiKeyEnpoint
+Authorization: Apikey {{masterkey}}
+Content-Type: application/json
+X-API-Key: {{masterkey}}
+{
+  "owner": "Elsa Studio",
+  "roles": ["Admin", "WorkflowDesigner"],
+  "expires": "2027-12-31T23:59:59Z"
+}
+
+
+### 2. Set Local Variable from Response
+# This uses the @name from the request above
+@accesstoken = {{getlogintoken.response.body.$.token}}
+
+### Elsa API Key Create - Server
+# @name createApiKey
+POST {{baseUrl}}/elsa-studio/api/api-keys
+Accept: application/json
+Authorization: Bearer {{accesstoken}}
+
+{
+  "owner": "Elsa Studio",
+  "roles": ["Admin", "WorkflowDesigner"],
+  "expires": "2027-12-31T23:59:59Z"
+}
+
+###Store the API key in a variable for later use
+@apikey = {{createApiKey.response.body.$.apiKey}}
+
+### get ApiKey
+# @name getapikey
+GET {{baseUrl}}/elsa/api/workflow-definitions
+X-API-Key: {{apikey}}
+
+
+
+### Login to get the access token
+# @name getlogintoken
+POST {{baseUrl}}/identity/login
+Content-Type: application/json
+
+{
+  "email": "admin@root.com",
+  "password": "123Pa$$word!"
+}
+
+
+### 2. Set Local Variable from Response
+# This uses the @name from the request above
+@accesstoken = {{getlogintoken.response.body.$.token}}
+
+
+
+###
+# @name getUsers
+GET {{baseUrl}}/api/users
+Accept: application/json
+Authorization: Bearer {{accesstoken}}

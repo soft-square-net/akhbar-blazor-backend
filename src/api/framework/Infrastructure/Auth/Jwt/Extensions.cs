@@ -14,14 +14,18 @@ internal static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
+        // services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
         services
             .AddAuthentication(authentication =>
             {
                 authentication.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 authentication.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, null!);
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, null!)
+            .AddJwtBearer(JwtAuthConstants.ElsaSchemeName, null!);
+        // Register both configuration classes
+        services.ConfigureOptions<ConfigureJwtBearerOptions>();
+        services.ConfigureOptions<ConfigureJwtBearerElsaOptions>();
 
         services.AddAuthorizationBuilder().AddRequiredPermissionPolicy();
         services.AddAuthorization(options =>

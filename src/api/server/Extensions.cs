@@ -23,7 +23,7 @@ internal static class Extensions
             typeof(CatalogMetadata).Assembly,
             typeof(DocumentMetadata).Assembly,
             typeof(TodoModule).Assembly,
-            typeof(ElsaMetadata).Assembly
+            typeof(ElsaModule).Assembly
         };
 
         //register validators
@@ -61,7 +61,7 @@ internal static class Extensions
         app.UseCatalogModule();
         app.UseDocumentModule();
         app.UseTodoModule();
-        await app.UseElsaModule();
+        app.UseElsaModule();
         //register api versions
         var versions = app.NewApiVersionSet()
                     .HasApiVersion(1)
