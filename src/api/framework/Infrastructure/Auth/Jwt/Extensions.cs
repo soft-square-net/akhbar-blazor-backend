@@ -1,7 +1,10 @@
 ﻿using FSH.Framework.Core.Auth.Jwt;
 using FSH.Framework.Infrastructure.Auth.Policy;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace FSH.Framework.Infrastructure.Auth.Jwt;
@@ -15,22 +18,40 @@ internal static class Extensions
             .ValidateOnStart();
 
         // services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
-        services
-            .AddAuthentication(authentication =>
-            {
-                authentication.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                authentication.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, null!)
-            .AddJwtBearer(JwtAuthConstants.ElsaSchemeName, null!);
-        // Register both configuration classes
-        services.ConfigureOptions<ConfigureJwtBearerOptions>();
-        services.ConfigureOptions<ConfigureJwtBearerElsaOptions>();
+        // services.ConfigureOptions<ConfigureJwtBearerOptions>();
+        // services.ConfigureOptions<ConfigureJwtBearerElsaOptions>();
+        services.AddAuthentication(options =>
+        {
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+            .AddJwtBearer(JwtAuthConstants.FSHSchemeName, JwtBearerFSHOptions.ConfigAction)
+            .AddJwtBearer(JwtAuthConstants.ElsaSchemeName, JwtBearerElsaOptions.ConfigAction);
+            // .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
-        services.AddAuthorizationBuilder().AddRequiredPermissionPolicy();
+        // Register both configuration classes
+
+
+        //var authBuilder = services.AddAuthorizationBuilder();  // .AddRequiredPermissionPolicy();
+        //authBuilder.AddPolicy(RequiredPermissionDefaults.PolicyName, policy =>
+        //    {
+        //        policy.RequireAuthenticatedUser();
+        //        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+        //        policy.RequireRequiredPermissions();
+        //    });
+
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<IAuthorizationHandler, RequiredPermissionAuthorizationHandler>());
+
         services.AddAuthorization(options =>
         {
-            options.FallbackPolicy = options.GetPolicy(RequiredPermissionDefaults.PolicyName);
+            AuthorizationPolicy policyBuilder = 
+                new AuthorizationPolicyBuilder(JwtAuthConstants.FSHSchemeName, JwtAuthConstants.ElsaSchemeName, JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .RequireRequiredPermissions()
+                .Build();
+
+            options.DefaultPolicy = policyBuilder;
+            // options.FallbackPolicy = options.GetPolicy(RequiredPermissionDefaults.PolicyName);
         });
         return services;
     }

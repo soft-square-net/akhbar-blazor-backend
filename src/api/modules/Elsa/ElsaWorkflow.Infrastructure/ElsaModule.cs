@@ -1,6 +1,5 @@
-﻿
-
-using System;
+﻿using System;
+using System.Text;
 using Acornima.Ast;
 using AspNetCore.Authentication.ApiKey;
 using Carter;
@@ -13,7 +12,10 @@ using Elsa.EntityFrameworkCore.Modules.Management;
 using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Elsa.EntityFrameworkCore.Modules.Tenants;
 using Elsa.Extensions;
+using Elsa.Identity.Contracts;
+using Elsa.Identity.Models;
 using Elsa.Identity.Multitenancy;
+using Elsa.Identity.Services;
 using Elsa.Tenants.Extensions;
 using Elsa.Workflows.LogPersistence.Strategies;
 using Elsa.Workflows.Management.Features;
@@ -112,8 +114,8 @@ public static class ElsaModule
         // Define your custom scheme name
         string customSchemeName = "elsaBearer";
         //// Disable endpoint security
-        
-        
+
+
         // Elsa.EndpointSecurityOptions.DisableSecurity();
         // ⚠️ DEVELOPMENT ONLY: Disable all endpoint security
 
@@ -124,16 +126,7 @@ public static class ElsaModule
             // builder.Services.AddFastEndpoints();
             // builder.Services.SwaggerDocument();
             // Default Identity features for authentication/authorization.
-            //elsa.UseIdentity(identity =>
-            //{
-            //    // identity.UseAdminUserProvider();
 
-            //    identity.TokenOptions = options =>
-            //    {
-            //        options.SigningKey = builder.Configuration["JwtOptions:Key"] ?? "";
-            //        options.AccessTokenLifetime = TimeSpan.FromMinutes(10);
-            //        options.RefreshTokenLifetime = TimeSpan.FromDays(7);
-            //    };
             // identity.UseEntityFrameworkCore(ef =>
             // {
             //     ef.UsePostgreSql(dbConfig.ConnectionString);
@@ -144,21 +137,98 @@ public static class ElsaModule
 
             // Configure ASP.NET authentication/authorization.
             // elsa.UseDefaultAuthentication(auth => auth.UseAdminApiKey());
-
-            //elsa.UseServerAuthentication(e => { 
-
-            //});
+            ////////////////////////////////////////////////////////////////////////////
             elsa.UseIdentity(identity =>
             {
+                // identity.ApiKeyOptions = options => { };
                 identity.UseAdminUserProvider();
                 identity.TokenOptions = options =>
                 {
+                    options.Issuer = "https://fullstackhero.net";
+                    options.Audience = "fullstackhero";
                     options.SigningKey = "QsJbczCNysv/5SGh+U7sxedX8C07TPQPBdsnSDKZ/aE=";
                     options.AccessTokenLifetime = TimeSpan.FromMinutes(10);
                     options.RefreshTokenLifetime = TimeSpan.FromDays(7);
+
                 };
             });
+            // Configure ASP.NET authentication/authorization.
+            elsa.UseDefaultAuthentication(auth => 
+            {
+                // auth.UseAdminApiKey();
+                auth.ConfigureAuthorizationOptions = option =>
+                {
+                    option.DefaultPolicy = new AuthorizationPolicyBuilder("ElsaScheme", JwtBearerDefaults.AuthenticationScheme)
+                                            .RequireAuthenticatedUser()
+                                            .Build();
+                };
+            });
+            // elsa.UseDefaultAuthentication();
+            /////////////////////////////////////////////////////////////////////////
 
+            //elsa.UseIdentity(identity =>
+            //{
+            //    // 1. Register the provider for USERS (IdP)
+            //    identity.UseConfigurationBasedUserProvider(o =>
+            //    {
+            //        ISecretHasher secretHasher = new DefaultSecretHasher();
+            //        HashedSecret hashedSecret = secretHasher.HashSecret("Password123!");
+            //        o.Users.Add(new Elsa.Identity.Entities.User
+            //        {
+            //            //Id = "89377249-129e-4154-b08d-ed6b711ba17a",
+            //            Id = "admin",
+            //            Name = "admin",
+            //            HashedPassword = hashedSecret.EncodeSecret(),
+            //            HashedPasswordSalt = hashedSecret.EncodeSalt(),
+            //            Roles = { "admin", "SecurityRoot" }
+            //        });
+            //    });
+
+            //    // 2. Register the provider for APPLICATIONS (e.g., Elsa Studio)
+            //    identity.UseConfigurationBasedApplicationProvider(o =>
+            //    {
+            //        o.Applications.Add(
+            //            new()
+            //            {
+            //                //Id = "f4a47a51-ae86-483f-9215-5d92598006ee",
+            //                Id = "2",
+            //                Name = "admin",
+            //                ClientId = "elsa-studio",
+            //                //HashedClientSecret = "QsJbczCNysv/5SGh+U7sxedX8C07TPQPBdsnSDKZ/aE=",
+            //                //HashedClientSecretSalt = "",
+            //                HashedApiKey = "$argon2id$v=19$m=19456,t=2,p=1$ZTc1YTBkMWUxMmI3NmEwNTU2NTJlZWI0Y2I2MTYyN2E$FeUWkIDLnr2OM2qUChgONqe0EqAKdZcgZfJvDYInARY",
+            //                HashedApiKeySalt = "e75a0d1e12b76a055652eeb4cb61627a",
+            //                Roles = { "SecurityRoot", "admin" }
+            //            }
+            //        );
+            //    });
+
+            //    identity.UseConfigurationBasedRoleProvider(o =>
+            //    {
+            //        o.Roles.Add(new()
+            //        {
+            //            //Id = "e860099f-dc1e-4916-b71e-8e2bf1091996",
+            //            Id = "3",
+            //            Name = "SecurityRoot",
+            //            Permissions = { "*" },
+            //        });
+            //        o.Roles.Add(new()
+            //        {
+            //            //Id = "e860099f-dc1e-4916-b71e-8e2bf1091996",
+            //            Id = "4",
+            //            Name = "admin",
+            //            Permissions = { "*" },
+            //        });
+            //    });
+            //    // Configure token options
+            //    identity.TokenOptions = options =>
+            //    {
+            //        options.SigningKey = "QsJbczCNysv/5SGh+U7sxedX8C07TPQPBdsnSDKZ/aE=";
+            //        options.AccessTokenLifetime = TimeSpan.FromHours(1);
+            //        options.RefreshTokenLifetime = TimeSpan.FromDays(7);
+            //    };
+
+            //});
             /**********************************************************************
             builder.Services.AddScoped<ITenantsProvider, FinbuckleTenantProvider>();
             elsa.UseTenants(tenants =>
@@ -197,7 +267,8 @@ public static class ElsaModule
             }); // Enable multi-tenancy support.
             ****************************************************************************/
             // Configure Management layer to use EF Core.
-            elsa.UseWorkflowManagement(management => {
+            elsa.UseWorkflowManagement(management =>
+            {
                 management.UseEntityFrameworkCore(ef =>
                 {
                     // ef.UsePostgreSql<WorkflowManagementPersistenceFeature, ManagementElsaDbContext>(dbConfig.ConnectionString); 
@@ -208,7 +279,8 @@ public static class ElsaModule
             });
 
             // Configure Runtime layer to use EF Core.
-            elsa.UseWorkflowRuntime(runtime => {
+            elsa.UseWorkflowRuntime(runtime =>
+            {
                 runtime.UseEntityFrameworkCore(ef =>
                     {
                         ef.UsePostgreSql(dbConfig.ConnectionString);

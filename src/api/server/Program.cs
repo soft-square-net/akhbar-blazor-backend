@@ -15,7 +15,9 @@ try
 
     var app = builder.Build();
 
-   
+    // turn on PII logging
+    Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
+
     app.UseFshFramework();
     await app.UseModules();
 

@@ -1,5 +1,17 @@
-@Server_HostAddress = http://localhost:5000
+@Server_HostAddress = https://localhost:7000
 
+
+### Login to get the access token
+# @name getlogintoken
+POST {{Server_HostAddress}}/api/token
+Content-Type: application/json
+Tenant: root
+{
+  "email": "admin@root.com",
+  "password": "123Pa$$word!"
+}
+
+###
 GET {{Server_HostAddress}}/weatherforecast/
 Accept: application/json
 

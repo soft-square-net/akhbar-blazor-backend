@@ -3,6 +3,52 @@
 
 ### Elsa API - Server
 
+### WWW-Authenticate: CustomBearer realm="elsa-api", charset="UTF-8"
+
+### Login to get the Main access token
+# @name getmaintoken
+POST {{baseurl}}/api/token
+Accept: application/json
+Tenant: root
+Content-Type: application/json
+{
+  "email": "admin@root.com",
+  "password": "123Pa$$word!"
+}
+
+### 
+@maintoken = {{getmaintoken.response.body.$.token}}
+
+### Login to get the access token
+# @name getlogintoken
+POST {{baseUrl}}/elsa/api/identity/login
+Content-Type: application/json
+tenant: root
+{
+  "username": "admin",
+  "password": "password"
+}
+###
+@token = {{getlogintoken.response.body.$.accessToken}}
+
+###get workflow-definitions
+GET {{baseUrl}}/elsa/api/workflow-definitions
+Authorization: Bearer {{token}}
+
+
+### Create Login User
+POST {{baseUrl}}/elsa/api/identity/users
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "roles": ["WorkflowDesigner","SecurityRoot"]
+}
+
+
+
+### Create Api Key
 # @name createApiKey
 GET {{baseUrl}}/api/v1/elsa/apikey/
 Accept: application/json
@@ -23,15 +69,7 @@ Accept: application/json
 # @name getworkfloedefinition
 GET {{baseUrl}}//elsa/api/workflow-definitions
 X-API-Key: your-api-key-here
-### Login to get the access token
-# @name getlogintoken
-POST {{baseUrl}}/identity/login
-Content-Type: application/json
-// WWW-Authenticate: CustomBearer realm="elsa-api", charset="UTF-8"
-{
-  "email": "admin@root.com",
-  "password": "123Pa$$word!"
-}
+
 
 
 ### Create Apikey
