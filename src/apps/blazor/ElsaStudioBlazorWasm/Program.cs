@@ -34,16 +34,20 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 // Register shell services and modules.
 var backendApiConfig = new BackendApiConfig
 {
-    ConfigureBackendOptions = options => {
-        builder.Configuration.GetSection("Backend").Bind(options);
+    ConfigureBackendOptions = backend => {
+        // builder.Configuration.GetSection("Backend").Bind(options);
+        backend.Url = new Uri(builder.Configuration["Backend:Url"]!);
+
     },
-    ConfigureHttpClientBuilder = options => { 
+    ConfigureHttpClientBuilder = options =>
+    {
         // options.AuthenticationHandler = typeof(AuthenticatingApiHttpMessageHandler); 
-        options.AuthenticationHandler = typeof(CustomAuthenticationHandler); 
+        options.BaseAddress = new Uri(builder.Configuration["Backend:Url"]!);
+        options.AuthenticationHandler = typeof(CustomAuthenticationHandler);
         options.ApiKey = configuration["ApiKey"];
-        options.BaseAddress = configuration["Backend:BaseAddress"].ConvertTo<Uri>() ?? new Uri("/");
+        //options.BaseAddress = configuration["Backend:BaseAddress"].ConvertTo<Uri>() ?? new Uri("/");
     }
-    
+
 };
 
 builder.Services.AddCore();

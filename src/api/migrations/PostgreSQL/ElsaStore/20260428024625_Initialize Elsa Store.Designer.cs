@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.ElsaStore
 {
     [DbContext(typeof(ElsaStoreDbContext))]
-    [Migration("20260423051852_Initialize Elsa Store")]
+    [Migration("20260428024625_Initialize Elsa Store")]
     partial class InitializeElsaStore
     {
         /// <inheritdoc />

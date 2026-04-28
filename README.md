@@ -82,6 +82,8 @@ dotnet ef migrations add "Add Catalog Schema" --project .././migrations/postgres
 dotnet ef migrations add "Add Document Schema" --project .././migrations/postgresql/ --context DocumentDbContext -o Document
 
 # Add a migration
+dotnet ef migrations add "Initialize Elsa Runtime" --project .././migrations/postgresql/ --context ElsaRuntimeDbContext -o ElsaStoreRuntime
+dotnet ef migrations add "Initialize Elsa Management" --project .././migrations/postgresql/ --context ElsaManagementDbContext -o ElsaStoreManagement
 dotnet ef migrations add "Initialize Elsa Store" --project .././migrations/postgresql/ --context ElsaStoreDbContext -o ElsaStore
 
 # Apply migrations

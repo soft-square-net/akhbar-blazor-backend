@@ -18,8 +18,6 @@ internal static class Extensions
             .ValidateOnStart();
 
         // services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
-        // services.ConfigureOptions<ConfigureJwtBearerOptions>();
-        // services.ConfigureOptions<ConfigureJwtBearerElsaOptions>();
         services.AddAuthentication(options =>
         {
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -27,19 +25,11 @@ internal static class Extensions
         })
             .AddJwtBearer(JwtAuthConstants.FSHSchemeName, JwtBearerFSHOptions.ConfigAction)
             .AddJwtBearer(JwtAuthConstants.ElsaSchemeName, JwtBearerElsaOptions.ConfigAction);
-            // .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
         // Register both configuration classes
 
 
-        //var authBuilder = services.AddAuthorizationBuilder();  // .AddRequiredPermissionPolicy();
-        //authBuilder.AddPolicy(RequiredPermissionDefaults.PolicyName, policy =>
-        //    {
-        //        policy.RequireAuthenticatedUser();
-        //        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-        //        policy.RequireRequiredPermissions();
-        //    });
-
+        //var authBuilder = services.AddAuthorizationBuilder().AddRequiredPermissionPolicy();
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IAuthorizationHandler, RequiredPermissionAuthorizationHandler>());
 
         services.AddAuthorization(options =>

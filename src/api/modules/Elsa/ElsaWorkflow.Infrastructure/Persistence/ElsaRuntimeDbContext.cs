@@ -1,14 +1,15 @@
-﻿// Management Db Context
+﻿ // Management Db Context
 using Elsa.EntityFrameworkCore.Modules.Management;
+using Elsa.EntityFrameworkCore.Modules.Runtime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Constants;
 
 namespace FSH.Starter.ElsaWorkflow.Infrastructure.Persistence;
 
-public class ElsaManagementDbContext : ManagementElsaDbContext   //FshDbContext
+public class ElsaRuntimeDbContext : RuntimeElsaDbContext  //FshDbContext
 {
-    public ElsaManagementDbContext(DbContextOptions<ManagementElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
+    public ElsaRuntimeDbContext(DbContextOptions<RuntimeElsaDbContext> options, IServiceProvider serviceProvider) : base(options, serviceProvider)
     {
     }
 
@@ -21,7 +22,7 @@ public class ElsaManagementDbContext : ManagementElsaDbContext   //FshDbContext
         base.OnModelCreating(modelBuilder);
         ArgumentNullException.ThrowIfNull(modelBuilder);
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ElsaManagementDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ElsaRuntimeDbContext).Assembly);
         modelBuilder.HasDefaultSchema(SchemaNames.ElsaManagment);
     }
 }

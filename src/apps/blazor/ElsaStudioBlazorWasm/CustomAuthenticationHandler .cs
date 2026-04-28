@@ -15,7 +15,7 @@ public class CustomAuthenticationHandler(IRefreshTokenService refreshTokenServic
         var sp = blazorServiceAccessor.Services;
         var jwtAccessor = sp.GetRequiredService<IJwtAccessor>();
         var accessToken = await jwtAccessor.ReadTokenAsync(TokenNames.AccessToken);
-        request.Headers.Authorization = new("CustomBearer", accessToken);
+        request.Headers.Authorization = new("Bearer", accessToken);
 
         var response = await base.SendAsync(request, cancellationToken);
 
@@ -23,7 +23,7 @@ public class CustomAuthenticationHandler(IRefreshTokenService refreshTokenServic
         {
             // Refresh token and retry once.
             var tokens = await refreshTokenService.RefreshTokenAsync(cancellationToken);
-            request.Headers.Authorization = new("CustomBearer", tokens.AccessToken);
+            request.Headers.Authorization = new("Bearer", tokens.AccessToken);
 
             // Retry.
             response = await base.SendAsync(request, cancellationToken);
