@@ -1,0 +1,8 @@
+﻿@using FSH.Starter.BlazorShared.interfaces;
+@implements IModuleMenu
+
+<MudNavGroup Title="Elsa Workflow" Icon="@Icons.Material.Filled.Business">
+    <MudNavLink Href="/workflows" Icon="@Icons.Material.Filled.CameraRoll" Class="fsh-nav-child">Definitions</MudNavLink>
+    <MudNavLink Href="/workflows/instances" Icon="@Icons.Material.Filled.Camera" Class="fsh-nav-child">Instances</MudNavLink>
+</MudNavGroup>
+

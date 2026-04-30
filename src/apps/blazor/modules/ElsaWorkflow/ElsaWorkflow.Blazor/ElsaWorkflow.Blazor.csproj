@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <RootNamespace>FSH.Starter.Blazor.Modules.ElsaWorkflow.Blazor</RootNamespace>
+    <AssemblyName>FSH.Starter.Blazor.Modules.ElsaWorkflow.Blazor</AssemblyName>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <PackageReference Include="Elsa.Api.Client" />
+    <PackageReference Include="Elsa.Studio" />
+    <PackageReference Include="Elsa.Studio.Core.BlazorWasm" />
+    <PackageReference Include="Elsa.Studio.Login.BlazorWasm" />
+    <PackageReference Include="Elsa.Studio.Shared" />
+    <PackageReference Include="Elsa.Studio.Workflows.Designer" />
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" />
+  </ItemGroup>
+
+
+  <!--<Target Name="PushToMainProject" AfterTargets="Build">
+    <ItemGroup>
+      <MyAssets Include="$(MSBuildProjectDirectory)\wwwroot\**\*.*" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      --><!-- Adjust this relative path to point to your main web project folder --><!--
+      <MainProjectDir>$(MSBuildProjectDirectory)\..\..\..\client\wwwroot\</MainProjectDir>
+    </PropertyGroup>
+
+    <Message Text="Pushing RCL assets to $(MainProjectDir)" Importance="high" />
+
+    <Copy SourceFiles="@(MyAssets)" DestinationFolder="$(MainProjectDir)%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>-->
+  <!--<ItemGroup>
+    <Content Update="wwwroot\Elsa.Studio.Host.CustomElements.styles.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Elsa.Studio.Shell\css\shell.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Radzen.Blazor\css\material-base.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Radzen.Blazor\Radzen.Blazor.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>-->
+
+</Project>
