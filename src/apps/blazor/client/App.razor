@@ -1,5 +1,6 @@
 ﻿@using System.Reflection
 @using FSH.Starter.BlazorShared.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Sections
 @using MudBlazor;
 
 @inject ILayoutService LayoutSrv ;
@@ -33,6 +34,7 @@
         </NotAuthorized>
       </AuthorizeRouteView>
       </CascadingValue>
+      <SectionOutlet SectionName="scripts" />
     </Found>
     <NotFound>
       <LayoutView Layout="@typeof(NotFound)">

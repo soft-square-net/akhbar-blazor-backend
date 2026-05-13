@@ -116,7 +116,7 @@ public static class ElsaModule
         //// Disable endpoint security
 
 
-        // Elsa.EndpointSecurityOptions.DisableSecurity();
+        Elsa.EndpointSecurityOptions.DisableSecurity();
         // ⚠️ DEVELOPMENT ONLY: Disable all endpoint security
 
         builder.Services.AddElsa(elsa =>
@@ -148,7 +148,8 @@ public static class ElsaModule
                     // Configure the tenant resolution pipeline.
                     options.TenantResolverPipelineBuilder.Append<ClaimsTenantResolver>();
                 });
-                tenants.UseTenantManagement(options => {
+                tenants.UseTenantManagement(options =>
+                {
                     //options.UseEntityFrameworkCore(ef =>
                     //{
                     //    ef.UsePostgreSql(dbConfig.ConnectionString);
@@ -156,12 +157,12 @@ public static class ElsaModule
                     //});
                 });
                 // Install the configuration-based tenant provider.
-                tenants.UseConfigurationBasedTenantsProvider(options => 
+                tenants.UseConfigurationBasedTenantsProvider(options =>
                         builder.Configuration.GetSection("Multitenancy").Bind(options));
 
             });
 
-
+            /*
             // Configure ASP.NET authentication/authorization.
             // elsa.UseDefaultAuthentication(auth => auth.UseAdminApiKey());
             ////////////////////////////////////////////////////////////////////////////
@@ -176,16 +177,16 @@ public static class ElsaModule
                 //    ef.RunMigrations = true; 
                 //});
                 identity.UseAdminUserProvider();
-            identity.TokenOptions = options =>
-            {
-                options.Issuer = "https://fullstackhero.net";
-                options.Audience = "fullstackhero";
-                options.SigningKey = "QsJbczCNysv/5SGh+U7sxedX8C07TPQPBdsnSDKZ/aE=";
-                options.AccessTokenLifetime = TimeSpan.FromMinutes(10);
-                options.RefreshTokenLifetime = TimeSpan.FromDays(7);
+                identity.TokenOptions = options =>
+                {
+                    options.Issuer = "https://fullstackhero.net";
+                    options.Audience = "fullstackhero";
+                    options.SigningKey = "QsJbczCNysv/5SGh+U7sxedX8C07TPQPBdsnSDKZ/aE=";
+                    options.AccessTokenLifetime = TimeSpan.FromMinutes(10);
+                    options.RefreshTokenLifetime = TimeSpan.FromDays(7);
 
-            };
-        });
+                };
+            });
             // Configure ASP.NET authentication/authorization.
             elsa.UseDefaultAuthentication(auth =>
             {
@@ -198,7 +199,7 @@ public static class ElsaModule
                 };
             });
             // elsa.UseDefaultAuthentication();
-            /////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////*/
 
             //elsa.UseIdentity(identity =>
             //{

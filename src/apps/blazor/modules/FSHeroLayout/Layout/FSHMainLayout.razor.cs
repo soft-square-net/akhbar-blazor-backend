@@ -38,7 +38,7 @@ public partial class FSHMainLayout
     {
         _drawerOpen = await ClientPreferences.ToggleDrawerAsync();
     }
-    private void Logout()
+    private async Task LogoutAsync()
     {
         var parameters = new DialogParameters
         {
@@ -48,7 +48,7 @@ public partial class FSHMainLayout
             };
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-        DialogService.Show<BlazorShared.Components.Dialogs.Logout>("Logout", parameters, options);
+        await DialogService.ShowAsync<BlazorShared.Components.Dialogs.Logout>("Logout", parameters, options);
     }
 
     private void Profile()

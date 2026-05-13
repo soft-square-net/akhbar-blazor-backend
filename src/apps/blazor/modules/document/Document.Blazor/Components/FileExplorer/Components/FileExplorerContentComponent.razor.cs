@@ -152,7 +152,7 @@ public partial class FileExplorerContentComponent
     async Task RenameFilePrompt(FileModel f)
     {
         var parameters = new DialogParameters { ["CurrentName"] = f.Name };
-        var dialog = DialogService.Show<RenameDialog>("Rename file", parameters);
+        var dialog = await DialogService.ShowAsync<RenameDialog>("Rename file", parameters);
         var res = await dialog.Result;
         if (!res.Canceled && res.Data is string newName && !string.IsNullOrWhiteSpace(newName))
         {

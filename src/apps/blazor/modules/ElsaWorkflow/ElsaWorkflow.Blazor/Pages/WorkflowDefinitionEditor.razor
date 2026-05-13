@@ -1,0 +1,72 @@
+﻿@page "/workflow-definitions/{definitionId}"
+@using Elsa.Api.Client.Resources.WorkflowDefinitions.Models
+@using FSH.Starter.Blazor.Modules.ElsaWorkflow.Blazor.Components
+@using Microsoft.AspNetCore.Components.Sections
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveWebAssembly
+@* @layout ElsaWorkflow.Blazor.Layout.LayoutWorkflow
+ *@
+<HeadContent>
+    <link rel="apple-touch-icon" sizes="180x180" href="_content/Elsa.Studio.Shell/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="_content/Elsa.Studio.Shell/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="_content/Elsa.Studio.Shell/favicon-16x16.png">
+    <link rel="manifest" href="_content/Elsa.Studio.Shell/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@100&display=swap" rel="stylesheet">
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
+    <link href="_content/Radzen.Blazor/css/material-base.css" rel="stylesheet">
+    <link href="_content/Elsa.Studio.Shell/css/shell.css" rel="stylesheet">
+    @* <link href="Elsa.Studio.Host.CustomElements.styles.css" rel="stylesheet"> *@
+</HeadContent>
+
+<WorkflowDefinitionEditorWrapper @ref="Editor" DefinitionId="@DefinitionId" WorkflowDefinitionVersionSelected="@WorkflowDefinitionVersionSelected"/>
+
+<MudButton OnClick="@OnClick">Get Current Version</MudButton>
+
+
+@* <SectionContent SectionName="scripts"> *@
+<SectionContent SectionName="PageAfterScripts">
+    <script src="_content/BlazorMonaco/jsInterop.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
+    @*     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+ *@    <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    @* <script src="_framework/blazor.webassembly.js"></script> *@
+</SectionContent>
+
+@code
+{
+    /// <summary>
+    /// The ID of the workflow definition to edit.
+    /// </summary>
+    [Parameter]
+    public string DefinitionId { get; set; } = default!;
+    
+    private WorkflowDefinitionEditorWrapper Editor { get; set; } = default!;
+
+    private Task WorkflowDefinitionVersionSelected(WorkflowDefinition arg)
+    {
+        return Task.CompletedTask;
+    }
+
+    private Task OnClick()
+    {
+        var selectedVersion = Editor.GetSelectedWorkflowDefinitionVersion();
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(50); // Small buffer for the DOM to catch up
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

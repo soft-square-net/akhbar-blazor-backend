@@ -82,7 +82,7 @@ public partial class Tenants
             }
         };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
-        var dialog = DialogService.Show<UpgradeSubscriptionModal>("Upgrade Subscription", parameters, options);
+        var dialog = await DialogService.ShowAsync<UpgradeSubscriptionModal>("Upgrade Subscription", parameters, options);
         var result = await dialog.Result;
         if (!result.Canceled)
         {

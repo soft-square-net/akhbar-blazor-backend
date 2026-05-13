@@ -16,21 +16,34 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Elsa.Api.Client" />
-    <PackageReference Include="Elsa.Studio" />
+    <PackageReference Include="BlazorMonaco" />
+    
+    <!--<PackageReference Include="Elsa.Studio" />-->
+    
+    <!--<PackageReference Include="Elsa.Studio.Dashboard" />
+    <PackageReference Include="Elsa.Studio.DomInterop" />-->
+    <!--<PackageReference Include="Elsa.Studio.Workflows.Designer" />-->
+    <!--<PackageReference Include="MudBlazor" />-->
+
+
     <PackageReference Include="Elsa.Studio.Core.BlazorWasm" />
+    <PackageReference Include="CodeBeam.MudBlazor.Extensions" />
+    <PackageReference Include="Elsa.Api.Client" />
+    <PackageReference Include="Elsa.Studio.Login" />
     <PackageReference Include="Elsa.Studio.Login.BlazorWasm" />
     <PackageReference Include="Elsa.Studio.Shared" />
-    <PackageReference Include="Elsa.Studio.Workflows.Designer" />
-    <PackageReference Include="Mapster" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+    <PackageReference Include="Elsa.Studio.Shell" />
+    <PackageReference Include="Elsa.Studio.Workflows" />
+    <!--<PackageReference Include="Mapster" />-->
+    <!--<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />-->
+    <!--<PackageReference Include="Microsoft.AspNetCore.Components.Web" />-->
   </ItemGroup>
 
 
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" />
+    <ProjectReference Include="..\..\..\Elsa.Studio.Host.CustomElements\Elsa.Studio.Host.CustomElements.csproj" />
   </ItemGroup>
 
 

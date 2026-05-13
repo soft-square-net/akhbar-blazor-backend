@@ -5,15 +5,15 @@ namespace FSH.Starter.BlazorShared.Components.Common;
 
 public static class DialogServiceExtensions
 {
-    public static Task<DialogResult> ShowModalAsync<TDialog>(this IDialogService dialogService, DialogParameters parameters)
+    public static async Task<DialogResult> ShowModalAsync<TDialog>(this IDialogService dialogService, DialogParameters parameters)
         where TDialog : ComponentBase =>
-        dialogService.ShowModal<TDialog>(parameters).Result!;
+        await (await dialogService.ShowModal<TDialog>(parameters)!).Result!;
 
-    public static IDialogReference ShowModal<TDialog>(this IDialogService dialogService, DialogParameters parameters)
+    public async static Task<IDialogReference> ShowModal<TDialog>(this IDialogService dialogService, DialogParameters parameters)
         where TDialog : ComponentBase
     {
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, BackdropClick = false };
 
-        return dialogService.Show<TDialog>(string.Empty, parameters, options);
+        return await dialogService.ShowAsync<TDialog>(string.Empty, parameters, options);
     }
 }

@@ -60,12 +60,12 @@ blazor.WaitFor(api)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-//var elsaStudio = builder.AddProject<Projects.ElsaStudioBlazorWasm>("elsaStudio")
-//    .WithEndpoint(endpointName: "https", callback: static endpoint =>
-//    {
-//        endpoint.TargetPort = 7250;
-//        endpoint.Port = 7350;
-//    });
+var elsaStudio = builder.AddProject<Projects.ElsaStudioBlazorWasm>("elsaStudio")
+    .WithEndpoint(endpointName: "https", callback: static endpoint =>
+    {
+        endpoint.TargetPort = 7250;
+        endpoint.Port = 7350;
+    });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //                              MINIO / S3 COMPATIBLE OBJECT STORAGE

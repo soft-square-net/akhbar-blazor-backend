@@ -21,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Mapster" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="MudBlazor.Extensions" />
   </ItemGroup>
   
   <ItemGroup>
@@ -29,6 +30,7 @@
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\OS\OS\OS.csproj" />
   </ItemGroup>
   
   <Target Name="ZipPlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">

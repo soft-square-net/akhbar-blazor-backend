@@ -19,26 +19,34 @@ public static class Extensions
     {
         services.AddMudServices(configuration =>
         {
+            //configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+            //configuration.SnackbarConfiguration.HideTransitionDuration = 100;
+            //configuration.SnackbarConfiguration.ShowTransitionDuration = 100;
+            //configuration.SnackbarConfiguration.VisibleStateDuration = 3000;
+            //configuration.SnackbarConfiguration.ShowCloseIcon = false;
             configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
-            configuration.SnackbarConfiguration.HideTransitionDuration = 100;
-            configuration.SnackbarConfiguration.ShowTransitionDuration = 100;
+            configuration.SnackbarConfiguration.NewestOnTop = false;
+            configuration.SnackbarConfiguration.ShowCloseIcon = true;
             configuration.SnackbarConfiguration.VisibleStateDuration = 3000;
-            configuration.SnackbarConfiguration.ShowCloseIcon = false;
+            configuration.SnackbarConfiguration.HideTransitionDuration = 500;
+            configuration.SnackbarConfiguration.ShowTransitionDuration = 500;
+            configuration.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            // configuration.PopoverOptions.OverflowBehavior = OverflowBehavior.FlipNever;
         });
-        services.AddMudExtensions(c =>
-        c.WithDefaultDialogOptions(ex =>
-        {
-            ex.MaximizeButton = true;
-            ex.CloseButton = true;
-            ex.CloseOnEscapeKey = true;
-            ex.MaxWidth = MaxWidth.Medium;
-            ex.FullWidth = true;
-            ex.Resizeable = true;
-            ex.DragMode = MudDialogDragMode.SnapDrag;
-            ex.DisableSizeMarginY = true;
-            ex.DisablePositionMargin = true;
-        })
-        );
+        //services.AddMudExtensions(c =>
+        //    c.WithDefaultDialogOptions(ex =>
+        //    {
+        //        ex.MaximizeButton = true;
+        //        ex.CloseButton = true;
+        //        ex.CloseOnEscapeKey = true;
+        //        ex.MaxWidth = MaxWidth.Medium;
+        //        ex.FullWidth = true;
+        //        ex.Resizeable = true;
+        //        ex.DragMode = MudDialogDragMode.SnapDrag;
+        //        ex.DisableSizeMarginY = true;
+        //        ex.DisablePositionMargin = true;
+        //    })
+        //);
         services.AddBlazoredLocalStorage();
         services.AddAuthentication(config);
         services.AddTransient<IApiClient, ApiClient>();

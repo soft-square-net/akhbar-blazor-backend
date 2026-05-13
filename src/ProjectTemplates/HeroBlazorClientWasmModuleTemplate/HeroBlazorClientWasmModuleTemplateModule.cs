@@ -5,6 +5,7 @@ using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.interfaces;
 using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.Blazor.Modules.HeroBlazorClientWasmModuleTemplate;
@@ -24,7 +25,7 @@ public class HeroBlazorClientWasmModuleTemplateModule : IBlazorModule
 
     public ILogger Logger => throw new NotImplementedException();
 
-    public Task ConfigureModule(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
+    public Task ConfigureModule(IServiceCollection services)
     {
         throw new NotImplementedException();
     }
