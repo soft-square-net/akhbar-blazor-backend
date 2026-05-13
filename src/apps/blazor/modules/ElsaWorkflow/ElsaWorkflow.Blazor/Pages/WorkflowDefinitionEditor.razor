@@ -3,10 +3,11 @@
 @using FSH.Starter.Blazor.Modules.ElsaWorkflow.Blazor.Components
 @using Microsoft.AspNetCore.Components.Sections
 @using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime JS
 @rendermode InteractiveWebAssembly
-@* @layout ElsaWorkflow.Blazor.Layout.LayoutWorkflow
- *@
-<HeadContent>
+@* @layout ElsaWorkflow.Blazor.Layout.LayoutWorkflow *@
+
+@* <HeadContent>
     <link rel="apple-touch-icon" sizes="180x180" href="_content/Elsa.Studio.Shell/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="_content/Elsa.Studio.Shell/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="_content/Elsa.Studio.Shell/favicon-16x16.png">
@@ -21,8 +22,8 @@
     <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
     <link href="_content/Radzen.Blazor/css/material-base.css" rel="stylesheet">
     <link href="_content/Elsa.Studio.Shell/css/shell.css" rel="stylesheet">
-    @* <link href="Elsa.Studio.Host.CustomElements.styles.css" rel="stylesheet"> *@
-</HeadContent>
+    @ <link href="Elsa.Studio.Host.CustomElements.styles.css" rel="stylesheet"> @
+</HeadContent> *@
 
 <WorkflowDefinitionEditorWrapper @ref="Editor" DefinitionId="@DefinitionId" WorkflowDefinitionVersionSelected="@WorkflowDefinitionVersionSelected"/>
 
@@ -30,15 +31,15 @@
 
 
 @* <SectionContent SectionName="scripts"> *@
-<SectionContent SectionName="PageAfterScripts">
+@* <SectionContent SectionName="PageAfterScripts">
     <script src="_content/BlazorMonaco/jsInterop.js"></script>
     <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
-    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
-    @*     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
- *@    <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script> 
+    @     <script src="_content/MudBlazor/MudBlazor.min.js"></script> @
+     <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
-    @* <script src="_framework/blazor.webassembly.js"></script> *@
-</SectionContent>
+    @ <script src="_framework/blazor.webassembly.js"></script> @
+</SectionContent> *@
 
 @code
 {
@@ -48,6 +49,11 @@
     [Parameter]
     public string DefinitionId { get; set; } = default!;
     
+    private IJSObjectReference? module;
+    [Parameter] public string ElementId { get; set; } = "monaco-container";
+    [Parameter] public string InitialValue { get; set; } = "// Type your code here";
+    [Parameter] public string Language { get; set; } = "javascript";
+
     private WorkflowDefinitionEditorWrapper Editor { get; set; } = default!;
 
     private Task WorkflowDefinitionVersionSelected(WorkflowDefinition arg)
@@ -65,8 +71,52 @@
     {
         if (firstRender)
         {
-            await Task.Delay(50); // Small buffer for the DOM to catch up
+            // await InjectExternalScript("_content/BlazorMonaco/jsInterop.js");
+            // await InjectExternalScript("_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js");
+            // await InjectExternalScript("_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js");
+            
+                                   // Import the module
+            // module = await JS.InvokeAsync<IJSObjectReference>(
+            //     "import", "_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js");
+
+            // // Call the function
+            // await module.InvokeVoidAsync("monaco.editor.create",new []{ "document.getElementById('container')"});
+            // Load the isolated JavaScript module
+            //module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js");
+            //module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js");
+
+            //module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorMonaco/jsInterop.js");
+            
+            // Initialize the AMD loader and editor
+            // await module.InvokeVoidAsync("initializeEditor", ElementId, InitialValue, Language);
+            await Task.Delay(500); // Small buffer for the DOM to catch up
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    // Dispose module reference to avoid memory leaks
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+    private async Task InjectExternalScript(string scriptUrl)
+    {
+        // string scriptUrl = "cloudflare.com";
+
+        // Complete script injection code executed in a single atomic JS call
+        string injectorPayload = $@"
+            if (!document.querySelector('script[src=""{scriptUrl}""]')) {{
+                var script = document.createElement('script');
+                script.src = '{scriptUrl}';
+                script.async = true;
+                document.head.appendChild(script);
+            }}";
+
+        // Injects the tag into <head> immediately
+        await JS.InvokeVoidAsync("Function", injectorPayload);
     }
 }
