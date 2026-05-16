@@ -49,10 +49,10 @@
     [Parameter]
     public string DefinitionId { get; set; } = default!;
     
-    private IJSObjectReference? module;
-    [Parameter] public string ElementId { get; set; } = "monaco-container";
-    [Parameter] public string InitialValue { get; set; } = "// Type your code here";
-    [Parameter] public string Language { get; set; } = "javascript";
+    // private IJSObjectReference? module;
+    // [Parameter] public string ElementId { get; set; } = "monaco-container";
+    // [Parameter] public string InitialValue { get; set; } = "// Type your code here";
+    // [Parameter] public string Language { get; set; } = "javascript";
 
     private WorkflowDefinitionEditorWrapper Editor { get; set; } = default!;
 
@@ -94,14 +94,14 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    // Dispose module reference to avoid memory leaks
-    public async ValueTask DisposeAsync()
-    {
-        if (module is not null)
-        {
-            await module.DisposeAsync();
-        }
-    }
+    // // Dispose module reference to avoid memory leaks
+    // public async ValueTask DisposeAsync()
+    // {
+    //     if (module is not null)
+    //     {
+    //         await module.DisposeAsync();
+    //     }
+    // }
 
     private async Task InjectExternalScript(string scriptUrl)
     {
