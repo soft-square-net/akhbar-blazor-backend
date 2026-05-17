@@ -4,18 +4,23 @@ using Acornima.Ast;
 using AspNetCore.Authentication.ApiKey;
 using Carter;
 using Elsa;
+
 using Elsa.Common.Multitenancy;
-using Elsa.EntityFrameworkCore;
-using Elsa.EntityFrameworkCore.Extensions;
-using Elsa.EntityFrameworkCore.Modules.Identity;
-using Elsa.EntityFrameworkCore.Modules.Management;
-using Elsa.EntityFrameworkCore.Modules.Runtime;
-using Elsa.EntityFrameworkCore.Modules.Tenants;
+//using Elsa.EntityFrameworkCore;
+//using Elsa.EntityFrameworkCore.Extensions;
+//using Elsa.EntityFrameworkCore.Modules.Identity;
+//using Elsa.EntityFrameworkCore.Modules.Management;
+//using Elsa.EntityFrameworkCore.Modules.Runtime;
+//using Elsa.EntityFrameworkCore.Modules.Tenants;
 using Elsa.Extensions;
 using Elsa.Identity.Contracts;
 using Elsa.Identity.Models;
 using Elsa.Identity.Multitenancy;
 using Elsa.Identity.Services;
+using Elsa.Persistence.EFCore.Extensions;
+using Elsa.Persistence.EFCore.Modules.Identity;
+using Elsa.Persistence.EFCore.Modules.Management;
+using Elsa.Persistence.EFCore.Modules.Runtime;
 using Elsa.Tenants.Extensions;
 using Elsa.Workflows.LogPersistence.Strategies;
 using Elsa.Workflows.Management.Features;
@@ -137,45 +142,44 @@ public static class ElsaModule
             ////////////////////////////////////////////////////////////////////////////
             //                           ELSA TENANT
             ////////////////////////////////////////////////////////////////////////////
-            // builder.Services.AddScoped<ITenantsProvider, FinbuckleTenantProvider>();
-            elsa.UseTenants(tenants =>
-            {
-                //tenants.ConfigureMultitenancy(options =>
-                //   options.TenantResolverPipelineBuilder.Append<FinbuckleTenantResolver>());
+            //// builder.Services.AddScoped<ITenantsProvider, FinbuckleTenantProvider>();
+            //elsa.UseTenants(tenants =>
+            //{
+            //    //tenants.ConfigureMultitenancy(options =>
+            //    //   options.TenantResolverPipelineBuilder.Append<FinbuckleTenantResolver>());
 
-                tenants.ConfigureMultitenancy(options =>
-                {
-                    // Configure the tenant resolution pipeline.
-                    options.TenantResolverPipelineBuilder.Append<ClaimsTenantResolver>();
-                });
-                tenants.UseTenantManagement(options =>
-                {
-                    //options.UseEntityFrameworkCore(ef =>
-                    //{
-                    //    ef.UsePostgreSql(dbConfig.ConnectionString);
-                    //    // ef.RunMigrations = true;
-                    //});
-                });
-                // Install the configuration-based tenant provider.
-                tenants.UseConfigurationBasedTenantsProvider(options =>
-                        builder.Configuration.GetSection("Multitenancy").Bind(options));
+            //    tenants.ConfigureMultitenancy(options =>
+            //    {
+            //        // Configure the tenant resolution pipeline.
+            //        options.TenantResolverPipelineBuilder.Append<ClaimsTenantResolver>();
+            //    });
+            //    tenants.UseTenantManagement(options =>
+            //    {
+            //        //options.UseEntityFrameworkCore(ef =>
+            //        //{
+            //        //    ef.UsePostgreSql(dbConfig.ConnectionString);
+            //        //    // ef.RunMigrations = true;
+            //        //});
+            //    });
+            //    // Install the configuration-based tenant provider.
+            //    tenants.UseConfigurationBasedTenantsProvider(options =>
+            //            builder.Configuration.GetSection("Multitenancy").Bind(options));
 
-            });
+            //});
 
-            /*
-            // Configure ASP.NET authentication/authorization.
-            // elsa.UseDefaultAuthentication(auth => auth.UseAdminApiKey());
+            ///*
+            //// Configure ASP.NET authentication/authorization.
+            //// elsa.UseDefaultAuthentication(auth => auth.UseAdminApiKey());
             ////////////////////////////////////////////////////////////////////////////
             //                           ELSA IDENTITY
             ////////////////////////////////////////////////////////////////////////////
             elsa.UseIdentity(identity =>
             {
                 identity.ApiKeyOptions = options => { };
-                //identity.UseEntityFrameworkCore(ef =>
-                //{
-                //    ef.UsePostgreSql(dbConfig.ConnectionString);
-                //    ef.RunMigrations = true; 
-                //});
+                identity.UseEntityFrameworkCore(ef =>
+                {
+                    ef.UsePostgreSql(builder.Configuration["Elsa:ConnectionString"]);
+                });
                 identity.UseAdminUserProvider();
                 identity.TokenOptions = options =>
                 {
@@ -307,8 +311,19 @@ public static class ElsaModule
             //    options.UsePostgreSql(dbConfig.ConnectionString);
             //    options.RunMigrations = true;
             //}));
-            elsa.UseWorkflowManagement();
+            // elsa.UseWorkflowManagement();
+            
+            elsa.UseWorkflowManagement(management =>
+            {
+                management.UseEntityFrameworkCore(ef =>
+                {
+                    // Use PostgreSQL (replace with UseSqlServer(), UseSqlite(), etc. as needed)
+                    ef.UsePostgreSql(builder.Configuration["Elsa:ConnectionString"]);
 
+                    // Apply migrations on startup (development only)
+                    ef.RunMigrations = true;
+                });
+            });
             // Configure Runtime layer to use EF Core.
             //elsa.UseWorkflowRuntime(runtime =>
             //{
@@ -323,8 +338,16 @@ public static class ElsaModule
             //        options.SweepInterval = TimeSpan.FromMinutes(60);
             //    };
             //});
-            elsa.UseWorkflowRuntime();
-
+            // elsa.UseWorkflowRuntime();
+            
+            elsa.UseWorkflowRuntime(runtime =>
+            {
+                runtime.UseEntityFrameworkCore(ef =>
+                {
+                    ef.UsePostgreSql(builder.Configuration["Elsa:ConnectionString"]);
+                    ef.RunMigrations = true;
+                });
+            });
 
             // Expose Elsa API endpoints.
             elsa.UseWorkflowsApi();

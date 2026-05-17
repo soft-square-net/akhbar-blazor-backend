@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Elsa.EntityFrameworkCore.Modules.Identity;
 using FSH.Starter.ElsaWorkflow.Infrastructure.Auth.ApiKey;
 using FSH.Starter.ElsaWorkflow.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

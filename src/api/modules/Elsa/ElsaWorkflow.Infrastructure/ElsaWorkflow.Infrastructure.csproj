@@ -12,9 +12,10 @@
   <ItemGroup>
     <PackageReference Include="Elsa" />
     <PackageReference Include="Elsa.CSharp" />
-    <PackageReference Include="Elsa.EntityFrameworkCore" />
-    <PackageReference Include="Elsa.EntityFrameworkCore.PostgreSql" />
-    <PackageReference Include="Elsa.EntityFrameworkCore.Sqlite" />
+    <!--<PackageReference Include="Elsa.EntityFrameworkCore" />
+    <PackageReference Include="Elsa.EntityFrameworkCore.Sqlite" />-->
+    <PackageReference Include="Elsa.Persistence.EFCore.PostgreSql" />
+    <PackageReference Include="Elsa.Persistence.EFCore.SqlServer" />
     <PackageReference Include="Elsa.Http" />
     <PackageReference Include="Elsa.Identity" />
     <PackageReference Include="Elsa.JavaScript" />
@@ -23,6 +24,7 @@
     <PackageReference Include="Elsa.Tenants" />
     <PackageReference Include="Elsa.Workflows.Api" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
   </ItemGroup>
 
 </Project>

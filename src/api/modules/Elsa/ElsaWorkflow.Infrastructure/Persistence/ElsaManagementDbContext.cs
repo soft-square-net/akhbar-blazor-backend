@@ -1,5 +1,5 @@
 ﻿// Management Db Context
-using Elsa.EntityFrameworkCore.Modules.Management;
+using Elsa.Persistence.EFCore.Modules.Management;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Constants;

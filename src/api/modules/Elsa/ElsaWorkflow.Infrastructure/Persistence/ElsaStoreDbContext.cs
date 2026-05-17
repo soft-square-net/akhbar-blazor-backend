@@ -8,7 +8,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Constants;
-using Elsa.EntityFrameworkCore.Modules.Management;
 
 namespace FSH.Starter.ElsaWorkflow.Infrastructure.Persistence;
 
