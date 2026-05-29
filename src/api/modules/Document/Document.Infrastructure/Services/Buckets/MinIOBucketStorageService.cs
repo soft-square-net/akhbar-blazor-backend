@@ -8,7 +8,7 @@ using FSH.Framework.Core.Storage.Bucket;
 using FSH.Framework.Core.Storage.Bucket.Features;
 using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
 using Microsoft.Extensions.Configuration;
-namespace FSH.Starter.WebApi.Document.Infrastructure.Services;
+namespace FSH.Starter.WebApi.Document.Infrastructure.Services.Buckets;
 public class MinIOBucketStorageService : IBucketStorageService
 {
     private readonly AmazonS3Client _s3Client;

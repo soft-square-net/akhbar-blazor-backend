@@ -39,18 +39,18 @@ public partial class Products
                 productFilter.MinimumRate = Convert.ToDouble(SearchMinimumRate);
                 productFilter.MaximumRate = Convert.ToDouble(SearchMaximumRate);
                 productFilter.BrandId = SearchBrandId;
-                var result = await _client.SearchProductsEndpointAsync("1", productFilter);
+                var result = await _client.SearchProductsEndpointAsync(productFilter);
                 return result.Adapt<PaginationResponse<ProductResponse>>();
             },
             createFunc: async prod =>
             {
-                await _client.CreateProductEndpointAsync("1", prod.Adapt<CreateProductCommand>());
+                await _client.CreateProductEndpointAsync(prod.Adapt<CreateProductCommand>());
             },
             updateFunc: async (id, prod) =>
             {
-                await _client.UpdateProductEndpointAsync("1", id, prod.Adapt<UpdateProductCommand>());
+                await _client.UpdateProductEndpointAsync( id, prod.Adapt<UpdateProductCommand>());
             },
-            deleteFunc: async id => await _client.DeleteProductEndpointAsync("1", id));
+            deleteFunc: async id => await _client.DeleteProductEndpointAsync(id));
 
         await LoadBrandsAsync();
     }
@@ -59,7 +59,7 @@ public partial class Products
     {
         if (_brands.Count == 0)
         {
-            var response = await _client.SearchBrandsEndpointAsync("1", new SearchBrandsCommand());
+            var response = await _client.SearchBrandsEndpointAsync( new SearchBrandsCommand());
             if (response?.Items != null)
             {
                 _brands = response.Items.ToList();

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
+namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 public interface IFileExplorerStateService
 {
     public event Action OnChange;

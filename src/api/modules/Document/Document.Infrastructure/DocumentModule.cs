@@ -1,7 +1,6 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Carter;
-using Document.Infrastructure.Services;
 using FSH.Framework.Core.Persistence;
 using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.Bucket;
@@ -14,6 +13,8 @@ using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.StorageAccounts.v1;
 using FSH.Starter.WebApi.Document.Infrastructure.Persistence;
 using FSH.Starter.WebApi.Document.Infrastructure.Services;
 using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
+using FSH.Starter.WebApi.Document.Infrastructure.Services.Buckets;
+using FSH.Starter.WebApi.Document.Infrastructure.Services.Files;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

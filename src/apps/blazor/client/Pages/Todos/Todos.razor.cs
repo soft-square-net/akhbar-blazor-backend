@@ -32,18 +32,18 @@ public partial class Todos
             {
                 var todoFilter = filter.Adapt<PaginationFilter>();
 
-                var result = await ApiClient.GetTodoListEndpointAsync("1", todoFilter);
+                var result = await ApiClient.GetTodoListEndpointAsync(todoFilter);
                 return result.Adapt<PaginationResponse<GetTodoResponse>>();
             },
             createFunc: async todo =>
             {
-                await ApiClient.CreateTodoEndpointAsync("1", todo.Adapt<CreateTodoCommand>());
+                await ApiClient.CreateTodoEndpointAsync(todo.Adapt<CreateTodoCommand>());
             },
             updateFunc: async (id, todo) =>
             {
-                await ApiClient.UpdateTodoEndpointAsync("1", id, todo.Adapt<UpdateTodoCommand>());
+                await ApiClient.UpdateTodoEndpointAsync(id, todo.Adapt<UpdateTodoCommand>());
             },
-            deleteFunc: async id => await ApiClient.DeleteTodoEndpointAsync("1", id));
+            deleteFunc: async id => await ApiClient.DeleteTodoEndpointAsync( id));
 }
 
 public class TodoViewModel : UpdateTodoCommand

@@ -5,7 +5,7 @@ using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
 using Microsoft.Extensions.Configuration;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
-namespace FSH.Starter.WebApi.Document.Infrastructure.Services;
+namespace FSH.Starter.WebApi.Document.Infrastructure.Services.Buckets;
 public class DocumentLocalBucketStorageService : IBucketStorageService
 {
     public DocumentLocalBucketStorageService(IExternalRefreshingAWSWithBasicCredentials refreshCeredintials, IConfiguration configuration)

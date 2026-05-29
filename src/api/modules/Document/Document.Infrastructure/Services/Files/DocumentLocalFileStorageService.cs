@@ -8,7 +8,7 @@ using FSH.Framework.Infrastructure.Common.Extensions;
 using Microsoft.Extensions.Options;
 using Shared.Enums;
 
-namespace Document.Infrastructure.Services;
+namespace FSH.Starter.WebApi.Document.Infrastructure.Services.Files;
 public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSettings) : IFileStorageService
 {
 

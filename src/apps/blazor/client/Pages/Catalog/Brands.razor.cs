@@ -31,18 +31,18 @@ public partial class Brands
             searchFunc: async filter =>
             {
                 var brandFilter = filter.Adapt<SearchBrandsCommand>();
-                var result = await _client.SearchBrandsEndpointAsync("1", brandFilter);
+                var result = await _client.SearchBrandsEndpointAsync(brandFilter);
                 return result.Adapt<PaginationResponse<BrandResponse>>();
             },
             createFunc: async brand =>
             {
-                await _client.CreateBrandEndpointAsync("1", brand.Adapt<CreateBrandCommand>());
+                await _client.CreateBrandEndpointAsync( brand.Adapt<CreateBrandCommand>());
             },
             updateFunc: async (id, brand) =>
             {
-                await _client.UpdateBrandEndpointAsync("1", id, brand.Adapt<UpdateBrandCommand>());
+                await _client.UpdateBrandEndpointAsync( id, brand.Adapt<UpdateBrandCommand>());
             },
-            deleteFunc: async id => await _client.DeleteBrandEndpointAsync("1", id));
+            deleteFunc: async id => await _client.DeleteBrandEndpointAsync( id));
 }
 
 public class BrandViewModel : UpdateBrandCommand

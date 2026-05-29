@@ -1,11 +1,13 @@
 ﻿
 using System.Diagnostics.CodeAnalysis;
-using FSH.Starter.Blazor.Modules.Document.Blazor.API;
+using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Document;
 using FSH.Starter.BlazorShared;
+using FSH.Starter.Blazor.Infrastructure.Api;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,10 +34,19 @@ public sealed class DocumentModule : BlazorModuleBase
     public override Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
-        services.AddTransient<IApiClient, ApiClient>();
+        // services.AddTransient<IApiClient, ApiClient>();
+        builder.Services.AddHttpClient<FileExplorerFileActionsService>(client =>
+        {
+            client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+        });
+        builder.Services.AddHttpClient<FileExplorerFolderActionsService>(client =>
+        {
+            client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+        });
         services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
+
         
         return base.ConfigureModule(services, builder);
     }

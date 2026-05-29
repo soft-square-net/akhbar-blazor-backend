@@ -2,7 +2,7 @@
 
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -19,8 +19,8 @@ public partial class FileExplorerComponent
     [Parameter] public bool AllowMultipleSelection { get; set; }
 
     private List<FolderModel> Folders = new();
-    private FolderModel CurrentFolder {get; set;}//=> _currentFolder ??= Folders.First();
-                                                 // private FolderModel? _currentFolder;
+    private FolderModel CurrentFolder { get; set; }//=> _currentFolder ??= Folders.First();
+                                                   // private FolderModel? _currentFolder;
     private bool _open = true;
 
     private void ToggleFileBrowserTree(bool opened)
@@ -65,18 +65,20 @@ public partial class FileExplorerComponent
                             new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
                         }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="mp3" }
            }
-        
-        ) { Path = $"{Constants._content}/img/" };
+
+        )
+        { Path = $"{Constants._content}/img/" };
 
         Folders.Add(root);
 
         var shared = new FolderModel("Shared", new[]
         {
             new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
-        }){ Path = $"{Constants._content}/" };
+        })
+        { Path = $"{Constants._content}/" };
 
         Folders.Add(shared);
-        var archive = new FolderModel("Archive"){ Path = $"{Constants._content}/archive" };
+        var archive = new FolderModel("Archive") { Path = $"{Constants._content}/archive" };
 
         Folders.Add(archive);
 
@@ -91,7 +93,7 @@ public partial class FileExplorerComponent
         CurrentFolder = folder;
         StateHasChanged();
     }
-    
+
 
     void ClearSelection()
     {
@@ -118,16 +120,17 @@ public partial class FileExplorerComponent
         Toast.Add($"Uploaded {e.GetMultipleFiles().Count} file(s).", Severity.Success);
     }
 
-    
-async Task OnFolderUpdated(ICollection<FolderModel> updatedFolders)
+
+    async Task OnFolderUpdated(ICollection<FolderModel> updatedFolders)
     {
         Folders = updatedFolders.ToList();
         // Ensure current folder reference is updated
         // _currentFolder = Folders.FirstOrDefault(f => f.Name == CurrentFolder.Name) ?? Folders.First();
         await InvokeAsync(StateHasChanged);
-    }   
+    }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         StateService.OnFileExplorerClearSelection -= ClearSelection;
     }
 }

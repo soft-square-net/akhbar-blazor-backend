@@ -15,7 +15,7 @@ var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432)
-    .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
+    // .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
     .WithDataVolume()
     .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
 // Ahmed Galal
@@ -24,36 +24,6 @@ var database = builder.AddPostgres("db", username, password, port: 5432)
 var cache = builder.AddGarnet("cache", port: 6379);
 // .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          BLAZOR WASM HOST
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-var blazor = builder.AddProject<Projects.Client>("blazor")
-    // .WithHttpEndpoint(port: 5100)
-    // .WithHttpsEndpoint(port: 7100)
-
-    .WithEndpoint(endpointName: "https", callback: static endpoint =>
-    {
-        // Sets the actual port the Blazor WASM app runs on
-        endpoint.TargetPort = 7100;
-        // Sets the port for the Aspire proxy (optional, can be same as TargetPort)
-        endpoint.Port = 7300;
-    }); // Use your desired fixed port;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          WEB API HOST
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-var api = builder.AddProject<Projects.Server>("webapi")
-    // .WithHttpEndpoint(port: 5000)
-    // .WithHttpsEndpoint(port: 7000)
-    .WithReference(cache)
-    .WithReference(blazor)
-    .WaitFor(database);
-
-blazor.WaitFor(api)
-    .WithReference(api);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          ELSA STUDIO
@@ -67,9 +37,10 @@ blazor.WaitFor(api)
 //        endpoint.Port = 7350;
 //    });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//                              MINIO / S3 COMPATIBLE OBJECT STORAGE
-////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+////                              MINIO / S3 COMPATIBLE OBJECT STORAGE
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//#region MINIO / S3 COMPATIBLE OBJECT STORAGE
 //// Object storage (MinIO, S3-compatible)
 //const string MinioBucket = "fsh-uploads";
 //var minioUser = builder.AddParameter("minio-user", "minioadmin");
@@ -101,7 +72,88 @@ blazor.WaitFor(api)
 //    .WaitFor(minio);
 
 //var minioApiEndpoint = minio.GetEndpoint("minoioapi");
+//#endregion
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                              MINIO OLD / S3 COMPATIBLE OBJECT STORAGE
+////////////////////////////////////////////////////////////////////////////////////////////////////
+#region MINIO OLD/ S3 COMPATIBLE OBJECT STORAGE
+// Object storage (MinIO, S3-compatible)
+const string MinioBucket = "fsh-uploads";
+var minioUser = builder.AddParameter("minio-user", "minioadmin");
+var minioPassword = builder.AddParameter("minio-password", "minioadmin", secret: true);
+
+var minio = builder.AddContainer("minio", "minio/minio", "RELEASE.2023-03-13T19-46-17Z")
+    .WithArgs("server", "/data", "--console-address", ":9001")
+    .WithHttpEndpoint(port: 9000, targetPort: 9000, name: "minoioapi")
+    .WithHttpEndpoint(port: 9001, targetPort: 9001, name: "console")
+    .WithEnvironment("MINIO_ROOT_USER", minioUser)
+    .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
+    .WithVolume("fsh-minio-data", "/data")
+    .WithLifetime(ContainerLifetime.Persistent);
+
+var minioInitScript = $$"""
+        until mc alias set local http://minio:9000 "$MC_USER" "$MC_PASS"; do
+            echo "waiting for minio...";
+            sleep 2;
+        done;
+        mc mb --ignore-existing local/{{MinioBucket}};
+        mc anonymous set download local/{{MinioBucket}};
+        echo "MinIO setup completed!"
+        mc admin accesskey create local minioadmin --access-key wrZ1ifuJ9Fo8wbGv --secret-key unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2
+    """;
+
+var minioInit = builder.AddContainer("minio-init", "minio/mc")
+    .WithEntrypoint("/bin/sh")
+    .WithArgs("-c", minioInitScript)
+    .WithEnvironment("MC_USER", minioUser)
+    .WithEnvironment("MC_PASS", minioPassword)
+    .WaitFor(minio);
+
+var minioApiEndpoint = minio.GetEndpoint("minoioapi");
+#endregion
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                          BLAZOR WASM HOST
+////////////////////////////////////////////////////////////////////////////////////////////////////
+#region Blazor WASM with ASP.NET Core Hosted Template
+
+var blazor = builder.AddProject<Projects.Client>("blazor")
+    // .WithHttpEndpoint(port: 5100)
+    // .WithHttpsEndpoint(port: 7100)
+
+    .WithEndpoint(endpointName: "https", callback: static endpoint =>
+    {
+        // Sets the actual port the Blazor WASM app runs on
+        endpoint.TargetPort = 7100;
+        // Sets the port for the Aspire proxy (optional, can be same as TargetPort)
+        endpoint.Port = 7300;
+    }); // Use your desired fixed port;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                          WEB API HOST
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+var api = builder.AddProject<Projects.Server>("webapi")
+    // .WithHttpEndpoint(port: 5000)
+    // .WithHttpsEndpoint(port: 7000)
+    .WithReference(cache)
+    .WithReference(blazor)
+    .WaitFor(database)
+    .WithEnvironment("Storage__Provider", "s3")
+    .WithEnvironment("Storage__S3__Bucket", MinioBucket)
+    .WithEnvironment("Storage__S3__Region", "us-east-1")
+    .WithEnvironment("Storage__S3__ServiceUrl", minioApiEndpoint)
+    .WithEnvironment("Storage__S3__AccessKey", minioUser)
+    .WithEnvironment("Storage__S3__SecretKey", minioPassword)
+    .WithEnvironment("Storage__S3__ForcePathStyle", "true")
+    .WithEnvironment("Storage__S3__PublicBaseUrl", ReferenceExpression.Create($"{minioApiEndpoint}/{MinioBucket}")); ;
+
+blazor.WaitFor(api)
+    .WithReference(api);
+
+#endregion
 
 using var app = builder.Build();
 

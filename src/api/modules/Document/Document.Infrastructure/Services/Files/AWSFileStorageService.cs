@@ -12,7 +12,7 @@ using FSH.Starter.WebApi.Document.Infrastructure.Services.Auth;
 using Microsoft.Extensions.Configuration;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Infrastructure.Services;
+namespace FSH.Starter.WebApi.Document.Infrastructure.Services.Files;
 public class AWSFileStorageService : IFileStorageService
 {
     private readonly IAmazonS3 _s3Client;
