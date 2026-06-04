@@ -11,6 +11,17 @@
 
 <EntityTable @ref="_table" TEntity="StorageAccountResponse" TId="Guid" TRequest="StorageAccountVM" Context="@Context">
 
+  <ExtraActions>
+    <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
+    @if (@* _canViewRoles *@ true)
+    {
+      <MudMenuItem OnClick="(() => ManageRoles(context.Id))">Manage Roles</MudMenuItem>
+    }
+    @if (@* _canViewAuditTrails *@ true)
+    {
+      <MudMenuItem OnClick="(() => ViewAuditTrails(context.Id))">View Audit Trails</MudMenuItem>
+    }
+  </ExtraActions>
     <AdvancedSearchContent>
         <MudSelect T="Guid?" Label="Brand" @bind-Value="SearchStorageAccountId">
             <MudSelectItem T="Guid?" Value="null">All Brands</MudSelectItem>

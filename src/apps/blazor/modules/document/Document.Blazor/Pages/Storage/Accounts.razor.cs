@@ -108,8 +108,18 @@ public partial class Accounts : MobulePageBase
        {
            await _client.UpdateStorageAccountEndpointAsync(id, storageAccount.Adapt<UpdateStorageAccountCommand>());
        },
-       deleteFunc: async id => await _client.DeleteStorageAccountEndpointAsync(id));
+       deleteFunc: async id => await _client.DeleteStorageAccountEndpointAsync(id),
+       hasExtraActionsFunc: () => true,
+       exportAction: string.Empty);
     }
+
+    private void ViewProfile(in Guid? userId) =>
+       Navigation.NavigateTo($"/identity/users/{userId}/profile");
+
+    private void ManageRoles(in Guid? userId) =>
+        Navigation.NavigateTo($"/identity/users/{userId}/roles");
+    private void ViewAuditTrails(in Guid? userId) =>
+        Navigation.NavigateTo($"/identity/users/{userId}/audit-trail");
 
     public class StorageAccountVM : UpdateStorageAccountCommand
     {

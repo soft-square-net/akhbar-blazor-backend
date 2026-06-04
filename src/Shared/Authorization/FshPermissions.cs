@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Security.AccessControl;
 
 namespace FSH.Starter.Shared.Authorization;
 
@@ -62,7 +63,7 @@ public class FshPermissions
 
         //audit
         new("View Audit Trails", FshActions.View, FshResources.AuditTrails),
-
+        
         //storage accounts
         new("View storage accounts", FshActions.View, FshResources.StorageAccounts),
         new("Search storage accounts", FshActions.Search, FshResources.StorageAccounts),
@@ -70,6 +71,15 @@ public class FshPermissions
         new("Update storage accounts", FshActions.Update, FshResources.StorageAccounts),
         new("Delete storage accounts", FshActions.Delete, FshResources.StorageAccounts),
         new("Export storage accounts", FshActions.Export, FshResources.StorageAccounts),
+
+        //AccessRules
+         new("View Access Rules", FshActions.View, FshResources.AccessRules),
+         new("Search Access Rules", FshActions.Search, FshResources.AccessRules),
+         new("Create Access Rules", FshActions.Create, FshResources.AccessRules),
+         new("Update Access Rules", FshActions.Update, FshResources.AccessRules),
+         new("Delete Access Rules", FshActions.Delete, FshResources.AccessRules),
+         new("Export Access Rules", FshActions.Export, FshResources.AccessRules),
+
     ];
 
     public static FshPermissions Instance {

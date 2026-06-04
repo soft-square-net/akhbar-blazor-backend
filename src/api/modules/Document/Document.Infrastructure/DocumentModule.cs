@@ -7,6 +7,7 @@ using FSH.Framework.Core.Storage.Bucket;
 using FSH.Framework.Core.Storage.File;
 using FSH.Framework.Infrastructure.Persistence;
 using FSH.Starter.WebApi.Document.Domain;
+using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.AccessRules.v1;
 using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.Buckets.v1;
 using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.Documents.v1;
 using FSH.Starter.WebApi.Document.Infrastructure.Endpoints.StorageAccounts.v1;
@@ -71,6 +72,13 @@ public static class DocumentModule
             storageAccountGroup.MapGetStorageAccountEndpoint();
             storageAccountGroup.MapGetStorageAccountListEndpoint();
             storageAccountGroup.MapStorageAccountUpdateEndpoint();
+            // Mapping Access Rule endpoints
+            var accessRuleGroup = app.MapGroup("access-rules").WithGroupName("documents").WithTags("access-rules");
+            accessRuleGroup.MapAccessRuleCreationEndpoint();
+            accessRuleGroup.MapAccessRuleDeleteEndpoint();
+            accessRuleGroup.MapAccessRuleUpdateEndpoint();
+            accessRuleGroup.MapGetAccessRuleEndpoint();
+            accessRuleGroup.MapGetAccessRuleListEndpoint();
         }
     
         
@@ -87,6 +95,8 @@ public static class DocumentModule
         //builder.Services.AddKeyedScoped<IReadRepository<File>, DocumentRepository<File>>("document:files");
         //builder.Services.AddKeyedScoped<IRepository<Folder>, DocumentRepository<Folder>>("document:folders");
         //builder.Services.AddKeyedScoped<IReadRepository<Folder>, DocumentRepository<Folder>>("document:folders");
+        builder.Services.AddKeyedScoped<IRepository<AccessRule>, DocumentRepository<AccessRule>>("document:access-rules");
+        builder.Services.AddKeyedScoped<IReadRepository<AccessRule>, DocumentRepository<AccessRule>>("document:access-rules");
         builder.Services.AddKeyedScoped<IRepository<Bucket>, DocumentRepository<Bucket>>("document:buckets");
         builder.Services.AddKeyedScoped<IReadRepository<Bucket>, DocumentRepository<Bucket>>("document:buckets");
         builder.Services.AddKeyedScoped<IRepository<StorageAccount>, DocumentRepository<StorageAccount>>("document:storage-accounts");
@@ -94,7 +104,7 @@ public static class DocumentModule
         builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
         builder.Services.AddSingleton<IExternalRefreshingAWSWithBasicCredentials, ExternalRefreshingAWSWithBasicCredentials>();
         builder.Services.AddAWSService<IAmazonS3>();
-
+        
         builder.Services.AddKeyedScoped<IFileStorageService, AWSFileStorageService>(nameof(StorageProvider.AmazonS3));
         builder.Services.AddKeyedScoped<IBucketStorageService, AWSBucketStorageService>(nameof(StorageProvider.AmazonS3));
         builder.Services.AddKeyedScoped<IFileStorageService, DocumentLocalFileStorageService>(nameof(StorageProvider.Local));

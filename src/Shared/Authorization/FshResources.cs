@@ -16,5 +16,6 @@ public static partial class FshResources
     public const string Files = nameof(Files); 
     public const string Folders = nameof(Folders);
     public const string StorageAccounts = nameof(StorageAccounts);
+    public const string AccessRules = nameof(AccessRules);
     public const string Documents = nameof(Documents);
 }

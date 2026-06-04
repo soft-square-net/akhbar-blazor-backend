@@ -30,6 +30,111 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     public partial interface IApiClient
     {
         /// <summary>
+        /// creates a storage account
+        /// </summary>
+        /// <remarks>
+        /// creates a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<CreateAccessRuleResponse> CreateAccessRuleEndpointAsync(CreateAccessRuleCommand body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// creates a storage account
+        /// </summary>
+        /// <remarks>
+        /// creates a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<CreateAccessRuleResponse> CreateAccessRuleEndpointAsync(CreateAccessRuleCommand body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// deletes storage account by id
+        /// </summary>
+        /// <remarks>
+        /// deletes storage account by id
+        /// </remarks>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task DeleteAccessRuleEndpointAsync(System.Guid id);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// deletes storage account by id
+        /// </summary>
+        /// <remarks>
+        /// deletes storage account by id
+        /// </remarks>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task DeleteAccessRuleEndpointAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// update a storage account
+        /// </summary>
+        /// <remarks>
+        /// update a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<UpdateAccessRuleResponse> UpdateAccessRuleEndpointAsync(System.Guid id, UpdateAccessRuleCommand body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a storage account
+        /// </summary>
+        /// <remarks>
+        /// update a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<UpdateAccessRuleResponse> UpdateAccessRuleEndpointAsync(System.Guid id, UpdateAccessRuleCommand body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// gets storage account by id
+        /// </summary>
+        /// <remarks>
+        /// gets storage account by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AccessRuleResponse> GetAccessRuleEndpointAsync(System.Guid id);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// gets storage account by id
+        /// </summary>
+        /// <remarks>
+        /// gets storage account by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AccessRuleResponse> GetAccessRuleEndpointAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets a list of storage accounts
+        /// </summary>
+        /// <remarks>
+        /// Gets a list of storage accounts with pagination and filtering support
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Gets a list of storage accounts
+        /// </summary>
+        /// <remarks>
+        /// Gets a list of storage accounts with pagination and filtering support
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// creates a brand
         /// </summary>
         /// <remarks>
@@ -457,7 +562,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body);
+        System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -468,7 +573,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Search bucket files with paging support
@@ -1595,6 +1700,483 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
+        /// <summary>
+        /// creates a storage account
+        /// </summary>
+        /// <remarks>
+        /// creates a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<CreateAccessRuleResponse> CreateAccessRuleEndpointAsync(CreateAccessRuleCommand body)
+        {
+            return CreateAccessRuleEndpointAsync(body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// creates a storage account
+        /// </summary>
+        /// <remarks>
+        /// creates a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<CreateAccessRuleResponse> CreateAccessRuleEndpointAsync(CreateAccessRuleCommand body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/access-rules"
+                    urlBuilder_.Append("api/v1/Document/access-rules");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<CreateAccessRuleResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// deletes storage account by id
+        /// </summary>
+        /// <remarks>
+        /// deletes storage account by id
+        /// </remarks>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task DeleteAccessRuleEndpointAsync(System.Guid id)
+        {
+            return DeleteAccessRuleEndpointAsync(id, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// deletes storage account by id
+        /// </summary>
+        /// <remarks>
+        /// deletes storage account by id
+        /// </remarks>
+        /// <returns>No Content</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task DeleteAccessRuleEndpointAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/access-rules/{id}"
+                    urlBuilder_.Append("api/v1/Document/access-rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 204)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// update a storage account
+        /// </summary>
+        /// <remarks>
+        /// update a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<UpdateAccessRuleResponse> UpdateAccessRuleEndpointAsync(System.Guid id, UpdateAccessRuleCommand body)
+        {
+            return UpdateAccessRuleEndpointAsync(id, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a storage account
+        /// </summary>
+        /// <remarks>
+        /// update a storage account
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<UpdateAccessRuleResponse> UpdateAccessRuleEndpointAsync(System.Guid id, UpdateAccessRuleCommand body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/access-rules/{id}"
+                    urlBuilder_.Append("api/v1/Document/access-rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<UpdateAccessRuleResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// gets storage account by id
+        /// </summary>
+        /// <remarks>
+        /// gets storage account by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<AccessRuleResponse> GetAccessRuleEndpointAsync(System.Guid id)
+        {
+            return GetAccessRuleEndpointAsync(id, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// gets storage account by id
+        /// </summary>
+        /// <remarks>
+        /// gets storage account by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<AccessRuleResponse> GetAccessRuleEndpointAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/access-rules/{id}"
+                    urlBuilder_.Append("api/v1/Document/access-rules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<AccessRuleResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of storage accounts
+        /// </summary>
+        /// <remarks>
+        /// Gets a list of storage accounts with pagination and filtering support
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body)
+        {
+            return SearchAccessRulesEndpointAsync(body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Gets a list of storage accounts
+        /// </summary>
+        /// <remarks>
+        /// Gets a list of storage accounts with pagination and filtering support
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/access-rules/search"
+                    urlBuilder_.Append("api/v1/Document/access-rules/search");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
 
         /// <summary>
         /// creates a brand
@@ -3575,7 +4157,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body)
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body)
         {
             return SearchBucketsEndpointAsync(body, System.Threading.CancellationToken.None);
         }
@@ -3589,7 +4171,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -3637,7 +4219,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8770,6 +9352,15 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class DomainEvent
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("raisedOn")]
+        public System.DateTime RaisedOn { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateOrUpdateRoleCommand
     {
 
@@ -9108,6 +9699,60 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
         public System.Collections.Generic.ICollection<ProductResponse>? Items { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageNumber")]
+        public int PageNumber { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageSize")]
+        public int PageSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
+        public int TotalCount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalPages")]
+        public int TotalPages { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("hasPrevious")]
+        public bool HasPrevious { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("hasNext")]
+        public bool HasNext { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("items")]
+        public System.Collections.Generic.ICollection<AccessRuleResponse>? Items { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageNumber")]
+        public int PageNumber { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageSize")]
+        public int PageSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
+        public int TotalCount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalPages")]
+        public int TotalPages { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("hasPrevious")]
+        public bool HasPrevious { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("hasNext")]
+        public bool HasNext { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("items")]
+        public System.Collections.Generic.ICollection<BucketResponse>? Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("pageNumber")]
         public int PageNumber { get; set; } = default!;
@@ -9589,6 +10234,51 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateAccessRuleCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public System.Guid ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
+        public bool IsEnabled { get; set; } = true;
+
+        [System.Text.Json.Serialization.JsonPropertyName("read")]
+        public bool Read { get; set; } = true;
+
+        [System.Text.Json.Serialization.JsonPropertyName("write")]
+        public bool Write { get; set; } = false;
+
+        [System.Text.Json.Serialization.JsonPropertyName("execute")]
+        public bool Execute { get; set; } = false;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
+        public Bucket Bucket { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = "Descriptive Description";
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateAccessRuleResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateBucketCommand
     {
 
@@ -9769,6 +10459,117 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AccessRuleResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public System.Guid? ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
+        public bool IsEnabled { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("read")]
+        public bool Read { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("write")]
+        public bool Write { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("execute")]
+        public bool Execute { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
+        public Bucket Bucket { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SearchAccessRulesCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("advancedSearch")]
+        public Search AdvancedSearch { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("keyword")]
+        public string? Keyword { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("advancedFilter")]
+        public Filter AdvancedFilter { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageNumber")]
+        public int PageNumber { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageSize")]
+        public int PageSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("orderBy")]
+        public System.Collections.Generic.ICollection<string>? OrderBy { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateAccessRuleCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
+        public System.Guid StorageAccountId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public System.Guid ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
+        public bool IsEnabled { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("read")]
+        public bool Read { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("write")]
+        public bool Write { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("execute")]
+        public bool Execute { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateAccessRuleResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class BucketResponse
     {
 
@@ -9823,14 +10624,8 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         [System.Text.Json.Serialization.JsonPropertyName("orderBy")]
         public System.Collections.Generic.ICollection<string>? OrderBy { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
-        public System.Guid StorageAccountId { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("bucketName")]
         public string? BucketName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("region")]
-        public string? Region { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
         public string? Description { get; set; } = default!;
@@ -10063,6 +10858,243 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Bucket
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("domainEvents")]
+        public System.Collections.Generic.ICollection<DomainEvent>? DomainEvents { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
+        public System.Guid CreatedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModified")]
+        public System.DateTime LastModified { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModifiedBy")]
+        public System.Guid? LastModifiedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
+        public System.DateTime? Deleted { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deletedBy")]
+        public System.Guid? DeletedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
+        public System.Guid StorageAccountId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("region")]
+        public string? Region { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
+
+        /// <summary>
+        /// (ARN) in AmazoneS3 Bucket, FullPath of Parent Folder in Local File System )
+        /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("resourceName")]
+        public string? ResourceName { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("size")]
+        public long Size { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("maxSize")]
+        public long MaxSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folders")]
+        public System.Collections.Generic.ICollection<Folder>? Folders { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class File
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("domainEvents")]
+        public System.Collections.Generic.ICollection<DomainEvent>? DomainEvents { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
+        public System.Guid CreatedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModified")]
+        public System.DateTime LastModified { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModifiedBy")]
+        public System.Guid? LastModifiedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
+        public System.DateTime? Deleted { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deletedBy")]
+        public System.Guid? DeletedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string? Key { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("extension")]
+        public string? Extension { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("etag")]
+        public string? Etag { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string? Url { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileType")]
+        public FileType FileType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
+        public System.Guid FolderId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("size")]
+        public long? Size { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isPublic")]
+        public bool IsPublic { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folder")]
+        public Folder Folder { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Folder
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("domainEvents")]
+        public System.Collections.Generic.ICollection<DomainEvent>? DomainEvents { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
+        public System.Guid CreatedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModified")]
+        public System.DateTime LastModified { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModifiedBy")]
+        public System.Guid? LastModifiedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
+        public System.DateTime? Deleted { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deletedBy")]
+        public System.Guid? DeletedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("slug")]
+        public string? Slug { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("icon")]
+        public string? Icon { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fullPath")]
+        public string? FullPath { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isRoot")]
+        public bool IsRoot { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("parentId")]
+        public System.Guid? ParentId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
+        public Bucket Bucket { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("parent")]
+        public Folder Parent { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("children")]
+        public System.Collections.Generic.ICollection<Folder>? Children { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("files")]
+        public System.Collections.Generic.ICollection<File>? Files { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class StorageAccount
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("domainEvents")]
+        public System.Collections.Generic.ICollection<DomainEvent>? DomainEvents { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdBy")]
+        public System.Guid CreatedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModified")]
+        public System.DateTime LastModified { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModifiedBy")]
+        public System.Guid? LastModifiedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
+        public System.DateTime? Deleted { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deletedBy")]
+        public System.Guid? DeletedBy { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("provider")]
+        public StorageProvider Provider { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("accountName")]
+        public string? AccountName { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("accessKey")]
+        public string? AccessKey { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("secretKey")]
+        public string? SecretKey { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("buckets")]
+        public System.Collections.Generic.ICollection<Bucket>? Buckets { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateTodoCommand
     {
 
@@ -10139,6 +11171,24 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public enum FileType
+    {
+
+        _0 = 0,
+
+        _1 = 1,
+
+        _2 = 2,
+
+        _3 = 3,
+
+        _4 = 4,
+
+        _5 = 5,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum ResourceOwnerType
     {
 
         _0 = 0,

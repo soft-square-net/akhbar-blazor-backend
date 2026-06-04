@@ -2,6 +2,7 @@
 using FSH.Framework.Core.Storage.Bucket.Features;
 using FSH.Framework.Infrastructure.Auth.Policy;
 using FSH.Starter.WebApi.Document.Appication.Buckets.Create.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.Get.v1;
 using FSH.Starter.WebApi.Document.Application.Buckets.Search.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +22,7 @@ public static class SearchBucketsEndpoint
             .WithName(nameof(SearchBucketsEndpoint))
             .WithSummary("creates a bucket")
             .WithDescription("creates a bucket")
-            .Produces<PagedList<SingleBucketResponse>>()
+            .Produces<PagedList<BucketResponse>>()
             .RequirePermission("Permissions.Buckets.Create")
             .MapToApiVersion(1);
     }
