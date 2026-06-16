@@ -23,7 +23,7 @@ public static class CreateBucketFileEndpoint
             .WithSummary("creates a bucket File")
             .WithDescription("creates a bucket File")
             .Produces<CreateBucketFileResponse>()
-            .RequirePermission("Permissions.Buckets.Create")
+            .RequirePermission("Permissions.Files.Create")
             .DisableAntiforgery()
             .MapToApiVersion(1);
     }

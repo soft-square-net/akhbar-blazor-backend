@@ -19,7 +19,7 @@ public static class GetBucketFolderEndpoint
             .WithSummary("Get bucket folder by id")
             .WithDescription("Get bucket folder by id")
             .Produces<GetBucketFolderResponse>()
-            .RequirePermission("Permissions.Buckets.View")
+            .RequirePermission("Permissions.Folders.View")
             .MapToApiVersion(1);
     }
 

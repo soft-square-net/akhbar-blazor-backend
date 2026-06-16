@@ -20,7 +20,7 @@ public static class UpdateBucketFileEndpoint
             .WithSummary("Update a bucket file")
             .WithDescription("Update a bucket file")
             .Produces<UpdateBucketFileResponse>()
-            .RequirePermission("Permissions.Buckets.Update")
+            .RequirePermission("Permissions.Files.Update")
             .MapToApiVersion(1);
     }
 

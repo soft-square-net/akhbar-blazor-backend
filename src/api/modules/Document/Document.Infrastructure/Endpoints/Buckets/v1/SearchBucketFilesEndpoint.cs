@@ -23,7 +23,7 @@ public static class SearchBucketFilesEndpoint
             .WithSummary("Search bucket files with paging support")
             .WithDescription("Search bucket files with paging support")
             .Produces<PagedList<SingleBucketResponse>>()
-            .RequirePermission("Permissions.Buckets.View")
+            .RequirePermission("Permissions.Files.View")
             .MapToApiVersion(1);
     }
 

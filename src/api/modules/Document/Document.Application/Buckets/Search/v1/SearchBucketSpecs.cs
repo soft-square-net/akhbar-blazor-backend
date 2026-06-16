@@ -11,6 +11,7 @@ public class SearchBucketSpecs : EntitiesByPaginationFilterSpec<Bucket, BucketRe
     public SearchBucketSpecs(SearchBucketsRequest command)
         : base(command) =>
         Query
+            // .Include(c => c.StorageAccount)
             .OrderBy(c => c.Name, !command.HasOrderBy())
             .Where(b => b.Name.Contains(command.Keyword!), !string.IsNullOrEmpty(command.Keyword))
             .Where(b => (b.Description!.Contains(command.Keyword!)), !string.IsNullOrEmpty(command.Keyword));

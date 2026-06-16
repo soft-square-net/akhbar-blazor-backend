@@ -20,7 +20,7 @@ public static class UpdateBucketFolderEndpoint
             .WithSummary("update bucket folder by id")
             .WithDescription("update bucket folder by id")
             .Produces<UpdateBucketFolderResponse>()
-            .RequirePermission("Permissions.Buckets.update")
+            .RequirePermission("Permissions.Folder.update")
             .MapToApiVersion(1);
     }
 

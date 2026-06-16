@@ -22,7 +22,7 @@ public static class SearchBucketFolderEndpoint
             .WithSummary("creates a bucket")
             .WithDescription("creates a bucket")
             .Produces<PagedList<SingleBucketResponse>>()
-            .RequirePermission("Permissions.Buckets.Create")
+            .RequirePermission("Permissions.Folders.View")
             .MapToApiVersion(1);
     }
 

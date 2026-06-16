@@ -12,4 +12,6 @@ public class SearchStorageAccountSpecs : EntitiesByPaginationFilterSpec<Domain.S
         Query
             .OrderBy(c => c.AccountName, !command.HasOrderBy())
             .Where(b => b.AccountName.Contains(command.Keyword), !string.IsNullOrEmpty(command.Keyword));
+            // in SearchStorageAccountSpecs constructor
+            // Select(sa => new StorageAccountResponse(sa.Id, sa.AccountName, sa.Description, sa.AccessKey, sa.SecretKey));
 }

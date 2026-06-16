@@ -23,7 +23,7 @@ public static class SearchBucketsEndpoint
             .WithSummary("creates a bucket")
             .WithDescription("creates a bucket")
             .Produces<PagedList<BucketResponse>>()
-            .RequirePermission("Permissions.Buckets.Create")
+            .RequirePermission("Permissions.Buckets.View")
             .MapToApiVersion(1);
     }
 

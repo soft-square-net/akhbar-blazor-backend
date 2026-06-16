@@ -20,7 +20,7 @@ public static class DeleteBucketFolderEndpoint
             .WithSummary("deletes bucket folder by id")
             .WithDescription("deletes bucket folder by id")
             .Produces(StatusCodes.Status204NoContent)
-            .RequirePermission("Permissions.Bucket.Delete")
+            .RequirePermission("Permissions.Folders.Delete")
             .MapToApiVersion(1);
     }
 }

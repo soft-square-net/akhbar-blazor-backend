@@ -21,7 +21,7 @@ public static class CreatePucketFolderEndpoint
             .WithSummary("creates a bucket Folder")
             .WithDescription("creates a bucket Folder")
             .Produces<CreateBucketFolderResponse>()
-            .RequirePermission("Permissions.Buckets.Create")
+            .RequirePermission("Permissions.Folders.Create")
             .MapToApiVersion(1);
     }
 

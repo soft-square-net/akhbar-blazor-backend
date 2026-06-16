@@ -80,6 +80,30 @@ public class FshPermissions
          new("Delete Access Rules", FshActions.Delete, FshResources.AccessRules),
          new("Export Access Rules", FshActions.Export, FshResources.AccessRules),
 
+                //Buckets
+        new("View Buckets", FshActions.View, FshResources.Buckets, IsBasic: true),
+        new("Search Buckets", FshActions.Search, FshResources.Buckets, IsBasic: true),
+        new("Create Buckets", FshActions.Create, FshResources.Buckets),
+        new("Update Buckets", FshActions.Update, FshResources.Buckets),
+        new("Delete Buckets", FshActions.Delete, FshResources.Buckets),
+        new("Export Buckets", FshActions.Export, FshResources.Buckets),
+
+        //Files
+        new("View Files", FshActions.View, FshResources.Files, IsBasic: true),
+        new("Search Files", FshActions.Search, FshResources.Files, IsBasic:true),
+        new("Create Files", FshActions.Create, FshResources.Files),
+        new("Update Files", FshActions.Update, FshResources.Files),
+        new("Delete Files", FshActions.Delete, FshResources.Files),
+        new("Export Files", FshActions.Export, FshResources.Files),
+
+        //Folders
+        new("View Folders", FshActions.View, FshResources.Folders, IsBasic: true),
+        new("Search Folders", FshActions.Search, FshResources.Folders, IsBasic: true),
+        new("Create Folders", FshActions.Create, FshResources.Folders),
+        new("Update Folders", FshActions.Update, FshResources.Folders),
+        new("Delete Folders", FshActions.Delete, FshResources.Folders),
+        new("Export Folders", FshActions.Export, FshResources.Folders),
+
     ];
 
     public static FshPermissions Instance {

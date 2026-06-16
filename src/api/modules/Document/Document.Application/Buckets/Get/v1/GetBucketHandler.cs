@@ -20,7 +20,7 @@ public sealed class GetBucketHandler(
             {
                 var bucketItem = await repository.GetByIdAsync(request.Id, cancellationToken);
                 if (bucketItem == null) throw new BucketNotFoundException(request.Id);
-                return new BucketResponse(bucketItem.Id,bucketItem.StorageAccount.Id,bucketItem.StorageAccount.AccountName, bucketItem.Name, bucketItem.Region, bucketItem.Description, bucketItem.Size,bucketItem.MaxSize, bucketItem.Created);
+                return new BucketResponse(bucketItem.Id,bucketItem.StorageAccount, bucketItem.Name, bucketItem.ResourceName ?? "", bucketItem.Region, bucketItem.Description, bucketItem.Size,bucketItem.MaxSize, bucketItem.Created);
             },
             cancellationToken: cancellationToken);
         return item!;

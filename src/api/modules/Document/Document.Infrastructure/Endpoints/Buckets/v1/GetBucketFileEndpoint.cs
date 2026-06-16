@@ -20,7 +20,7 @@ public static class GetBucketFileEndpoint
             .WithSummary("Get bucket File by Id")
             .WithDescription("Get bucket File by Id")
             .Produces<GetBucketFileResponse>()
-            .RequirePermission("Permissions.Buckets.View")
+            .RequirePermission("Permissions.Files.View")
             .MapToApiVersion(1);
     }
 

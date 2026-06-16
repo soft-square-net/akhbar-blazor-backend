@@ -22,7 +22,7 @@ public static class ListBucketFilesEndpoint
             .WithSummary("Gets a list of bucket items with paging support")
             .WithDescription("Gets a list of bucket items with paging support")
             .Produces<PagedList<SingleBucketResponse>>()
-            .RequirePermission("Permissions.Buckets.View")
+            .RequirePermission("Permissions.Files.View")
             .MapToApiVersion(1);
     }
 

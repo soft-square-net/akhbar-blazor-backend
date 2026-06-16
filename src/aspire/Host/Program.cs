@@ -15,7 +15,7 @@ var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432)
-    // .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
+    .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
     .WithDataVolume()
     .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
 // Ahmed Galal
@@ -90,25 +90,28 @@ var minio = builder.AddContainer("minio", "minio/minio", "RELEASE.2023-03-13T19-
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
     .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
     .WithVolume("fsh-minio-data", "/data")
-    .WithLifetime(ContainerLifetime.Persistent);
+    .WithLifetime(ContainerLifetime.Session);
+    // .WithLifetime(ContainerLifetime.Persistent);
 
 var minioInitScript = $$"""
-        until mc alias set local http://minio:9000 "$MC_USER" "$MC_PASS"; do
-            echo "waiting for minio...";
-            sleep 2;
-        done;
+        until mc alias set local http://minio:9000 "$MC_USER" "$MC_PASS";
+        do echo "waiting for minio..."; sleep 2; done;
         mc mb --ignore-existing local/{{MinioBucket}};
         mc anonymous set download local/{{MinioBucket}};
-        echo "MinIO setup completed!"
-        mc admin accesskey create local minioadmin --access-key wrZ1ifuJ9Fo8wbGv --secret-key unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2
+        echo "Bucket {{MinioBucket}} created successfully!";
+        mc admin accesskey create local minioadmin --access-key wrZ1ifuJ9Fo8wbGv --secret-key unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2  --name "DEVELOPMENT_ACCESS_KEY" --description "The default development access key";
+        echo "Access Key created successfully!";
+        echo "MinIO setup completed!";
     """;
 
 var minioInit = builder.AddContainer("minio-init", "minio/mc")
-    .WithEntrypoint("/bin/sh")
-    .WithArgs("-c", minioInitScript)
+    .WaitFor(minio)
     .WithEnvironment("MC_USER", minioUser)
     .WithEnvironment("MC_PASS", minioPassword)
-    .WaitFor(minio);
+    .WithVolume("fsh-minio-data", "/data")
+    .WithEnvironment("MC_HOST_minio", minio.GetEndpoint("minoioapi").ToString())
+    .WithEntrypoint("/bin/sh")
+    .WithArgs("-c", minioInitScript);
 
 var minioApiEndpoint = minio.GetEndpoint("minoioapi");
 #endregion

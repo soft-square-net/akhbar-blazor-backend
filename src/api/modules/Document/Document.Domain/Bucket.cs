@@ -25,9 +25,9 @@ public class Bucket : AuditableEntity, IAggregateRoot
     public long MaxSize { get; private set; }
     public string? Description { get; private set; }
 
-
     public StorageAccount StorageAccount { get; private set; } = null!;
-    public IReadOnlyList<Domain.Folder> Folders  =>  _Folders.ToList();  
+    public IReadOnlyList<Domain.Folder> Folders => _Folders.ToList();
+    // public ICollection<AccessRule> AccessRules { get; private set; } = new List<AccessRule>();  
 
     private Bucket() { }
 

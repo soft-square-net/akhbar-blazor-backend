@@ -1,5 +1,4 @@
-﻿@page "/storage/access-rules"
-@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components
+﻿@page "/storage/buckets"
 @using FSH.Starter.BlazorShared.Components.EntityTable;
 @using FSH.Starter.Blazor.Infrastructure.Api;
 @using FSH.Starter.BlazorShared
@@ -7,22 +6,9 @@
 @inject IDialogService DialogService
 
 
-<PageHeader Title="Access Rules" Header="Access Rules" SubHeader="Manage your Access Rules." />
+<PageHeader Title="Buckets" Header="Buckets" SubHeader="Manage your Buckets." />
 
-<EntityTable @ref="_table" TEntity="AccessRuleResponse" TId="Guid" TRequest="AccessRuleVM" Context="@Context">
-
-  <AdvancedSearchContent>
-    <MudSelect T="Guid?" Label="Brand" @bind-Value="SearchAccessRuleId">
-      <MudSelectItem T="Guid?" Value="null">All Brands</MudSelectItem>
-      @foreach (var bucket in _buckets)
-      {
-        <MudSelectItem T="Guid?" Value="bucket.Id">@bucket.Name</MudSelectItem>
-      }
-
-    </MudSelect>
-    <MudSlider T="decimal" @bind-value="SearchMinimumRate" Min="0" Max="9999" Step="100">Minimum Rate: @_searchMinimumRate.ToString()</MudSlider>
-    <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider>
-  </AdvancedSearchContent> 
+<EntityTable @ref="_table" TEntity="BucketResponse" TId="Guid" TRequest="BucketVM" Context="@Context">
 
   <EditFormContent>
     @{
@@ -37,7 +23,7 @@
       </MudItem>
     }
     <MudItem xs="12" md="6">
-      <MudSelect T="Guid" Label="Bucket" @bind-Value="context.BucketId">
+      <MudSelect T="Guid" Label="Account" @bind-Value="context.Id">
         @foreach (var bucket in _buckets)
         {
           <MudSelectItem T="Guid?" Value="bucket?.Id">@bucket?.Name</MudSelectItem>
@@ -45,7 +31,7 @@
       </MudSelect>
     </MudItem>
     <MudItem xs="12" md="6">
-      <MudSwitch Label="Name" For="@(() => context.Read)" @bind-Value="context.Read" />
+      <MudSwitch Label="Name" For="@(() => context.Name)" @bind-Value="context.Name" />
     </MudItem>`
     <MudItem xs="12" md="12">
       <MudTextField Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
@@ -60,12 +46,12 @@
           {
             <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Target="_blank"
                        StartIcon="@Icons.Material.Filled.RemoveRedEye" Style="margin-left: 5px;">
-              View
+              View!!
             </MudButton>
 
             <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small"
                        StartIcon="@Icons.Material.Filled.Delete" Style="margin-left: 5px;">
-              Delete
+              Delete!!
             </MudButton>
           }
         </div>

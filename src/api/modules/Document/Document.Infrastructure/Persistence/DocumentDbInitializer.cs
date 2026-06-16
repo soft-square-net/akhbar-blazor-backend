@@ -38,7 +38,7 @@ internal sealed class DocumentDbInitializer(
         StorageAccount storageAccount = null;
         if (!await context.StorageAccounts.AnyAsync().ConfigureAwait(false))
         {
-            storageAccount = StorageAccount.Create(StorageProvider.AmazonS3 ,"AWS","","", "Amazon Web Services Storage Account");
+            storageAccount = StorageAccount.Create(StorageProvider.AmazonS3 ,"MinIO", "wrZ1ifuJ9Fo8wbGv", "unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2", "Amazon Web Services Storage Account");
             await context.StorageAccounts.AddAsync(storageAccount, cancellationToken);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -46,7 +46,8 @@ internal sealed class DocumentDbInitializer(
 
         if (storageAccount is not null && !await context.Buckets.AnyAsync().ConfigureAwait(false))
         {
-            var bucket = Bucket.Create(storageAccount, "us-east-1", "akhbar-demo", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
+            // var bucket = Bucket.Create(storageAccount, "us-east-1", "akhbar-demo", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
+            var bucket = Bucket.Create(storageAccount, "us-east-1", "Default", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
             // bucket.Folders.Add(Domain.Folder.Create(bucket));
             await context.Buckets.AddAsync(bucket, cancellationToken);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

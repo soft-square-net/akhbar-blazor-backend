@@ -10576,14 +10576,14 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public System.Guid? Id { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
-        public System.Guid StorageAccountId { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccountName")]
-        public string? StorageAccountName { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("bucketName")]
-        public string? BucketName { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("resourceName")]
+        public string? ResourceName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("region")]
         public string? Region { get; set; } = default!;

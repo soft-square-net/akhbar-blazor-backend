@@ -14,7 +14,6 @@ public sealed class SearchBucketsHandler(
     public async Task<PagedList<BucketResponse>> Handle(SearchBucketsRequest request, CancellationToken cancellationToken)
     {
         // ArgumentNullException.ThrowIfNull(request);
-
         var spec = new SearchBucketSpecs(request);
 
         var items = await repository.ListAsync(spec, cancellationToken).ConfigureAwait(false);

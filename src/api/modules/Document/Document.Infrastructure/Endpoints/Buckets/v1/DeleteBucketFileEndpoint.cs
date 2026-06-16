@@ -20,7 +20,7 @@ public static class DeleteBucketFileEndpoint
             .WithSummary("deletes bucket by id")
             .WithDescription("deletes bucket by id")
             .Produces(StatusCodes.Status204NoContent)
-            .RequirePermission("Permissions.Bucket.Delete")
+            .RequirePermission("Permissions.Files.Delete")
             .MapToApiVersion(1);
     }
 }
