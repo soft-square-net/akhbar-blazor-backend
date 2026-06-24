@@ -6,7 +6,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace FSH.Framework.Core.Storage.Bucket.Features;
 
 public record SingleBucketResponse(string Name,string Region, string ResourceName, DateTime? Created);
-public class GetAllBucketsResponse
+public class SvcGetAllBucketsResponse
 {
     public IDictionary<string,string> MetaData { get; set; } = default!;
     public HttpStatusCode HttpStatusCode { get; set; }

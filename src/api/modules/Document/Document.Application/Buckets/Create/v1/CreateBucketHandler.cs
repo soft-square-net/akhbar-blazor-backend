@@ -27,24 +27,24 @@ public sealed class CreateBucketHandler(
         }
         IBucketStorageService bucketService = storageServiceFactory.GetBucketStorageService(storageAccount.Provider);
         
-        var onlineBucket = await bucketService.GetAllBucketsAsync(new GetAllBucketsRequest(
+        var onlineBucket = await bucketService.GetAllBucketsAsync(new SvcGetAllBucketsRequest(
             request.Region,
             storageAccount.AccessKey,
             storageAccount.SecretKey
         ));
 
-        if (!onlineBucket.Buckets.Any(b => b.Name == request.BucketName))
+        if (!onlineBucket.Buckets.Any(b => b.Name == request.Name))
         {
             // If Bucket does not exist online, create it
             SvcCreateBucketResponse response = await bucketService.CreateBucketAsync(new SvcCreateBucketCommand()
             {
                 AccessKey = storageAccount.AccessKey,
                 SecretKey = storageAccount.SecretKey,
-                BucketName = request.BucketName,
+                BucketName = request.Name,
                 Region = request.Region,
                 Tags = request.Tags ?? new Dictionary<string, string>()
             });
-            var bucket = Bucket.Create(storageAccount, request.Region, request.BucketName!,response.ResourceName, request.Description);
+            var bucket = Bucket.Create(storageAccount, request.Region, request.Name!,response.ResourceName, request.Description);
             await repository.AddAsync(bucket, cancellationToken);
             logger.LogInformation("bucket created {BrandId}", bucket.Id);
             return new CreateBucketResponse(bucket.Id);
@@ -52,18 +52,18 @@ public sealed class CreateBucketHandler(
         else 
         {
             // If Bucket exist online, check if it exist in database
-            var DbBucket = await repository.SingleOrDefaultAsync(new GetBucketByNameSpec(request.BucketName), cancellationToken);
-            var OnlineBucket = onlineBucket.Buckets.SingleOrDefault(b => b.Name == request.BucketName);
+            var DbBucket = await repository.SingleOrDefaultAsync(new GetBucketByNameSpec(request.Name), cancellationToken);
+            var OnlineBucket = onlineBucket.Buckets.SingleOrDefault(b => b.Name == request.Name);
             if (DbBucket is null)
             {
                 // If Bucket exist online but not in database, add it to database
-                logger.LogInformation($"The bucket {request.BucketName} exsist but not in the database, now adding it...");
-                var bucket = Bucket.Create(storageAccount, request.Region, request.BucketName!, OnlineBucket.ResourceName, request.Description);
+                logger.LogInformation($"The bucket {request.Name} exsist but not in the database, now adding it...");
+                var bucket = Bucket.Create(storageAccount, request.Region, request.Name!, OnlineBucket.ResourceName, request.Description);
                 await repository.AddAsync(bucket, cancellationToken);
                 return new CreateBucketResponse(bucket.Id);
             }
             // If Bucket exist both online and in database, throw error that Bucket already exist
-            string errorMessage = $"Can't create bucket with name {request.BucketName}, Bucket already exist";
+            string errorMessage = $"Can't create bucket with name {request.Name}, Bucket already exist";
             logger.LogError(errorMessage);
             throw new InvalidOperationException(errorMessage);
         }

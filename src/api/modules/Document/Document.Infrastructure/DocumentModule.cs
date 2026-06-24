@@ -59,6 +59,7 @@ public static class DocumentModule
             bucketsGroup.MapBucketListEndpoint();
             bucketsGroup.MapBucketListFilesEndpoint();
             bucketsGroup.MapBucketListFolderEndpoint();
+            bucketsGroup.MapRegionListEndpoint();
             bucketsGroup.MapBucketSearchEndpoint();
             bucketsGroup.MapBucketSearchFilesEndpoint();
             bucketsGroup.MapBucketSearchFolderEndpoint();
@@ -80,8 +81,6 @@ public static class DocumentModule
             accessRuleGroup.MapGetAccessRuleEndpoint();
             accessRuleGroup.MapGetAccessRuleListEndpoint();
         }
-    
-        
     }
     public static WebApplicationBuilder RegisterDocumentServices(this WebApplicationBuilder builder)
     {

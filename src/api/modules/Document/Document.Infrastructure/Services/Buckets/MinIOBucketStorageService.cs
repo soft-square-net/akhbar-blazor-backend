@@ -82,7 +82,7 @@ public class MinIOBucketStorageService : IBucketStorageService
             
     }
 
-    public async Task<GetAllBucketsResponse> GetAllBucketsAsync(GetAllBucketsRequest request)
+    public async Task<SvcGetAllBucketsResponse> GetAllBucketsAsync(SvcGetAllBucketsRequest request)
     {
         // RegionEndpoint region = RegionEndpoint.GetBySystemName(request.Region); // Specify your desired AWS region
         // AWSCredentials credentials = new BasicAWSCredentials(request.AccessKey, request.SecretKey);
@@ -91,7 +91,7 @@ public class MinIOBucketStorageService : IBucketStorageService
         
         _refreshCeredintials.UpdateCredentials(request.AccessKey, request.SecretKey);
         var data = await _s3Client.ListBucketsAsync();
-        return new GetAllBucketsResponse
+        return new SvcGetAllBucketsResponse
         {
             HttpStatusCode = data.HttpStatusCode,
             MetaData = data.ResponseMetadata.Metadata,
@@ -103,7 +103,7 @@ public class MinIOBucketStorageService : IBucketStorageService
         // }
     }
 
-    public async Task DeleteBucketsAsync(DeleteBucketsRequest request)
+    public async Task DeleteBucketsAsync(SvcDeleteBucketsRequest request)
     {
         //RegionEndpoint region = RegionEndpoint.GetBySystemName(request.Region);
         //AWSCredentials credentials = new BasicAWSCredentials(request.AccessKey, request.SecretKey);
@@ -112,5 +112,32 @@ public class MinIOBucketStorageService : IBucketStorageService
         _refreshCeredintials.UpdateCredentials(request.AccessKey, request.SecretKey);
         await _s3Client.DeleteBucketAsync(request.BucketName);
         //}
+    }
+
+    public async Task<SvcCreateBucketResponse> CreateBucketFolderAsync(SvcCreateBucketFolderCommand command)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<SvcCreateBucketResponse> CreateBucketFileAsync(SvcCreateBucketFileCommand command)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    public Task<List<StorageEndpoint>> ListRegionsAsync(SvcListRegionsCommand request)
+    {
+        return Task.FromResult(RegionEndpoint.EnumerableAllRegions.Select(r => StorageEndpoint.Create( r.SystemName, r.DisplayName)).ToList());
+    }
+
+
+    public async Task DeleteBucketFolderAsync(SvcDeleteBucketFolderRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteBucketFileAsync(SvcDeleteBucketFileRequest request)
+    {
+        throw new NotImplementedException();
     }
 }

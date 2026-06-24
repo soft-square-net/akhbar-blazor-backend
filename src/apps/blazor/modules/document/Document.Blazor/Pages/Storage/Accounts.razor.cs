@@ -87,9 +87,9 @@ public partial class Accounts : MobulePageBase
        fields: new()
        {
                 new(storageAccount => storageAccount.Id, "Id", "Id"),
-                new(storageAccount => storageAccount.AccountName, "Account Name", "AccountName"),
-                new(storageAccount => storageAccount.AccessKey, "Access Key", "AccessKey"),
-                new(storageAccount => storageAccount.SecretKey, "Access Key", "AccessKey"),
+                new(storageAccount => storageAccount.AccountName, "Name", "AccountName"),
+                new(storageAccount => storageAccount.AccessKey, "Key", "AccessKey"),
+                // new(storageAccount => storageAccount.SecretKey, "Secret", "SecretKey"),
                 new(storageAccount => storageAccount.Description, "Description", "Description")
        },
        enableAdvancedSearch: true,

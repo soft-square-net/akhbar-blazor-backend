@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using MediatR;
 
 namespace FSH.Framework.Core.Storage.Bucket.Features;
-public class DeleteBucketsRequest : IRequest<GetAllBucketsResponse>
+public class SvcDeleteBucketFolderRequest : IRequest<SvcGetAllBucketsResponse>
 {
-    public DeleteBucketsRequest(string region, string accessKey, string secretKey, string bucketName)
+    public SvcDeleteBucketFolderRequest(string region, string accessKey, string secretKey, string bucketName)
     {
         Region = region;
         AccessKey = accessKey;

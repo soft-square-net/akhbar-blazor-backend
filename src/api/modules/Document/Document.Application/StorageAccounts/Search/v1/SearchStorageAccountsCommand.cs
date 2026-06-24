@@ -6,6 +6,6 @@ namespace FSH.Starter.WebApi.Document.Application.StorageAccounts.Search.v1;
 
 public class SearchStorageAccountsCommand : PaginationFilter, IRequest<PagedList<StorageAccountResponse>>
 {
-    //public string? AccountName { get; set; }
-    //public string? Description { get; set; }
+    public string? AccountName { get; set; }
+    public string? Description { get; set; }
 }

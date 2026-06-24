@@ -2,6 +2,7 @@
 @using FSH.Starter.BlazorShared.Components.EntityTable;
 @using FSH.Starter.Blazor.Infrastructure.Api;
 @using FSH.Starter.BlazorShared
+@using FSH.Starter.BlazorShared.Components.General
 @inherits MobulePageBase
 @inject IDialogService DialogService
 
@@ -11,6 +12,7 @@
 <EntityTable @ref="_table" TEntity="BucketResponse" TId="Guid" TRequest="BucketVM" Context="@Context">
 
   <EditFormContent>
+
     @{
       // bool IsCreate = Context.AddEditModal.IsCreate;
       bool IsCreate = context.Id == Guid.Empty;
@@ -18,23 +20,33 @@
     }
     @if (!IsCreate)
     {
-      <MudItem xs="12" md="6">
-        <MudTextField Value="context.Id" Underline=false ReadOnly Label="Access Rule Id" />
+      <MudItem xs="12" md="12">
+        <MudTextField Value="context.Id" Underline=false ReadOnly Label="Id" />
       </MudItem>
-    }
-    <MudItem xs="12" md="6">
-      <MudSelect T="Guid" Label="Account" @bind-Value="context.Id">
-        @foreach (var bucket in _buckets)
+    }   
+    <MudItem xs="12" md="5">
+      @* <MudSelect T="Guid?" Label="Account" Value="context.StorageAccountId" ValueChanged="() => StorageAccountValueChanged(context.StorageAccountId)"> *@
+      <MudSelect T="Guid?" Label="Account" Value="context.StorageAccountId" ValueChanged="StorageAccountValueChanged">
+        @foreach (var sa in _storageAccounts)
         {
-          <MudSelectItem T="Guid?" Value="bucket?.Id">@bucket?.Name</MudSelectItem>
+          <MudSelectItem T="Guid?" Value="sa?.Id">@sa?.AccountName</MudSelectItem>
         }
       </MudSelect>
     </MudItem>
+   
     <MudItem xs="12" md="6">
-      <MudSwitch Label="Name" For="@(() => context.Name)" @bind-Value="context.Name" />
-    </MudItem>`
+      <MudSelect T="string" Label="Region" @bind-Value="context.Region">
+        @foreach (var region in _regions)
+        {
+          <MudSelectItem T="string" Value="region?.SystemName">@region?.DisplayName</MudSelectItem>
+        }
+      </MudSelect>
+    </MudItem>
     <MudItem xs="12" md="12">
-      <MudTextField Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
+      <MudTextField Label="Name" For="@(() => context.Name)" @bind-Value="context.Name" />
+    </MudItem>
+    <MudItem xs="12" md="12">
+      <MudTextField Lines="3" MaxLines="3" Variant="Variant.Outlined" Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
     </MudItem>
 
         
@@ -60,5 +72,3 @@
   </EditFormContent>
 
 </EntityTable>
-
-

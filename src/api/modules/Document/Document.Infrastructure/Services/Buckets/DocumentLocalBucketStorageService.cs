@@ -18,12 +18,38 @@ public class DocumentLocalBucketStorageService : IBucketStorageService
         throw new NotImplementedException();
     }
 
-    public async Task<GetAllBucketsResponse> GetAllBucketsAsync(GetAllBucketsRequest request)
+    public async Task<SvcGetAllBucketsResponse> GetAllBucketsAsync(SvcGetAllBucketsRequest request)
     {
         throw new NotImplementedException();
     }
 
-    public async Task DeleteBucketsAsync(DeleteBucketsRequest request)
+    public async Task DeleteBucketsAsync(SvcDeleteBucketsRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SvcCreateBucketResponse> CreateBucketFolderAsync(SvcCreateBucketFolderCommand command)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SvcCreateBucketResponse> CreateBucketFileAsync(SvcCreateBucketFileCommand command)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    public Task<List<StorageEndpoint>> ListRegionsAsync(SvcListRegionsCommand request)
+    {
+        return Task.FromResult(new List<StorageEndpoint>() { StorageEndpoint.Create("local", "Local") });
+    }
+
+    public Task DeleteBucketFolderAsync(SvcDeleteBucketFolderRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteBucketFileAsync(SvcDeleteBucketFileRequest request)
     {
         throw new NotImplementedException();
     }

@@ -83,7 +83,7 @@ public class AWSBucketStorageService : IBucketStorageService
             
     }
 
-    public async Task<GetAllBucketsResponse> GetAllBucketsAsync(GetAllBucketsRequest request)
+    public async Task<SvcGetAllBucketsResponse> GetAllBucketsAsync(SvcGetAllBucketsRequest request)
     {
         // RegionEndpoint region = RegionEndpoint.GetBySystemName(request.Region); // Specify your desired AWS region
         // AWSCredentials credentials = new BasicAWSCredentials(request.AccessKey, request.SecretKey);
@@ -94,7 +94,7 @@ public class AWSBucketStorageService : IBucketStorageService
         var data = await _s3Client.ListBucketsAsync();
         _refreshCeredintials.UpdateCredentials("", "");
 
-        return new GetAllBucketsResponse
+        return new SvcGetAllBucketsResponse
         {
             HttpStatusCode = data.HttpStatusCode,
             MetaData = data.ResponseMetadata.Metadata,
@@ -106,7 +106,7 @@ public class AWSBucketStorageService : IBucketStorageService
         // }
     }
 
-    public async Task DeleteBucketsAsync(DeleteBucketsRequest request)
+    public async Task DeleteBucketsAsync(SvcDeleteBucketsRequest request)
     {
         //RegionEndpoint region = RegionEndpoint.GetBySystemName(request.Region);
         //AWSCredentials credentials = new BasicAWSCredentials(request.AccessKey, request.SecretKey);
@@ -117,5 +117,32 @@ public class AWSBucketStorageService : IBucketStorageService
         _refreshCeredintials.UpdateCredentials("", "");
 
         //}
+    }
+
+    public Task<SvcCreateBucketResponse> CreateBucketFolderAsync(SvcCreateBucketFolderCommand command)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SvcCreateBucketResponse> CreateBucketFileAsync(SvcCreateBucketFileCommand command)
+    {
+        throw new NotImplementedException();
+    }
+
+
+    public Task<List<StorageEndpoint>> ListRegionsAsync(SvcListRegionsCommand request)
+    {
+        return Task.FromResult(RegionEndpoint.EnumerableAllRegions.Select(r => StorageEndpoint.Create(r.SystemName, r.DisplayName)).ToList());
+    }
+
+
+    public Task DeleteBucketFolderAsync(SvcDeleteBucketFolderRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteBucketFileAsync(SvcDeleteBucketFileRequest request)
+    {
+        throw new NotImplementedException();
     }
 }
