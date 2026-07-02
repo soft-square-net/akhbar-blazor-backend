@@ -10389,6 +10389,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public System.Guid ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
         public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
@@ -10620,6 +10621,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public System.Guid? ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
         public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
@@ -10683,6 +10685,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public System.Guid ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
         public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
@@ -11393,17 +11396,23 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     public enum ResourceOwnerType
     {
 
-        _0 = 0,
+        [System.Runtime.Serialization.EnumMember(Value = @"Anonymous")]
+        Anonymous = 0,
 
-        _1 = 1,
+        [System.Runtime.Serialization.EnumMember(Value = @"Group")]
+        Group = 1,
 
-        _2 = 2,
+        [System.Runtime.Serialization.EnumMember(Value = @"ManagedIdentity")]
+        ManagedIdentity = 2,
 
-        _3 = 3,
+        [System.Runtime.Serialization.EnumMember(Value = @"Role")]
+        Role = 3,
 
-        _4 = 4,
+        [System.Runtime.Serialization.EnumMember(Value = @"ServicePrincipal")]
+        ServicePrincipal = 4,
 
-        _5 = 5,
+        [System.Runtime.Serialization.EnumMember(Value = @"User")]
+        User = 5,
 
     }
 

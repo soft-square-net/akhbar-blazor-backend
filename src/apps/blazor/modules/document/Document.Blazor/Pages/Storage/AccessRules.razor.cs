@@ -68,31 +68,34 @@ public partial class AccessRules : MobulePageBase
         // Context.AddEditModal.ForceRender();
     }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        // Context.AddEditModal.ForceRender();
 
-    }
     protected override async Task OnInitializedAsync()
     {
-        OnInitialized();
+        await base.OnInitializedAsync();
         ClaimsPrincipal user = (await AuthState).User;
         // _canViewAccessRules = await AuthService.HasPermissionAsync(user, FshActions.View, FshResources.AccessRules);
         _canViewAccessRules = await AuthService.HasPermissionAsync(user, ModuleActions.View, ModuleResources.AccessRules);
-        // await LoadBucketsAsync(); 
-        await base.OnInitializedAsync();
+
+        // await LoadBucketsAsync();
 
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await PopulateBucketValues();
+        }
+    }
     private void PopulateContext()
     {
-       Context = new(
-       entityName: "AccessRule",
-       entityNamePlural: "AccessRules",
-       entityResource: FshResources.AccessRules,
-       fields: new()
-       {
+        Context = new(
+        entityName: "AccessRule",
+        entityNamePlural: "AccessRules",
+        entityResource: FshResources.AccessRules,
+        fields: new()
+        {
                 new(accessRule => accessRule.Id, "Id", "Id"),
                 // new(accessRule => accessRule.StorageAccount.Id, "Storage Account", "StorageAccountId"),
                 // new(accessRule => accessRule.StorageAccount.AccountName, "Storage Account", "StorageAccountName"),
@@ -102,39 +105,49 @@ public partial class AccessRules : MobulePageBase
                 new(accessRule => accessRule.ResourceOwnerId, "Resource Owner Id", "ResourceOwnerId"),
                 new(accessRule => accessRule.Read, "Read", "Read"),
                 new(accessRule => accessRule.Description, "Description", "Description")
-       },
-       enableAdvancedSearch: true,
-       idFunc: storageAccount => storageAccount.Id!.Value,
-       searchFunc: async filter =>
-       {
-           var storageAccountCommand = filter.Adapt<SearchAccessRulesCommand>();
-           var result = await _client.SearchAccessRulesEndpointAsync(storageAccountCommand);
-           return result.Adapt<PaginationResponse<AccessRuleResponse>>();
-       },
-       createFunc: async storageAccount =>
-       {
-           await _client.CreateAccessRuleEndpointAsync(storageAccount.Adapt<CreateAccessRuleCommand>());
-       },
-       updateFunc: async (id, storageAccount) =>
-       {
-           await _client.UpdateAccessRuleEndpointAsync(id, storageAccount.Adapt<UpdateAccessRuleCommand>());
-       },
-       deleteFunc: async id => await _client.DeleteAccessRuleEndpointAsync(id));
+        },
+        enableAdvancedSearch: true,
+        idFunc: storageAccount => storageAccount.Id!.Value,
+        searchFunc: async filter =>
+        {
+            var storageAccountCommand = filter.Adapt<SearchAccessRulesCommand>();
+            var result = await _client.SearchAccessRulesEndpointAsync(storageAccountCommand);
+            return result.Adapt<PaginationResponse<AccessRuleResponse>>();
+        },
+        createFunc: async storageAccount =>
+        {
+            await _client.CreateAccessRuleEndpointAsync(storageAccount.Adapt<CreateAccessRuleCommand>());
+        },
+        updateFunc: async (id, storageAccount) =>
+        {
+            await _client.UpdateAccessRuleEndpointAsync(id, storageAccount.Adapt<UpdateAccessRuleCommand>());
+        },
+        deleteFunc: async id => await _client.DeleteAccessRuleEndpointAsync(id));
     }
 
 
-    private async Task LoadBucketsAsync()
+    private async Task PopulateBucketValues()
     {
         if (_buckets.Count == 0)
         {
-            
-            var response = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { });
-            if (response?.Items != null)
-            {
-               _buckets = response.Items.ToList();
-            }
+            var result = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { OrderBy = [], PageNumber = 1, PageSize = 10 });
+            _buckets = result.Items.ToList();
         }
     }
+
+
+    //private async Task LoadBucketAsync()
+    //{
+    //    if (_buckets.Count == 0)
+    //    {
+
+    //        var response = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { });
+    //        if (response?.Items != null)
+    //        {
+    //            _buckets = response.Items.ToList();
+    //        }
+    //    }
+    //}
     public class AccessRuleVM : UpdateAccessRuleCommand
     {
     }

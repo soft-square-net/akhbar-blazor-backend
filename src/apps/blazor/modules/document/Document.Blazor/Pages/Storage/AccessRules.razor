@@ -3,17 +3,18 @@
 @using FSH.Starter.BlazorShared.Components.EntityTable;
 @using FSH.Starter.Blazor.Infrastructure.Api;
 @using FSH.Starter.BlazorShared
+@using FSH.Starter.BlazorShared.Components.General
 @inherits MobulePageBase
 @inject IDialogService DialogService
 
 
 <PageHeader Title="Access Rules" Header="Access Rules" SubHeader="Manage your Access Rules." />
 
-<EntityTable @ref="_table" TEntity="AccessRuleResponse" TId="Guid" TRequest="AccessRuleVM" Context="@Context">
+<EntityTable @ref="_table" TEntity="AccessRuleResponse" TId="Guid" TRequest="AccessRuleVM" Context="@Context" >
 
   <AdvancedSearchContent>
     <MudSelect T="Guid?" Label="Brand" @bind-Value="SearchAccessRuleId">
-      <MudSelectItem T="Guid?" Value="null">All Brands</MudSelectItem>
+      <MudSelectItem T="Guid?" Value="null">Buckets</MudSelectItem>
       @foreach (var bucket in _buckets)
       {
         <MudSelectItem T="Guid?" Value="bucket.Id">@bucket.Name</MudSelectItem>
@@ -37,7 +38,11 @@
       </MudItem>
     }
     <MudItem xs="12" md="6">
-      <MudSelect T="Guid" Label="Bucket" @bind-Value="context.BucketId">
+      <MudSelect T="Guid?" Label="Bucket" Value="context.BucketId">
+        @if(context.BucketId == Guid.Empty)
+        {
+          <MudSelectItem T="Guid?" Value="Guid.Empty">..Please Select a Bucket..</MudSelectItem>
+        }
         @foreach (var bucket in _buckets)
         {
           <MudSelectItem T="Guid?" Value="bucket?.Id">@bucket?.Name</MudSelectItem>
@@ -45,31 +50,20 @@
       </MudSelect>
     </MudItem>
     <MudItem xs="12" md="6">
-      <MudSwitch Label="Name" For="@(() => context.Read)" @bind-Value="context.Read" />
+      <MudSelect T="ResourceOwnerType" Label="Resource Type" @bind-Value="context.ResourceOwnerType">
+        @foreach (ResourceOwnerType RO in Enum.GetValues<ResourceOwnerType>())
+        {
+          <MudSelectItem T="ResourceOwnerType" Value="RO">@RO</MudSelectItem>
+        }
+      </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="12">
+      <MudSwitch Label="Read" For="@(() => context.Read)" @bind-Value="context.Read" />
+      <MudSwitch Label="Write" For="@(() => context.Write)" @bind-Value="context.Write" />
+      <MudSwitch Label="Execute" For="@(() => context.Execute)" @bind-Value="context.Execute" />
     </MudItem>`
     <MudItem xs="12" md="12">
       <MudTextField Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
-    </MudItem>
-
-        
-
-    <MudItem xs="12" md="12">
-      <MudItem>
-        <div>
-          @if (!IsCreate)
-          {
-            <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Target="_blank"
-                       StartIcon="@Icons.Material.Filled.RemoveRedEye" Style="margin-left: 5px;">
-              View
-            </MudButton>
-
-            <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small"
-                       StartIcon="@Icons.Material.Filled.Delete" Style="margin-left: 5px;">
-              Delete
-            </MudButton>
-          }
-        </div>
-      </MudItem>
     </MudItem>
   </EditFormContent>
 

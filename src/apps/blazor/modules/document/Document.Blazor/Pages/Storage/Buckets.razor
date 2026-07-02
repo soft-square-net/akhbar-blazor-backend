@@ -16,6 +16,11 @@
     @{
       // bool IsCreate = Context.AddEditModal.IsCreate;
       bool IsCreate = context.Id == Guid.Empty;
+      if (!IsCreate)
+      {
+         StorageAccountValueChanged(context.StorageAccountId).ConfigureAwait(true);
+        StateHasChanged();
+      }
     }
     }
     @if (!IsCreate)

@@ -10,6 +10,7 @@ public class ListAwsBucketSpecs : EntitiesByPaginationFilterSpec<Bucket, BucketD
     public ListAwsBucketSpecs(ListBucketRequest command)
         : base(command) =>
         Query
+            .Include(b => b.StorageAccount)
             .OrderBy(c => c.Name, !command.HasOrderBy())
             .Where(b => b.Name.Contains(command.Keyword), !string.IsNullOrEmpty(command.Keyword));
 }
