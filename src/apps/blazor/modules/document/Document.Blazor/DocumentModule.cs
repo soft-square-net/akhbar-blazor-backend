@@ -7,9 +7,9 @@ using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Service
 using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Document;
 using FSH.Starter.BlazorShared;
-using FSH.Starter.Blazor.Infrastructure.Api;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor;
@@ -35,6 +35,7 @@ public sealed class DocumentModule : BlazorModuleBase
     {
         // Console.WriteLine(value: $@"Configuring {Name} Blazor Module...");
         // services.AddTransient<IApiClient, ApiClient>();
+        builder.Services.AddTransient<IStringLocalizer<DocumentsResources>, StringLocalizer<DocumentsResources>>();
         builder.Services.AddHttpClient<FileExplorerFileActionsService>(client =>
         {
             client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);

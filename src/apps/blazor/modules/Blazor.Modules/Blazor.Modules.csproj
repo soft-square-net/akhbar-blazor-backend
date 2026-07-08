@@ -9,8 +9,19 @@
     <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <PublishTrimmed>false</PublishTrimmed>
     <IsTrimmable>false</IsTrimmable>-->
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <BlazorWebAssemblySupportedCultures>en;ar</BlazorWebAssemblySupportedCultures>
+    <BlazorWebAssemblyDefaultCulture>ar</BlazorWebAssemblyDefaultCulture>
   </PropertyGroup>
+  <PropertyGroup>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Keeps your source resources active as content -->
+    <Content Include="Resources\**" CopyToOutputDirectory="Never" />
 
+    <!-- Forces the .targets file to layout correctly for project references and NuGet -->
+  </ItemGroup>
   <ItemGroup>
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
@@ -42,7 +53,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Update="FSH.Starter.Blazor.Modules.Document.Blazor" PrivateAssets="All" CopyToPublishDirectory="PreserveNewest" />
+    <Compile Update="Resources\ModulesResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ModulesResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\ModulesResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ModulesResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

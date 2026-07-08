@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using Shared.Enums;
 
 namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
 
@@ -18,6 +19,7 @@ public partial class FSHMainLayout
     private bool _drawerOpen;
     private bool _isDarkMode;
     private bool _isFullscreen;
+    private bool _isEnglish;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,5 +63,32 @@ public partial class FSHMainLayout
         await JS.InvokeVoidAsync("toggleFullScreen");
         _isFullscreen = !_isFullscreen;
         StateHasChanged();
+    }
+
+    private async Task ToggleLanguage()
+    {
+        CurrentCulture = CurrentCulture.StartsWith("en", StringComparison.InvariantCultureIgnoreCase) ? FSHLang.arEg.Value : FSHLang.enUS.Value;
+        _isEnglish = CurrentCulture.StartsWith("en", StringComparison.InvariantCultureIgnoreCase);
+        StateHasChanged();
+    }
+    private string CurrentCulture
+    {
+        get => System.Globalization.CultureInfo.CurrentCulture.Name;
+        set
+        {
+            if (System.Globalization.CultureInfo.CurrentCulture.Name != value)
+            {
+                _ = ChangeCulture(value);
+            }
+        }
+    }
+
+    private async Task ChangeCulture(string culture)
+    {
+        // Save choice to local storage
+        await JS.InvokeVoidAsync("localStorage.setItem", "blazorCulture", culture);
+
+        // Force reload the app to let Program.cs apply the thread state updates
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
     }
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using FSH.Starter.Blazor.Infrastructure.Preferences;
 using FSH.Starter.Blazor.Infrastructure.Themes;
 using Microsoft.AspNetCore.Components;
@@ -17,8 +18,11 @@ public partial class FSHeroLayout
 
     protected override async Task OnInitializedAsync()
     {
+        await ClientPreferences.ChangeLanguageAsync(CultureInfo.CurrentCulture.Name);
         _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
         if (_themePreference == null) _themePreference = new ClientPreference();
+        _themePreference.IsRTL = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
+
         SetCurrentTheme(_themePreference);
 
         Toast.Add("Like this project? ", Severity.Info, config =>

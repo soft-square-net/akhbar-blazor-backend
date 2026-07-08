@@ -3,6 +3,7 @@ using Blazored.LocalStorage;
 using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Blazor.Infrastructure.Auth;
 using FSH.Starter.Blazor.Infrastructure.Auth.Jwt;
+using FSH.Starter.Blazor.Infrastructure.Localization;
 using FSH.Starter.Blazor.Infrastructure.Notifications;
 using FSH.Starter.Blazor.Infrastructure.Preferences;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,8 @@ public static class Extensions
     private const string ClientName = "FullStackHero.API";
     public static IServiceCollection AddClientServices(this IServiceCollection services, IConfiguration config)
     {
+        // services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
         services.AddMudServices(configuration =>
         {
             //configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
@@ -48,6 +51,7 @@ public static class Extensions
         //    })
         //);
         services.AddBlazoredLocalStorage();
+        services.AddFSHLocalization();
         services.AddAuthentication(config);
         services.AddTransient<IApiClient, ApiClient>();
         services.AddHttpClient(ClientName, client =>

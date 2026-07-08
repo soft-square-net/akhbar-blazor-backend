@@ -8,6 +8,11 @@
 		<AssemblyName>FSH.Starter.Blazor.Client</AssemblyName>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <!--<PublishTrimmed>false</PublishTrimmed>-->
+
+    <!-- Highlighted Configuration Below -->
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <BlazorWebAssemblySupportedCultures>en;ar</BlazorWebAssemblySupportedCultures>
+    <BlazorWebAssemblyDefaultCulture>ar</BlazorWebAssemblyDefaultCulture>
   </PropertyGroup>
 
   <ItemGroup>

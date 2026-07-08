@@ -1,6 +1,7 @@
 using FSH.Starter.Blazor.Client;
 using FSH.Starter.Blazor.Client.Layout;
 using FSH.Starter.Blazor.Infrastructure;
+using FSH.Starter.Blazor.Infrastructure.Localization;
 using FSH.Starter.Blazor.Modules;
 using FSH.Starter.BlazorShared.Layout;
 using Microsoft.AspNetCore.Components.Web;
@@ -25,7 +26,7 @@ var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 logger.LogInformation("Logging an Information message from Program.cs");
-
+await app.UseFSHLocalization();
 await app.UseBlazorModules();
 
 await   app.RunAsync();

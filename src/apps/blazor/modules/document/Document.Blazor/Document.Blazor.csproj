@@ -10,9 +10,22 @@
     <!--<PublishTrimmed>false</PublishTrimmed>
     <IsTrimmable>false</IsTrimmable>
     <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>-->
-
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <BlazorWebAssemblySupportedCultures>en;ar</BlazorWebAssemblySupportedCultures>
+    <BlazorWebAssemblyDefaultCulture>ar</BlazorWebAssemblyDefaultCulture>
   </PropertyGroup>
+  <!--<PropertyGroup>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>-->
+  <!--<ItemGroup>
+    --><!-- Prevents MSBuild from evaluating files inside the folder entirely --><!--
+    <DefaultItemExcludes Include="Resources\**" />
 
+    --><!-- Explicitly removes C# compilation and Razor file building --><!--
+    <Compile Remove="Resources\**" />
+    <Content Remove="Resources\**" />
+    <None Include="Resources\**" />
+  </ItemGroup>-->
   <ItemGroup>
     <Content Remove="launchSettings.json" />
     <Content Remove="Properties\launchSettings.json" />
@@ -59,6 +72,28 @@
     <Folder Include="wwwroot\img\projects\" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Compile Update="Resources\DocumentsResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DocumentsResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Resources\DocumentsResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DocumentsResources.resx</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\DocumentsResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DocumentsResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  
   <!--<ItemGroup>
     <None Include="Properties\launchSettings.json">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -76,5 +111,12 @@
           DestinationFolder="..\..\..\client\wwwroot\modules\$(ProjectName)\%(RecursiveDir)"
           SkipUnchangedFiles="true" />
   </Target>-->
-
+  
+  <!--<Target Name="CopyRclAssets" BeforeTargets="Build">
+    <ItemGroup>
+      <RclStaticAssets Include=".\Resources\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RclStaticAssets)" DestinationFolder="..\..\..\client\Resources\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>-->
+  
 </Project>

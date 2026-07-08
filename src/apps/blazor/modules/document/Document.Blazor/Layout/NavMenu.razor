@@ -1,13 +1,18 @@
 ﻿@using FSH.Starter.BlazorShared.interfaces;
-@implements IModuleMenu
+@using Microsoft.Extensions.Localization;
+@implements IModuleMenu;
+@using FSH.Starter.Blazor.Modules.Document.Blazor;
+@inject IStringLocalizer<DocumentsResources> Loc
 
-<MudNavGroup Title="Document" Icon="@Icons.Material.Filled.DocumentScanner">
-  <MudNavLink Href="/document/list" Icon="@Icons.Material.Filled.FolderOpen" Class="fsh-nav-child">File Explorer</MudNavLink>
-</MudNavGroup>
-<MudNavGroup Title="Storage " Icon="@Icons.Material.Filled.Storage">
-  <MudNavLink Href="/storage/accounts" Icon="@Icons.Material.Filled.ManageAccounts" Class="fsh-nav-child">Accounts</MudNavLink>
-  <MudNavLink Href="/storage/buckets" Icon="@Icons.Material.Filled.FolderShared" Class="fsh-nav-child">Buckets</MudNavLink>
-  <MudNavLink Href="/storage/access-rules" Icon="@Icons.Material.Filled.SystemSecurityUpdateWarning" Class="fsh-nav-child">Access Rules</MudNavLink>
+<MudNavGroup Title="@Loc["ModulesDocumentTitle"]" Icon="@Icons.Material.Filled.DocumentScanner">
+  <MudNavGroup Title="Document" Icon="@Icons.Material.Filled.DocumentScanner">
+    <MudNavLink Href="/document/list" Icon="@Icons.Material.Filled.FolderOpen" Class="fsh-nav-child">File Explorer</MudNavLink>
+  </MudNavGroup>
+  <MudNavGroup Title="Storage " Icon="@Icons.Material.Filled.Storage">
+    <MudNavLink Href="/storage/accounts" Icon="@Icons.Material.Filled.ManageAccounts" Class="fsh-nav-child">Accounts</MudNavLink>
+    <MudNavLink Href="/storage/buckets" Icon="@Icons.Material.Filled.FolderShared" Class="fsh-nav-child">Buckets</MudNavLink>
+    <MudNavLink Href="/storage/access-rules" Icon="@Icons.Material.Filled.SystemSecurityUpdateWarning" Class="fsh-nav-child">Access Rules</MudNavLink>
+  </MudNavGroup>
 </MudNavGroup>
 
 

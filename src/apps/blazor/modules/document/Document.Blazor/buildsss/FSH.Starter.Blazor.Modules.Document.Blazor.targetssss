@@ -1,0 +1,27 @@
+<!--<Project xmlns="http://microsoft.com">
+   --><!--This runs inside the Blazor WASM build pipeline--><!-- 
+  --><!--<Target Name="CopyRclResourcesToWasm" AfterTargets="Build">--><!--
+  <Target Name="CopyDocumentResourcesToModules" BeforeTargets="BeforeCompile">
+    <ItemGroup>
+       --><!--Locates the resources folder inside the RCL package/project source--><!-- 
+      <RclSourceFiles Include="$(MSBuildThisFileDirectory)..\Resources\**\*.*" />
+    </ItemGroup>
+
+     --><!--Copies them straight into the consuming WASM app's output wwwroot--><!-- 
+    <Copy SourceFiles="@(RclSourceFiles)"
+          DestinationFolder="$(TargetDir)wwwroot\Resources\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+   --><!--This runs inside the Blazor WASM publish pipeline--><!-- 
+  --><!--<Target Name="CopyRclResourcesToWasmPublish" AfterTargets="Publish">--><!--
+  <Target Name="CopyDocumentResourcesToModulesPublish" BeforeTargets="BeforeCompile">
+    <ItemGroup>
+      <RclPublishFiles Include="$(MSBuildThisFileDirectory)..\Resources\**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(RclPublishFiles)"
+          DestinationFolder="$(PublishDir)wwwroot\Resources\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>-->
