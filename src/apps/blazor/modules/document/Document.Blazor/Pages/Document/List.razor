@@ -3,13 +3,11 @@
 @using FSH.Starter.BlazorShared
 @inherits MobulePageBase
 @inject IDialogService DialogService
-@using Microsoft.Extensions.Localization
 @using FSH.Starter.Blazor.Modules.Document.Blazor
-@inject IStringLocalizer<DocumentsResources> Loc
 
 
 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
-  @Loc["ModulesDocumentTitle"] Open File Explorer
+  @Loc["Modules.Document.Title"] Open File Explorer
 </MudButton>
 
 <MudText Typo="Typo.h6">@_content</MudText>

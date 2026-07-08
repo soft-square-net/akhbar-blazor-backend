@@ -63,9 +63,9 @@ namespace FSH.Starter.Blazor.Modules.Document.Blazor.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Manage Documents.
         /// </summary>
-        internal static string ModulesDocumentTitle {
+        internal static string Modules_Document_Title {
             get {
-                return ResourceManager.GetString("ModulesDocumentTitle", resourceCulture);
+                return ResourceManager.GetString("Modules.Document.Title", resourceCulture);
             }
         }
     }

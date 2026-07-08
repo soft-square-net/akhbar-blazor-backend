@@ -5,8 +5,8 @@
 @using MudBlazor;
 
 @inject ILayoutService LayoutSrv ;
-@inject IStringLocalizer<SharedResources> Loc ;
-<div>@Loc["AppTitle"]</div>
+
+
 <CascadingAuthenticationState>
   @* <MudList T="string">
     @foreach (var item in additionalAssemblies.Select(a => a.FullName).ToList())

@@ -1,33 +1,32 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using Blazored.LocalStorage
+@using FSH.Starter.Blazor.Client
+@using FSH.Starter.Blazor.Client.Layout
+@using FSH.Starter.Blazor.Client.Pages.Auth
+@using FSH.Starter.Blazor.Infrastructure.Api
+@using FSH.Starter.Blazor.Infrastructure.Auth
 @using FSH.Starter.Blazor.Infrastructure.Preferences
+@using FSH.Starter.Blazor.Modules;
+@using FSH.Starter.Blazor.Modules.Pages.Document;
+@using FSH.Starter.BlazorShared.Components
+@using FSH.Starter.BlazorShared.Components.Common
+@using FSH.Starter.BlazorShared.Components.Dialogs
+@using FSH.Starter.BlazorShared.Components.EntityTable
+@using FSH.Starter.BlazorShared.Components.General
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.Extensions.Localization
 @using Microsoft.JSInterop
-@using FSH.Starter.Blazor.Client
-@using FSH.Starter.Blazor.Client.Layout
-@using FSH.Starter.BlazorShared.Components
-@using FSH.Starter.BlazorShared.Components.General
-@using FSH.Starter.BlazorShared.Components.Dialogs
-@using FSH.Starter.BlazorShared.Components.Common
-@using FSH.Starter.BlazorShared.Components.EntityTable
-@using FSH.Starter.Blazor.Infrastructure.Auth
 @using MudBlazor
 @using MudBlazor.Extensions
 @using MudBlazor.Extensions.Components
 @using MudBlazor.Extensions.Components.ObjectEdit
-@using Blazored.LocalStorage
-@using FSH.Starter.Blazor.Infrastructure.Api
-@using FSH.Starter.Blazor.Modules;
-@using FSH.Starter.Blazor.Modules.Pages.Document;
-
-@using FSH.Starter.Blazor.Client.Pages.Auth
-
-@using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
 @inject NavigationManager Navigation
@@ -35,3 +34,4 @@
 @inject IDialogService DialogService
 @inject IConfiguration Config
 @inject IClientPreferenceManager ClientPreferences
+@inject IStringLocalizer<SharedResources> Loc ;
