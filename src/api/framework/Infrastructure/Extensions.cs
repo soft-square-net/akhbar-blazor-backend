@@ -12,6 +12,7 @@ using FSH.Framework.Infrastructure.Cors;
 using FSH.Framework.Infrastructure.Exceptions;
 using FSH.Framework.Infrastructure.Identity;
 using FSH.Framework.Infrastructure.Jobs;
+using FSH.Framework.Infrastructure.Localization;
 using FSH.Framework.Infrastructure.Logging.Serilog;
 using FSH.Framework.Infrastructure.Mail;
 using FSH.Framework.Infrastructure.OpenApi;
@@ -52,7 +53,7 @@ public static class Extensions
         builder.Services.AddProblemDetails();
         builder.Services.AddHealthChecks();
         builder.Services.AddOptions<OriginOptions>().BindConfiguration(nameof(OriginOptions));
-
+        builder.Services.AddJsonLocalization();
         // Define module assemblies
         var assemblies = new Assembly[]
         {
@@ -86,6 +87,7 @@ public static class Extensions
         app.UseCorsPolicy();
         app.UseOpenApi();
         app.UseJobDashboard(app.Configuration);
+        app.UseAppLocalization();
         app.UseRouting();
         app.UseStaticFiles();
         app.UseStaticFiles(new StaticFileOptions()

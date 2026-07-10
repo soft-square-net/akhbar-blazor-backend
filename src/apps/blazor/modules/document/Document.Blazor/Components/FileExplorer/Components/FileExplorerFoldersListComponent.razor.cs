@@ -13,7 +13,9 @@ public partial class FileExplorerFoldersListComponent
     [Parameter] public List<FolderModel> Folders { get; set; } = new();
     [Parameter] public EventCallback<FolderModel> OnFolderSelected { get; set; }
     private string Search = string.Empty;
-
+    public string SelectedFolder = string.Empty;
+    public bool ReadOnly = false;
+    public SelectionMode SelectionMode = SelectionMode.SingleSelection;
     // private void SelectFolder(FolderModel folder)
     // {
     //     OnFolderSelected.InvokeAsync(folder);

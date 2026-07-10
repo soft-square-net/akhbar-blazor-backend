@@ -1,0 +1,109 @@
+﻿@using System.IO
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using MudBlazor
+
+<MudTreeView T="TreeItemDataModel" Items="TreeItems" Hover="true" ReadOnly="false" @bind-SelectedValue="SelectedNode">
+  <ItemTemplate>
+    <MudTreeViewItem T="TreeItemDataModel" @bind-Expanded="@context.Value.IsFolder" Text="@(context.Value?.Name ?? "None")"
+                     Value="@context.Value"
+                     Items="@(context.Value?.Children )"
+                     Icon="@(context.Value != null?GetIcon(context):null)" />
+  </ItemTemplate>
+</MudTreeView>
+
+@if (SelectedNode != null)
+{
+  <MudText Typo="Typo.body1" Class="mt-4">
+    Selected: <b>@SelectedNode.FullPath</b>
+  </MudText>
+}
+
+@code {
+
+  private IReadOnlyCollection<TreeItemData<TreeItemDataModel>> TreeItems { get; set; } = new List<TreeItemData<TreeItemDataModel>>()
+  {
+    new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "Folder 1", FullPath = "/A", IsFolder = true, Children = new List<TreeItemData<TreeItemDataModel>>()
+    {
+        new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "image01.jpg", FullPath = "/A/image01.jpg", IsFolder = false, Children = new List<TreeItemData<TreeItemDataModel>>() } },
+        new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "image02.xml", FullPath = "/A/image02.jpg", IsFolder = false, Children = new List<TreeItemData<TreeItemDataModel>>() } },
+    } } },
+    new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "Folder 2", FullPath = "/B", IsFolder = true, Children = new List<TreeItemData<TreeItemDataModel>>() } },
+    new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "logo.jpg", FullPath = "/C", IsFolder = false, Children = new List<TreeItemData<TreeItemDataModel>>() } },
+  };
+  private TreeItemDataModel SelectedNode { get; set; } = new TreeItemDataModel() { Name = "Folder 1", FullPath = "", IsFolder = true, Children = new List<TreeItemData<TreeItemDataModel>>() };
+
+  protected override void OnInitialized()
+  {
+    // Replace with your target Windows directory path
+    string targetPath = @"C:\YourTargetFolder";
+
+    if (Directory.Exists(targetPath))
+    {
+      var rootNode = LoadDirectory(targetPath);
+      TreeItems = new List<TreeItemData<TreeItemDataModel>> { rootNode };
+    }
+  }
+
+  // Recursive function to load folders and files
+  private TreeItemData<TreeItemDataModel> LoadDirectory(string path)
+  {
+    var di = new DirectoryInfo(path);
+    var node = new TreeItemData<TreeItemDataModel>
+    {
+      Value = new TreeItemDataModel
+      {
+        Name = di.Name,
+        FullPath = di.FullName,
+        IsFolder = true,
+        Children = new List<TreeItemData<TreeItemDataModel>>()
+      }
+    };
+
+    try
+    {
+      // 1. Populate Subdirectories recursively
+      foreach (var dir in di.GetDirectories())
+      {
+        node.Children.Add(LoadDirectory(dir.FullName));
+      }
+
+      // 2. Populate Files
+      foreach (var file in di.GetFiles())
+      {
+        node.Children.Add(new TreeItemData<TreeItemDataModel>
+        {
+          Value = new TreeItemDataModel
+          {
+            Name = file.Name,
+            FullPath = file.FullName,
+            IsFolder = false
+          }
+        });
+      }
+    }
+    catch (UnauthorizedAccessException)
+    {
+      // Handle or log permission errors for restricted system folders
+    }
+
+    return node;
+  }
+
+  // Helper to assign correct icons dynamically
+  private string GetIcon(TreeItemData<TreeItemDataModel> item)
+  {
+    if (item.Value.IsFolder)
+    {
+      return !!item.Expanded ? Icons.Custom.Uncategorized.FolderOpen : Icons.Custom.Uncategorized.Folder;
+    }
+
+    // Quick extension check for icons
+    var ext = Path.GetExtension(item.Value.Name).ToLower();
+    return ext switch
+    {
+      ".json" or ".cs" or ".xml" => Icons.Custom.FileFormats.FileCode,
+      ".png" or ".jpg" or ".jpeg" => Icons.Custom.FileFormats.FileImage,
+      _ => Icons.Material.Filled.DeviceUnknown
+    };
+  }
+}
