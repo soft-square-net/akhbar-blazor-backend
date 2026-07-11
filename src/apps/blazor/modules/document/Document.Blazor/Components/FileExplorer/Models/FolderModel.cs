@@ -1,4 +1,6 @@
 
+using MudBlazor;
+
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public class FolderModel: BaseExplorerItemModel
 {
@@ -18,7 +20,7 @@ public class FolderModel: BaseExplorerItemModel
     private List<FileModel> _files { get; init; } = new();
     public IReadOnlyList<FileModel> Files => _files.AsReadOnly();
     private List<FolderModel> _folders { get; init; } = new();
-    public IReadOnlyList<FolderModel> Folders => _folders.AsReadOnly();
+    public IReadOnlyList<TreeItemData<FolderModel>> Folders => _folders.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
 
     public string AllowedExtensions { get; set; } = string.Empty;
     public void AddFolder(FolderModel folder)

@@ -15,15 +15,17 @@
                 <MudIcon Icon="@Icons.Material.Filled.Folder" Class="me-2" Size="Size.Small" Color="Color.Error" />
                 @f.Name
             </MudText>
-            @* <MudSpacer />
-                <MudText Typo="Typo.caption">@f.Files.Count</MudText> *@
+            <MudSpacer />
+                <MudText Typo="Typo.caption">@f.Files.Count</MudText>
         </MudListItem>
     }
+
+    <FileBrowserFoldersTreeView OnNodeSelected="HandleNodeSelected"/>
+
 </MudList>
 
 <MudPaper Width="100%" Elevation="0">
 
-    <FileBrowserFoldersTreeView />
 </MudPaper>
 
 <style>
@@ -33,7 +35,7 @@
 
     .file-explorer-folders-list {
         height: calc(100% - var(--file-explorer-search-box-height));
-
+    }
         /* box-shadow: inset h-offset v-offset blur-radius spread-radius color; */
         .element-class {
             @* box-shadow: inset 6px 6px 10px 0 rgba(0, 0, 0, 0.2),

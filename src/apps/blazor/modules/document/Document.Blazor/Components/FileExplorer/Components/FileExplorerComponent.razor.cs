@@ -101,7 +101,7 @@ public partial class FileExplorerComponent
         {
             foreach (var folder in CurrentFolder.Folders)
             {
-                folder.UnSelect();
+                folder.Value.UnSelect();
             }
             foreach (var file in CurrentFolder.Files)
             {

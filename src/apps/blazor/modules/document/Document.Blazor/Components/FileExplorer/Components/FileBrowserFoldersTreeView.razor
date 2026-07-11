@@ -2,11 +2,12 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using MudBlazor
 
-<MudTreeView T="TreeItemDataModel" Items="TreeItems" Hover="true" ReadOnly="false" @bind-SelectedValue="SelectedNode">
+<MudTreeView T="FolderModel" Items="TreeItems" Hover="true" ReadOnly="false" @bind-SelectedValue="SelectedNode">
   <ItemTemplate>
-    <MudTreeViewItem T="TreeItemDataModel" @bind-Expanded="@context.Value.IsFolder" Text="@(context.Value?.Name ?? "None")"
+    <MudTreeViewItem T="FolderModel" @bind-Expanded="@context.Value.IsFolder" Text="@(context.Value?.Name ?? "None")"
+                     SelectedChanged="() => OnNodeSelected.InvokeAsync(context)"
                      Value="@context.Value"
-                     Items="@(context.Value?.Children )"
+                     Items="@(context.Value?.Folders )"
                      Icon="@(context.Value != null?GetIcon(context):null)" />
   </ItemTemplate>
 </MudTreeView>
@@ -14,24 +15,23 @@
 @if (SelectedNode != null)
 {
   <MudText Typo="Typo.body1" Class="mt-4">
-    Selected: <b>@SelectedNode.FullPath</b>
+    Selected: <b>@SelectedNode.Path</b>
   </MudText>
 }
 
 @code {
-
-  private IReadOnlyCollection<TreeItemData<TreeItemDataModel>> TreeItems { get; set; } = new List<TreeItemData<TreeItemDataModel>>()
+  [Parameter] public EventCallback<TreeItemData<FolderModel>> OnNodeSelected { get; set; }
+  private IReadOnlyCollection<TreeItemData<FolderModel>> TreeItems { get; set; } = new List<TreeItemData<FolderModel>>()
   {
-    new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "Folder 1", FullPath = "/A", IsFolder = true, Children = new List<TreeItemData<TreeItemDataModel>>()
-    {
-        new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "image01.jpg", FullPath = "/A/image01.jpg", IsFolder = false, Children = new List<TreeItemData<TreeItemDataModel>>() } },
-        new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "image02.xml", FullPath = "/A/image02.jpg", IsFolder = false, Children = new List<TreeItemData<TreeItemDataModel>>() } },
-    } } },
-    new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "Folder 2", FullPath = "/B", IsFolder = true, Children = new List<TreeItemData<TreeItemDataModel>>() } },
-    new TreeItemData<TreeItemDataModel>(){ Value = new TreeItemDataModel() { Name = "logo.jpg", FullPath = "/C", IsFolder = false, Children = new List<TreeItemData<TreeItemDataModel>>() } },
+    new TreeItemData<FolderModel>(){ Value = new FolderModel("Folder 1", null,
+    [
+        new FolderModel("Folder 11",null,[])
+    ])
+    },
+    new TreeItemData<FolderModel>(){ Value = new FolderModel("Folder 2", null, [] )},
+    new TreeItemData<FolderModel>(){ Value = new FolderModel("Folder 3", null, [] )},
   };
-  private TreeItemDataModel SelectedNode { get; set; } = new TreeItemDataModel() { Name = "Folder 1", FullPath = "", IsFolder = true, Children = new List<TreeItemData<TreeItemDataModel>>() };
-
+  private FolderModel SelectedNode { get; set; } = new FolderModel("Folder 2", null, []);
   protected override void OnInitialized()
   {
     // Replace with your target Windows directory path
@@ -40,23 +40,18 @@
     if (Directory.Exists(targetPath))
     {
       var rootNode = LoadDirectory(targetPath);
-      TreeItems = new List<TreeItemData<TreeItemDataModel>> { rootNode };
+      TreeItems = new List<TreeItemData<FolderModel>> { rootNode };
     }
   }
 
   // Recursive function to load folders and files
-  private TreeItemData<TreeItemDataModel> LoadDirectory(string path)
+  private TreeItemData<FolderModel> LoadDirectory(string path)
   {
     var di = new DirectoryInfo(path);
-    var node = new TreeItemData<TreeItemDataModel>
+    var node = new TreeItemData<FolderModel>
     {
-      Value = new TreeItemDataModel
-      {
-        Name = di.Name,
-        FullPath = di.FullName,
-        IsFolder = true,
-        Children = new List<TreeItemData<TreeItemDataModel>>()
-      }
+      // Value = new FolderModel(di.Name,di.GetFiles(),[])
+      Value = new FolderModel(di.Name,null,[])
     };
 
     try
@@ -70,15 +65,7 @@
       // 2. Populate Files
       foreach (var file in di.GetFiles())
       {
-        node.Children.Add(new TreeItemData<TreeItemDataModel>
-        {
-          Value = new TreeItemDataModel
-          {
-            Name = file.Name,
-            FullPath = file.FullName,
-            IsFolder = false
-          }
-        });
+        node.Value.AddFile(new FileModel(Guid.NewGuid() ,file.Name,file.Length,file.CreationTime,file.LastWriteTime));
       }
     }
     catch (UnauthorizedAccessException)
@@ -90,7 +77,7 @@
   }
 
   // Helper to assign correct icons dynamically
-  private string GetIcon(TreeItemData<TreeItemDataModel> item)
+  private string GetIcon(TreeItemData<FolderModel> item)
   {
     if (item.Value.IsFolder)
     {
