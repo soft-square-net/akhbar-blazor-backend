@@ -7,7 +7,7 @@
     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
 
 <MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list">
-    @foreach (FolderModel f in Folders)
+    @* @foreach (FolderModel f in Folders)
     {
         <MudListItem Selected="@(CurrentFolder == f)" OnClick="() => ChangeFolder(f)">
 
@@ -18,7 +18,7 @@
             <MudSpacer />
                 <MudText Typo="Typo.caption">@f.Files.Count</MudText>
         </MudListItem>
-    }
+    } *@
 
     <FileBrowserFoldersTreeView OnNodeSelected="HandleNodeSelected"/>
 

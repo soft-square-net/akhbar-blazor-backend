@@ -5,7 +5,7 @@
 <MudTreeView T="FolderModel" Items="TreeItems" Hover="true" ReadOnly="false" @bind-SelectedValue="SelectedNode">
   <ItemTemplate>
     <MudTreeViewItem T="FolderModel" @bind-Expanded="@context.Value.IsFolder" Text="@(context.Value?.Name ?? "None")"
-                     SelectedChanged="() => OnNodeSelected.InvokeAsync(context)"
+                     SelectedChanged="@(selected => HandleSelectedChanged(selected, context))"
                      Value="@context.Value"
                      Items="@(context.Value?.Folders )"
                      Icon="@(context.Value != null?GetIcon(context):null)" />
@@ -76,6 +76,26 @@
     return node;
   }
 
+  private async Task HandleSelectedChanged(bool selected, TreeItemData<FolderModel> context)
+  {
+    if (selected)
+    {
+      // assign the same instance used by the tree so @bind-SelectedValue can match it
+      SelectedNode = context.Value;
+      await OnNodeSelected.InvokeAsync(context);
+    }
+    else
+    {
+      // if the item that became unselected was the currently selected node, clear the selection
+      if (SelectedNode == context.Value)
+      {
+        SelectedNode = null;
+      }
+    }
+
+    // ensure the component re-renders on the UI thread
+    await InvokeAsync(StateHasChanged);
+  }
   // Helper to assign correct icons dynamically
   private string GetIcon(TreeItemData<FolderModel> item)
   {

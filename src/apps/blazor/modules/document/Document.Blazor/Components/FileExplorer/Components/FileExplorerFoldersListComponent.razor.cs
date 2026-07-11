@@ -23,10 +23,10 @@ public partial class FileExplorerFoldersListComponent
     //     OnFolderSelected.InvokeAsync(folder);
     // }
 
-    private void ChangeFolder(FolderModel f)
+    private async Task ChangeFolder(FolderModel f)
     {
         CurrentFolder = f;
-        OnFolderSelected.InvokeAsync(f).Wait();
+        await OnFolderSelected.InvokeAsync(f);
     }
 
 
@@ -67,8 +67,9 @@ public partial class FileExplorerFoldersListComponent
         // Return null if the folder wasn't found in this branch
         return null;
     }
-    private void HandleNodeSelected(TreeItemData<FolderModel> node)
+    private async Task HandleNodeSelected(TreeItemData<FolderModel> node)
     {
-        ChangeFolder(node.Value!);
+        await ChangeFolder(node.Value!);
+        //StateHasChanged();
     }
 }
