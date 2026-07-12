@@ -22,21 +22,29 @@
           @* OnNavigateAsync="OnNavigateAsync"  *@
 
     <Found Context="routeData">
-      <CascadingValue Value="@routeData" Name="AppRouteData">
-      <AuthorizeRouteView RouteData="@routeData"
-                          DefaultLayout="@LayoutSrv.CurrentLayout.GetType()">
-        <NotAuthorized>
-          @if (@context.User.Identity?.IsAuthenticated is true)
-          {
-            <p>You are not authorized to be here.</p>
-          }
-          else
-          {
-            <Login />
-          }
-        </NotAuthorized>
-      </AuthorizeRouteView>
-      </CascadingValue>
+      @if (routeData is not null)
+      {
+        <CascadingValue Value="@routeData" Name="AppRouteData">
+          <AuthorizeRouteView RouteData="@routeData"
+                              DefaultLayout="@LayoutSrv.CurrentLayout.GetType()">
+            <NotAuthorized>
+              @if (@context.User.Identity?.IsAuthenticated is true)
+              {
+                <p>You are not authorized to be here.</p>
+              }
+              else
+              {
+                <Login />
+              }
+            </NotAuthorized>
+          </AuthorizeRouteView>
+        </CascadingValue>
+
+      }
+      else
+      {
+        <p>Loading...</p>
+      }
       <SectionOutlet SectionName="scripts" />
     </Found>
     <NotFound>

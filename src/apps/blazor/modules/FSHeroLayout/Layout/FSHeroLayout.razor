@@ -2,9 +2,14 @@
 
 <MudRTLProvider>
   <MudThemeProvider @bind-IsDarkMode="_isDarkMode" Theme="_currentTheme" />
-  <MudDialogProvider />
-  <MudSnackbarProvider />
+  @* Required *@
   <MudPopoverProvider />
+
+  @* Needed for dialogs *@
+  <MudDialogProvider />
+
+  @* Needed for snackbars *@
+  <MudSnackbarProvider />
 
   <AuthorizeView>
     <NotAuthorized>

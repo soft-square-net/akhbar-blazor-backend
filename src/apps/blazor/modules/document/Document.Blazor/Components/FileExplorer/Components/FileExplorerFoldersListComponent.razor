@@ -20,7 +20,7 @@
         </MudListItem>
     } *@
 
-    <FileBrowserFoldersTreeView OnNodeSelected="HandleNodeSelected"/>
+    <FileExplorerFoldersTreeView Items="Folders" OnNodeSelected="HandleNodeSelected"/>
 
 </MudList>
 
@@ -34,6 +34,9 @@
     }
 
     .file-explorer-folders-list {
+        display:flex;
+        flex-direction:column;
+        flex: 1;
         height: calc(100% - var(--file-explorer-search-box-height));
     }
         /* box-shadow: inset h-offset v-offset blur-radius spread-radius color; */

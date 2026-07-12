@@ -12,7 +12,7 @@ public interface IExplorerItemModel
     public bool IsReadOnly { get; set; }
     public string Path { get; set; }
     public long Size { get; set; }
-    public bool IsFolder { get; set; }
+    public bool IsFolder { get; }
     public DateTime Created { get; set; }
     public DateTime Modified { get; set; }
     // public Guid Author { get; set; }

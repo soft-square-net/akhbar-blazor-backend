@@ -16,6 +16,7 @@ public class FileModel : BaseExplorerItemModel
         Size = size;
         Created = created;
         Modified = modified;
+        SetAsFile();
     }
 
     public Uri? Url { get; set; }

@@ -57,13 +57,13 @@ public partial class FileExplorerComponent
                             new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
                         }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="jpg" },
                 new FolderModel("Docs files", new[]{
-                            new FileModel(Guid.NewGuid(), "beach.png", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
-                            new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
-                        }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="jpg,docx" },
+                            new FileModel(Guid.NewGuid(), "Doc01.pdf", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
+                            new FileModel(Guid.NewGuid(), "doc02.docx", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
+                        }){Path = $"{Constants._content}/documents" , AllowedExtensions="pdf,docx" },
                 new FolderModel("Music files", new[]{
-                            new FileModel(Guid.NewGuid(), "beach.png", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
-                            new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
-                        }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="mp3" }
+                            new FileModel(Guid.NewGuid(), "voice.wav", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
+                            new FileModel(Guid.NewGuid(), "video.mp4", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
+                        }){Path = $"{Constants._content}/music" , AllowedExtensions="mp3,mp4" }
            }
 
         )

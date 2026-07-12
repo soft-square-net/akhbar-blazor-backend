@@ -17,13 +17,12 @@ public class BaseExplorerItemModel : IExplorerItemModel
     public bool IsReadOnly { get; set; } = false;
     public string Path { get; set; }
     public long Size { get; set; }
-    public bool IsFolder { get; set; } = false;
+    
     public DateTime Created { get; set; } = DateTime.Now;
     public DateTime Modified { get; set; } = DateTime.Now;
     public FolderModel Folder { get; set; }
     private bool _selected { get; set; }
     public bool IsSelected => _selected;
-
 
     public void Select()
     {
@@ -35,5 +34,20 @@ public class BaseExplorerItemModel : IExplorerItemModel
     public void UnSelect()
     {
         _selected = false;
+    }
+
+    private bool _isFolder;
+    public bool IsFolder => _isFolder;
+
+    public void SetAsFolder()
+    {
+
+        _isFolder = true;
+        // StateService.NotifyFileSelectionChanged();
+        // StateService.NotifyStateChanged();
+    }
+    public void SetAsFile()
+    {
+        _isFolder = false;
     }
 }

@@ -4,24 +4,32 @@
 
 <CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
   @* <MudGrid Spacing="1" Style="height:calc(100% - 70px); min-height:500px;"> *@
-    @* <MudText Typo="Typo.body2" Color="Color.Error">@CurrentFolder</MudText> *@
-    <MudPaper  Style="overflow:hidden; position:relative;">
+  @* <MudText Typo="Typo.body2" Color="Color.Error">@CurrentFolder</MudText> *@
+  <MudPaper Style="overflow:hidden; position:relative;min-height:500px;">
     <MudDrawerContainer Class="mud-height-full">
-        <MudDrawer @bind-Open="@_open" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
-    @* <MudItem xs="12" sm="4" md="3"> *@
-      <MudPaper Outlined="false" Class="pa-0 px-2 mud-height-full" Elevation="0">
-        <FileExplorerFoldersListComponent Folders="Folders" OnFolderSelected="OnFolderSelected" />
-        @* <FileExplorerFoldersListComponent Folders="Folders"/> *@
-      </MudPaper>
-    @* </MudItem> *@
-    </MudDrawer>
-    @* <MudItem xs="12" sm="8" md="9"> *@
+      <MudDrawer @bind-Open="@_open" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
+        <MudPaper Outlined="false" Class="pa-0 px-2 mud-height-full" Elevation="0">
+          <FileExplorerFoldersListComponent Folders="Folders" OnFolderSelected="OnFolderSelected" />
+        </MudPaper>
+      </MudDrawer>
       <MudPaper Class="pa-1 mt-1" Style="height:calc(100% - 0px);" Elevation="0">
-            <FileExplorerContentComponent Folders="Folders" OnFolderUpdated="OnFolderUpdated" OnToggleFileBrowserTree="ToggleFileBrowserTree" />
+        <FileExplorerContentComponent Folders="Folders" OnFolderUpdated="OnFolderUpdated" OnToggleFileBrowserTree="ToggleFileBrowserTree" />
       </MudPaper>
-    @* </MudItem> *@
     </MudDrawerContainer>
-    </MudPaper>
+    <MudSplitPanel Class="mud-width-full">
+      <FirstPanel>
+        <MudCollapse Expanded="@_open">
+          <div style="width: 250px;">
+            <!-- Your Drawer Content Goes Here -->
+            <MudText>Drawer Content</MudText>
+          </div>
+        </MudCollapse>
+      </FirstPanel>
+      <SecondPanel>
+        <MudText>Main Content</MudText>
+      </SecondPanel>
+    </MudSplitPanel>
+  </MudPaper>
   @* </MudGrid> *@
 </CascadingValue>
 
@@ -36,5 +44,5 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  } 
+  }
 </style>

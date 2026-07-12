@@ -27,6 +27,7 @@
     <None Include="Resources\**" />
   </ItemGroup>-->
   <ItemGroup>
+    <Content Remove="Components\FileExplorer\Components\_FileBrowserFoldersTreeView.razor" />
     <Content Remove="launchSettings.json" />
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>

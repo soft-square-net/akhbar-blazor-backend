@@ -1,0 +1,146 @@
+﻿@using System.IO
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using MudBlazor
+
+<MudTreeView T="FolderModel" Items="_items" Hover="true" ReadOnly="false" SelectedValue="SelectedNode">
+  <ItemTemplate>
+    <MudTreeViewItem T="FolderModel" Text="@(context.Value?.Name ?? "None")"
+                     SelectedChanged="@(selected => HandleSelectedChanged(selected, context))"
+                     Expanded="@context.Value.IsExpanded"
+                     ExpandedChanged="@((bool isExpanded) => OnExpandedChanged(isExpanded, context))"
+                     Value="@context.Value"
+                     Items="@(context.Value?.Folders )"
+                     Icon="@(context.Value != null?GetIcon(context):null)"
+                     IconExpanded="@Icons.Custom.Uncategorized.FolderOpen">
+
+      <BodyContent Context="item">
+        <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
+          <MudText Style="justify-self: start;">@item.Text</MudText>
+          <div style="justify-self: end;">
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" Color="Color.Secondary" />
+          </div>
+        </div>
+      </BodyContent>
+
+    </MudTreeViewItem>
+
+  </ItemTemplate>
+</MudTreeView>
+
+@if (SelectedNode != null)
+{
+  <MudText Typo="Typo.body1" Class="mt-4">
+    Selected: <b>@SelectedNode.Path</b>
+  </MudText>
+}
+
+@code {
+  [Parameter] public EventCallback<TreeItemData<FolderModel>> OnNodeSelected { get; set; }
+
+  [Parameter] public List<FolderModel> Items { get; set; }
+  // private IReadOnlyCollection<TreeItemData<FolderModel>> TreeItems { get; set; } = new List<TreeItemData<FolderModel>>()
+  // {
+  //   new TreeItemData<FolderModel>(){ Value = new FolderModel("Folder 1", null,
+  //   [
+  //       new FolderModel("Folder 11",null,[])
+  //   ])
+  //   },
+  //   new TreeItemData<FolderModel>(){ Value = new FolderModel("Folder 2", null, [] )},
+  //   new TreeItemData<FolderModel>(){ Value = new FolderModel("Folder 3", null, [] )},
+  // };
+  private FolderModel SelectedNode { get; set; } = new FolderModel("Folder 2", null, []);
+  private IReadOnlyCollection<TreeItemData<FolderModel>> _items => Items.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
+  protected override void OnInitialized()
+  {
+    // Replace with your target Windows directory path
+    string targetPath = @"C:\YourTargetFolder";
+
+    if (Directory.Exists(targetPath))
+    {
+      // var rootNode = LoadDirectory(targetPath);
+      // Items = new List<TreeItemData<FolderModel>> { rootNode };
+    }
+  }
+
+  // Recursive function to load folders and files
+  private TreeItemData<FolderModel> LoadDirectory(string path)
+  {
+    var di = new DirectoryInfo(path);
+    var node = new TreeItemData<FolderModel>
+    {
+      // Value = new FolderModel(di.Name,di.GetFiles(),[])
+      Value = new FolderModel(di.Name, null, [])
+    };
+
+    try
+    {
+      // 1. Populate Subdirectories recursively
+      foreach (var dir in di.GetDirectories())
+      {
+        node.Children.Append(LoadDirectory(dir.FullName));
+      }
+
+      // 2. Populate Files
+      foreach (var file in di.GetFiles())
+      {
+        node.Value.AddFile(new FileModel(Guid.NewGuid(), file.Name, file.Length, file.CreationTime, file.LastWriteTime));
+      }
+    }
+    catch (UnauthorizedAccessException)
+    {
+      // Handle or log permission errors for restricted system folders
+    }
+
+    return node;
+  }
+
+  private async Task HandleSelectedChanged(bool selected, TreeItemData<FolderModel> context)
+  {
+    if (selected)
+    {
+      // assign the same instance used by the tree so @bind-SelectedValue can match it
+      SelectedNode = context.Value;
+      await OnNodeSelected.InvokeAsync(context);
+    }
+    else
+    {
+      // if the item that became unselected was the currently selected node, clear the selection
+      if (SelectedNode == context.Value)
+      {
+        SelectedNode = null;
+      }
+    }
+
+    // ensure the component re-renders on the UI thread
+    await InvokeAsync(StateHasChanged);
+  }
+  // Helper to assign correct icons dynamically
+  private string GetIcon(TreeItemData<FolderModel> item)
+  {
+    if (item.Value.IsFolder)
+    {
+      return item.Expanded ? Icons.Custom.Uncategorized.FolderOpen : Icons.Custom.Uncategorized.Folder;
+    }
+
+    // Quick extension check for icons
+    var ext = Path.GetExtension(item.Value.Name).ToLower();
+    return ext switch
+    {
+      ".json" or ".cs" or ".xml" => Icons.Custom.FileFormats.FileCode,
+      ".png" or ".jpg" or ".jpeg" => Icons.Custom.FileFormats.FileImage,
+      _ => Icons.Material.Filled.DeviceUnknown
+    };
+  }
+
+  private async Task OnExpandedChanged(bool isExpanded, TreeItemData<FolderModel> node)
+  {
+    // Update the visual property state
+    node.Value.IsExpanded = isExpanded;
+
+    // Perform conditional action on expand
+    if (isExpanded && (node.Value.Folders == null || !node.Value.Folders.Any()))
+    {
+      await node.Value.LoadFolders(); // LoadChildDataAsync(node);
+    }
+  }
+}

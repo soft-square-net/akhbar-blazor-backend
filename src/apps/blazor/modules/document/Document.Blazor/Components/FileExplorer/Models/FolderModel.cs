@@ -1,5 +1,6 @@
 
 using MudBlazor;
+using Nextended.Core.Extensions;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public class FolderModel: BaseExplorerItemModel
@@ -7,7 +8,7 @@ public class FolderModel: BaseExplorerItemModel
     public FolderModel(string name, FileModel[]? files= null, FolderModel[]? children = null )
     {
         Name = name;
-        IsFolder = true;
+        SetAsFolder();
         if (files is not null)
         {
             AddFiles(files);
@@ -23,6 +24,7 @@ public class FolderModel: BaseExplorerItemModel
     public IReadOnlyList<TreeItemData<FolderModel>> Folders => _folders.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
 
     public string AllowedExtensions { get; set; } = string.Empty;
+    public bool IsExpanded { get; set; }
     public void AddFolder(FolderModel folder)
     {
         folder.Folder = this;
@@ -55,4 +57,18 @@ public class FolderModel: BaseExplorerItemModel
         file.Folder = null;
         _files.Remove(file);
     }
-}
+
+    public async Task LoadFolders() { }
+    public async Task LoadFiles() { }
+    private async Task<IReadOnlyCollection<BaseExplorerItemModel>> GetChildren() {
+        if (_folders.IsNullOrEmpty()) LoadFolders(); 
+        if (_files.IsNullOrEmpty()) LoadFiles(); 
+        List<BaseExplorerItemModel> result = new List<BaseExplorerItemModel>();
+        result.AddRange(_folders);
+        result.AddRange(_files);
+        return result.AsReadOnly();
+    }
+
+    public IReadOnlyCollection<BaseExplorerItemModel> Children =>  GetChildren().Result;
+    
+  }
