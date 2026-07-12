@@ -75,7 +75,7 @@ public partial class FileExplorerComponent
         {
             new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
         })
-        { Path = $"{Constants._content}/" };
+        { Path = $"{Constants._content}/Shared" };
 
         Folders.Add(shared);
         var archive = new FolderModel("Archive") { Path = $"{Constants._content}/archive" };
@@ -101,7 +101,7 @@ public partial class FileExplorerComponent
         {
             foreach (var folder in CurrentFolder.Folders)
             {
-                folder.Value.UnSelect();
+                folder.UnSelect();
             }
             foreach (var file in CurrentFolder.Files)
             {

@@ -133,7 +133,7 @@ public partial class FileExplorerContentComponent
 
     async Task DeleteFile(FileModel f)
     {
-        bool? result = await DialogService.ShowMessageBox(
+        bool? result = await DialogService.ShowMessageBoxAsync(
             "Confirm Delete",
             $"Delete file '{f.Name}'?",
             yesText: "Delete",

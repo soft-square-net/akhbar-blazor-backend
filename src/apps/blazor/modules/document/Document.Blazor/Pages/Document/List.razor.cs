@@ -10,6 +10,13 @@ public partial class List : MobulePageBase
 {
     protected override string Path { get; set; }
 
+    private MudSplitPanel _splitPanel;
+    private bool _horizontal;
+    private bool _resetOnDoubleClick = true;
+    private bool _rounded = true;
+    private bool _elevation = true;
+    private bool _transparent;
+
     private Task OpenDialogAsync()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraExtraLarge, BackdropClick = false };

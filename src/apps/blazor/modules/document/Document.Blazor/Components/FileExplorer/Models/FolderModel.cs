@@ -21,7 +21,8 @@ public class FolderModel: BaseExplorerItemModel
     private List<FileModel> _files { get; init; } = new();
     public IReadOnlyList<FileModel> Files => _files.AsReadOnly();
     private List<FolderModel> _folders { get; init; } = new();
-    public IReadOnlyList<TreeItemData<FolderModel>> Folders => _folders.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
+    //public IReadOnlyList<TreeItemData<FolderModel>> Folders => _folders.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
+    public List<FolderModel> Folders => _folders;
 
     public string AllowedExtensions { get; set; } = string.Empty;
     public bool IsExpanded { get; set; }

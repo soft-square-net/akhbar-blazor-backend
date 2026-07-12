@@ -28,6 +28,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using MudExtensions.Services;
 using Microsoft.Extensions.Configuration;
+using Elsa.Studio.Login.Contracts;
 namespace FSH.Starter.Blazor.Modules.ElsaWorkflow.Blazor;
 
 public class ElsaWorkflowModule : BlazorModuleBase

@@ -69,28 +69,28 @@ public abstract class BaseExplorerFactory : IExplorerFilesView, IDisposable
             // b.OpenElement(sequence++, "div");
             foreach (var item in CurrentFolder.Folders)
             {
-                switch (item.Value.GetFileType())
+                switch (item.GetFileType())
                 {
                     case FileType.Audio:
-                        CreateAudioFolder(ref b, ref sequence, item.Value);
+                        CreateAudioFolder(ref b, ref sequence, item);
                         break;
                     case FileType.Code:
-                        CreateCodeFolder(ref b, ref sequence, item.Value);
+                        CreateCodeFolder(ref b, ref sequence, item);
                         break;
                     case FileType.Document:
-                        CreateDocumentFolder(ref b, ref sequence, item.Value);
+                        CreateDocumentFolder(ref b, ref sequence, item);
                         break;
                     case FileType.Image:
-                        CreateImageFolder(ref b, ref sequence, item.Value);
+                        CreateImageFolder(ref b, ref sequence, item);
                         break;
                     case FileType.Video:
-                        CreateVideoFolder(ref b, ref sequence, item.Value);
+                        CreateVideoFolder(ref b, ref sequence, item);
                         break;
                     case FileType.Other:
-                        CreateOtherFolder(ref b, ref sequence, item.Value);
+                        CreateOtherFolder(ref b, ref sequence, item);
                         break;
                     default:
-                        CreateFolder(ref b, ref sequence, item.Value);
+                        CreateFolder(ref b, ref sequence, item);
                         // sequence++; // For AddComponentParameter sequence number
                         break;
                 }

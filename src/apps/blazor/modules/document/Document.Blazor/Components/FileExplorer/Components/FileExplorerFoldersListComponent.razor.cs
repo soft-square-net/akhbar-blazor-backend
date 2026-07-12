@@ -67,7 +67,7 @@ public partial class FileExplorerFoldersListComponent
         // Return null if the folder wasn't found in this branch
         return null;
     }
-    private async Task HandleNodeSelected(TreeItemData<FolderModel> node)
+    private async Task HandleNodeSelected(ITreeItemData<FolderModel> node)
     {
         await ChangeFolder(node.Value!);
         //StateHasChanged();

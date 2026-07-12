@@ -4,8 +4,10 @@ namespace FSH.Starter.Blazor.Infrastructure.Themes;
 
 public class FshTheme : MudTheme
 {
+    Palette PaletteLight2;
     public FshTheme()
     {
+        // PaletteLight2 = new Palette();
         PaletteLight = new PaletteLight()
         {
             Primary = CustomColors.Light.Primary,

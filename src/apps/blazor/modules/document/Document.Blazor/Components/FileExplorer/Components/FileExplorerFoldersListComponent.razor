@@ -1,8 +1,8 @@
  @using MudBlazor
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-@using FSH.Starter.Blazor.Infrastructure.Api
-@* <MudText Typo="Typo.subtitle1" Class="mb-2">Folders</MudText> *@
-<MudTextField IconSize="Size.Small" T="string" Typo="Typo.caption" @bind-Value="Search" Label="Search"
+
+
+<MudTextField T="string" IconSize="Size.Small"  Typo="Typo.caption" @bind-Value="Search" Label="Search"
     Variant="Variant.Text" Margin="Margin.Dense" Adornment=" Adornment.End"
     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
 
@@ -20,12 +20,11 @@
         </MudListItem>
     } *@
 
-    <FileExplorerFoldersTreeView Items="Folders" OnNodeSelected="HandleNodeSelected"/>
 
 </MudList>
 
-<MudPaper Width="100%" Elevation="0">
-
+<MudPaper Width="100%" Elevation="0" Class="border-0 file-explorer-folders-list">
+    <FileExplorerFoldersTreeView Items="Folders" OnNodeSelected="HandleNodeSelected"/>
 </MudPaper>
 
 <style>

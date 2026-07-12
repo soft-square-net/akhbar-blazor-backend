@@ -46,7 +46,7 @@
                 ShrinkLabel="@_shrinkLabel" Adornment="Adornment.End" InnerPadding="false" >
           <MudStack Row Class="mud-input"
                     Spacing="0" AlignItems="AlignItems.Center" tabindex="-1">
-          <input @bind="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" />
+          <input @bind:get="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" />
             
           <MudIconButton Color="@Color.Tertiary"
                          Icon="@Icons.Material.Filled.Check"
