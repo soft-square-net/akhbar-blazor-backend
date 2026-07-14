@@ -29,11 +29,11 @@
   }
   protected override void OnInitialized()
   {
-    StateService.OnFileSelectionChanged += StateHasChangedHandler;
+    StateService.OnFolderSelectionChanged += StateHasChangedHandler;
     base.OnInitialized();
   }
 
-  public void StateHasChangedHandler()
+  public async Task StateHasChangedHandler(BaseExplorerItemModel model)
   {
     // Optionally update local values
     // ...
@@ -58,14 +58,14 @@
     {
       Model.Select();
     }
-    StateService.NotifyFileSelectionChanged();
+    StateService.NotifyFolderSelectionChanged(Model);
     StateService.NotifyStateChanged();
   }
 
 
   public void Dispose()
   {
-    StateService.OnFileSelectionChanged -= StateHasChangedHandler;
+    StateService.OnFolderSelectionChanged -= StateHasChangedHandler;
   }
 }
 

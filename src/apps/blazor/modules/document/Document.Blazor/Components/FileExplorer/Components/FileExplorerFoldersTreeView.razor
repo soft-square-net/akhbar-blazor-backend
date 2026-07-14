@@ -1,12 +1,15 @@
 ﻿@using System.IO
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
+
 @using MudBlazor
 
 <MudTreeView T="FolderModel" Items="_treeItems" Hover="true"
              ReadOnly="false"
              SelectedValue="SelectedTreeItemData">
+
   <ItemTemplate>
-    <MudTreeViewItem T="FolderModel" Text="@(context.Value.Name ?? "None")"
+    <MudTreeViewItem T="FolderModel" Text="@(context.Text)"
                      SelectedChanged="@((bool selected) => HandleSelectedChanged(selected, context))"
                      Expanded="@context.Expanded"
                      ExpandedChanged="@((bool isExpanded) => OnExpandedChanged(isExpanded, context))"
@@ -29,9 +32,13 @@
 }
 
 @code {
-  [Parameter] public EventCallback<TreeItemData<FolderModel>> OnNodeSelected { get; set; }
+  [Inject] IFileExplorerStateService StateService { get; set; } = default!;
 
-  [Parameter] public List<FolderModel> Items { get; set; }
+  // [Parameter] public required ICollection<FolderModel> Folders { get; set; }
+  [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
+  [Parameter] public EventCallback<TreeItemData<FolderModel>> OnNodeSelected { get; set; }
+  [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
+
   private List<TreeItemData<FolderModel>> _treeItems = new();
   private FolderModel? SelectedTreeItemData { get; set; }
 
@@ -40,6 +47,7 @@
   // private IReadOnlyCollection<TreeItemData<FolderModel>> _items => Items.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
   protected override void OnInitialized()
   {
+    StateService.OnFolderUpdated += HandleOnFolderUpdated;
     // Replace with your target Windows directory path
     string targetPath = @"C:\YourTargetFolder";
 
@@ -49,12 +57,17 @@
       // Items = new List<TreeItemData<FolderModel>> { rootNode };
     }
     // 2. Convert your existing raw list (_items) into MudBlazor's collection format
-    _treeItems = MapFoldersToTreeItemData(Items);
+    _treeItems = MapFoldersToTreeItemData(Folders);
 
   }
 
+  private async Task HandleOnFolderUpdated(FolderModel model)
+  {
+    // ensure the component re-renders on the UI thread
+    await InvokeAsync(StateHasChanged);
+  }
 
-  private List<TreeItemData<FolderModel>> MapFoldersToTreeItemData(List<FolderModel> folders)
+  private List<TreeItemData<FolderModel>> MapFoldersToTreeItemData(ICollection<FolderModel> folders)
   {
     if (folders == null) return new List<TreeItemData<FolderModel>>();
 

@@ -1,9 +1,10 @@
 
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
 using MudBlazor;
 using Nextended.Core.Extensions;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-public class FolderModel: BaseExplorerItemModel
+public class FolderModel: BaseExplorerItemModel, IExplorerFolder
 {
     public FolderModel(string name, FileModel[]? files= null, FolderModel[]? children = null )
     {
@@ -18,6 +19,8 @@ public class FolderModel: BaseExplorerItemModel
             AddFolders(children);
         }
     }
+
+    public new List<FolderModel> Children => _folders;
     private List<FileModel> _files { get; init; } = new();
     public IReadOnlyList<FileModel> Files => _files.AsReadOnly();
     private List<FolderModel> _folders { get; init; } = new();
@@ -61,7 +64,7 @@ public class FolderModel: BaseExplorerItemModel
 
     public async Task LoadFolders() { }
     public async Task LoadFiles() { }
-    private async Task<IReadOnlyCollection<BaseExplorerItemModel>> GetChildren() {
+    public async Task<IReadOnlyCollection<BaseExplorerItemModel>> LoadChildren() {
         if (_folders.IsNullOrEmpty()) LoadFolders(); 
         if (_files.IsNullOrEmpty()) LoadFiles(); 
         List<BaseExplorerItemModel> result = new List<BaseExplorerItemModel>();
@@ -70,6 +73,6 @@ public class FolderModel: BaseExplorerItemModel
         return result.AsReadOnly();
     }
 
-    public IReadOnlyCollection<BaseExplorerItemModel> Children =>  GetChildren().Result;
+    // public IReadOnlyCollection<BaseExplorerItemModel> Children =>  GetChildren().Result;
     
   }

@@ -15,5 +15,7 @@ public interface IExplorerItemModel
     public bool IsFolder { get; }
     public DateTime Created { get; set; }
     public DateTime Modified { get; set; }
+
+    public ICollection<IExplorerItemModel> Children { get; }
     // public Guid Author { get; set; }
 }

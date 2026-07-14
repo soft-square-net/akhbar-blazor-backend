@@ -1,0 +1,120 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
+@using MudBlazor.Utilities
+@using Nextended.Core.Helper
+<MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" Class="ms-6">
+  @if (!ShowNewFolderInput)
+  {
+    <MudIconButton Icon="@Icons.Material.Filled.AccessAlarm"></MudIconButton>
+    <MudToggleIconButton Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
+                         ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
+    <MudButton OnClick="ToggleNewFolder" StartIcon="@Icons.Material.Outlined.Add" IconColor="Color.Warning" IconSize="Size.Large">New Folder</MudButton>
+    <input @ref="fileInput" type="file" multiple style="display:none" @onchange="HandleUpload" />
+    <MudButton OnClick="TriggerFileInput" StartIcon="@Icons.Material.Filled.FileUpload" IconColor="Color.Warning" IconSize="Size.Large">Upload</MudButton>
+  }
+  else
+  {
+@code {
+
+  private bool _shrinkLabel = false;
+
+  protected string InputClassname =>
+  new CssBuilder("mud-input-slot")
+  .AddClass("mud-input-root")
+  .AddClass($"mud-input-root-{Variant.Outlined.ToDescriptionString()}")
+  .AddClass($"mud-input-root-adorned-{Adornment.End.ToDescriptionString()}")
+  .AddClass($"mud-input-root-margin-{Margin.Normal.ToDescriptionString()}")
+  .Build();
+}
+<MudField Variant="Variant.Text" AdornmentAriaLabel="Create New Folder icon"
+          AdornmentIcon="@Icons.Material.Filled.CreateNewFolder" AdornmentColor="Color.Warning" IconSize="Size.Large"
+          ShrinkLabel="@_shrinkLabel" Adornment="Adornment.End" InnerPadding="false">
+  <MudStack Row Class="mud-input"
+            Spacing="0" AlignItems="AlignItems.Center" tabindex="-1">
+    @* <input @bind:get="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" /> *@
+    <input @ref="fileNameInput" value="@NewFolderName"
+           @oninput="@((ChangeEventArgs e) => NewFolderName = e.Value.ToString())"
+           placeholder="New folder name.." class="@InputClassname" />
+
+            
+    <MudIconButton Color="@Color.Tertiary"
+                   Icon="@Icons.Material.Filled.Check"
+                   Size="@Size.Small"
+                   tabindex="-1"
+                   Disabled="string.IsNullOrWhiteSpace(NewFolderName)"
+                   OnClick="CreateFolder"
+                   @onmousedown:stopPropagation />
+    <MudIconButton Color="@Color.Error"
+                   Icon="@Icons.Material.Filled.Clear"
+                   Size="@Size.Small"
+                   tabindex="-1"
+                   OnClick="ToggleNewFolder"
+                   @onmousedown:stopPropagation />
+    @* aria-label="@Localizer[LanguageResource.MudInput_Clear]" *@
+  </MudStack>
+</MudField>
+      }
+</MudButtonGroup>
+@code {
+  [Inject] IFileExplorerStateService StateService { get; set; } = default!;
+  [Inject] IJSRuntime JSRuntime { get; set; } = default!;
+
+  [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
+
+  // UI refs & state
+  private ElementReference fileInput;
+  private ElementReference fileNameInput;
+
+  private bool ShowNewFolderInput;
+  private string NewFolderName = string.Empty;
+
+  async Task TriggerFileInput()
+  {
+    // focus click the hidden input to show native file picker
+    await fileInput.FocusAsync();
+    await JSRuntime.InvokeVoidAsync("eval", "document.querySelectorAll('input[type=file]')[0].click()");
+  }
+
+  void ToggleNewFolder()
+  {
+    ShowNewFolderInput = !ShowNewFolderInput;
+    NewFolderName = string.Empty;
+  }
+
+  void CreateFolder()
+  {
+    var name = (NewFolderName ?? string.Empty).Trim();
+    if (string.IsNullOrWhiteSpace(name))
+    {
+      Toast.Add("Enter a valid folder name.", Severity.Warning);
+      return;
+    }
+
+    if (CurrentFolder.Folders.Any(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)))
+    {
+      Toast.Add("A folder with that name already exists.", Severity.Warning);
+      return;
+    }
+
+    var folder = new FolderModel(name);
+    // Folders.Add(folder);
+    CurrentFolder.AddFolder(folder);
+    CurrentFolder = folder;
+
+    ShowNewFolderInput = false;
+    // OnFolderUpdated.InvokeAsync(Folders)
+    StateService.NotifyFolderUpdated(CurrentFolder);
+    Toast.Add($"Folder '{name}' created.", Severity.Success);
+    StateHasChanged();
+  }
+
+  
+  async Task HandleUpload(ChangeEventArgs e)
+  {
+    // Using ChangeEventArgs because ElementReference click -> native input change
+    // For richer usage use InputFile component with InputFileChangeEventArgs
+    // We'll try to cast: in Blazor wasm you'll likely use InputFile; this minimal handler simulates
+    // NOTE: If you prefer InputFile, replace markup to <InputFile OnChange="OnInputFileChange" /> and implement OnInputFileChange(InputFileChangeEventArgs)
+    Toast.Add("Files selected (simulate upload). Implement backend upload in HandleUpload.", Severity.Info);
+  }
+}

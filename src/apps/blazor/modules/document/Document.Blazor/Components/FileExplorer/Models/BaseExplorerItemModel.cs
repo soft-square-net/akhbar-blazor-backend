@@ -39,14 +39,16 @@ public class BaseExplorerItemModel : IExplorerItemModel
     private bool _isFolder;
     public bool IsFolder => _isFolder;
 
-    public void SetAsFolder()
+    public ICollection<IExplorerItemModel> Children { get;}
+
+    protected void SetAsFolder()
     {
 
         _isFolder = true;
         // StateService.NotifyFileSelectionChanged();
         // StateService.NotifyStateChanged();
     }
-    public void SetAsFile()
+    protected void SetAsFile()
     {
         _isFolder = false;
     }

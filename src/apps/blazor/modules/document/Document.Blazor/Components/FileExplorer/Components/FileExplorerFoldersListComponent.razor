@@ -1,5 +1,6 @@
  @using MudBlazor
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 
 
 <MudTextField T="string" IconSize="Size.Small"  Typo="Typo.caption" @bind-Value="Search" Label="Search"
@@ -7,25 +8,113 @@
     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
 
 <MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list">
-    @* @foreach (FolderModel f in Folders)
-    {
-        <MudListItem Selected="@(CurrentFolder == f)" OnClick="() => ChangeFolder(f)">
-
-            <MudText Typo="Typo.body2" Class="mb-0 d-flex align-center">
-                <MudIcon Icon="@Icons.Material.Filled.Folder" Class="me-2" Size="Size.Small" Color="Color.Error" />
-                @f.Name
-            </MudText>
-            <MudSpacer />
-                <MudText Typo="Typo.caption">@f.Files.Count</MudText>
-        </MudListItem>
-    } *@
-
-
+    <FileExplorerFoldersTreeView OnFolderUpdated="HandleFolderUpdated" OnNodeSelected="HandleNodeSelected"/>
 </MudList>
 
 <MudPaper Width="100%" Elevation="0" Class="border-0 file-explorer-folders-list">
-    <FileExplorerFoldersTreeView Items="Folders" OnNodeSelected="HandleNodeSelected"/>
 </MudPaper>
+
+@code{
+  [Inject] IFileExplorerStateService StateService { get; set; } = default!;
+  [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
+  [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
+  // [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
+  // [Parameter] public EventCallback<FolderModel> OnFolderSelected { get; set; }
+  private string Search = string.Empty;
+  public string SelectedFolder = string.Empty;
+  public bool ReadOnly = false;
+  public SelectionMode SelectionMode = SelectionMode.SingleSelection;
+
+
+  private bool SearchTree<T>(IReadOnlyCollection<ITreeItemData<T>> items, string searchValue, out ITreeItemData<T> foundItem)
+{
+    foundItem = null;
+    
+    foreach (var item in items)
+    {
+        // 1. Check if the current item matches your search criteria
+        if (item.Text.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
+        {
+            foundItem = item;
+            return true;
+        }
+
+        // 2. Recursively search children if they exist
+        if (item.Children != null && item.Children.Any())
+        {
+            if (SearchTree(item.Children, searchValue, out foundItem))
+            {
+                return true; // Item found deep in this branch
+            }
+        }
+    }
+    
+    return false;
+}
+
+  // private void SelectFolder(FolderModel folder)
+  // {
+  //     OnFolderSelected.InvokeAsync(folder);
+  // }
+
+  private async Task ChangeFolder(FolderModel f)
+  {
+    CurrentFolder = f;
+    await StateService.NotifyFolderUpdated(f);
+
+    await StateService.NotifyFolderSelectionChanged(f);
+    // await OnFolderSelected.InvokeAsync(f);
+  }
+
+
+
+  public DirectoryInfo? FindDirectoryRecursive(string currentPath, string targetFolderName)
+  {
+    try
+    {
+      var currentDir = new DirectoryInfo(currentPath);
+
+      // 1. Check if the current folder is the one we are looking for
+      if (string.Equals(currentDir.Name, targetFolderName, StringComparison.OrdinalIgnoreCase))
+      {
+        return currentDir;
+      }
+
+      // 2. Loop through subdirectories and search inside them recursively
+      foreach (var subDir in currentDir.GetDirectories())
+      {
+        var result = FindDirectoryRecursive(subDir.FullName, targetFolderName);
+
+        // If the target was found deeper in the tree, pass it back up
+        if (result != null)
+        {
+          return result;
+        }
+      }
+    }
+    catch (UnauthorizedAccessException)
+    {
+      // Skip folders that the application doesn't have permission to read
+    }
+    catch (DirectoryNotFoundException)
+    {
+      // Handle case where a directory might be deleted during the scan
+    }
+
+    // Return null if the folder wasn't found in this branch
+    return null;
+  }
+  private async Task HandleNodeSelected(ITreeItemData<FolderModel> node)
+  {
+    await ChangeFolder(node.Value!);
+    //StateHasChanged();
+  }
+
+  private async Task HandleFolderUpdated()
+  {
+    await InvokeAsync(StateHasChanged);
+  }
+}
 
 <style>
     :root {

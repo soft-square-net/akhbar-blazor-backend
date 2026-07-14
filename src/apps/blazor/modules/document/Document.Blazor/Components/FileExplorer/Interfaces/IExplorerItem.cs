@@ -7,5 +7,5 @@ using Shared.Enums;
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
 public interface IExplorerItem<T> where T : IExplorerItemModel
 {
-    [Parameter, EditorRequired] public T Model { get; set; }
+    // [Parameter, EditorRequired] public T Model { get; set; }
 }

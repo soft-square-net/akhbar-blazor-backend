@@ -11,3 +11,6 @@
 .file-explorer-icon-highlited .mud-button-label .mud-button-icon-start svg {
     color: rgb(37.64706%, 80.392158%, 100%);
 }
+
+/* use ::deep stop pass style stop child components */
+::deep h3{}

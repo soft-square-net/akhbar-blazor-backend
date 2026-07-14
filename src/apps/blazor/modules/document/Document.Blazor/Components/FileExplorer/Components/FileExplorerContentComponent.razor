@@ -1,9 +1,13 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
 @using MudBlazor.Utilities
 @using Nextended.Core.Helper
 
 @* <MudAlert Severity="Severity.Info" Elevation="0" Class="mb-3">@(_themePreference != null ? (_themePreference.IsDarkMode ? "Dark Mode" : "Light Mode") : "Unknown")</MudAlert>*@
-<MudStack Direction="Row" AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" >
+<MudStack  AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" >
   
   <MudToolBar Dense="true" Class="px-0 align-self-start">
     <MudIconButton OnClick="ToggleFileBrowserTree" Class="ms-0" Icon="@Icons.Material.Rounded.Notes" 
@@ -17,55 +21,7 @@
     <MudIconButton Icon="@Icons.Material.Outlined.Refresh" Size="Size.Small"
                    Style="color: var(--file-explorer-Icon-text-color);" Class="me-6" />
     <MudDivider Vertical="true" FlexItem="true" />
-    <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" Class="ms-6">
-      @if (!ShowNewFolderInput)
-      {
-        <MudIconButton Icon="@Icons.Material.Filled.AccessAlarm"></MudIconButton>
-        <MudToggleIconButton Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
-        ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
-        <MudButton OnClick="ToggleNewFolder" StartIcon="@Icons.Material.Outlined.Add" IconColor="Color.Warning" IconSize="Size.Large">New Folder</MudButton>
-        <input type="file" multiple style="display:none" @ref="fileInput" @onchange="HandleUpload" />
-        <MudButton OnClick="TriggerFileInput" StartIcon="@Icons.Material.Filled.FileUpload" IconColor="Color.Warning" IconSize="Size.Large">Upload</MudButton>
-      }
-      else
-      {
-      @code {
-        
-        private bool _shrinkLabel = false;
-
-        protected string InputClassname =>
-        new CssBuilder("mud-input-slot")
-        .AddClass("mud-input-root")
-        .AddClass($"mud-input-root-{Variant.Outlined.ToDescriptionString()}")
-        .AddClass($"mud-input-root-adorned-{Adornment.End.ToDescriptionString()}")
-        .AddClass($"mud-input-root-margin-{Margin.Normal.ToDescriptionString()}")
-        .Build();
-      }
-      <MudField Variant="Variant.Text" AdornmentAriaLabel="Create New Folder icon"
-                AdornmentIcon="@Icons.Material.Filled.CreateNewFolder" AdornmentColor="Color.Warning" IconSize="Size.Large"
-                ShrinkLabel="@_shrinkLabel" Adornment="Adornment.End" InnerPadding="false" >
-          <MudStack Row Class="mud-input"
-                    Spacing="0" AlignItems="AlignItems.Center" tabindex="-1">
-          <input @bind:get="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" />
-            
-          <MudIconButton Color="@Color.Tertiary"
-                         Icon="@Icons.Material.Filled.Check"
-                         Size="@Size.Small"
-                         tabindex="-1"
-                         Disabled="string.IsNullOrWhiteSpace(NewFolderName)"
-                         OnClick="CreateFolder"
-                         @onmousedown:stopPropagation />
-          <MudIconButton Color="@Color.Error"
-                         Icon="@Icons.Material.Filled.Clear"
-                         Size="@Size.Small"
-                         tabindex="-1"
-                         OnClick="ToggleNewFolder"
-                         @onmousedown:stopPropagation />
-          @* aria-label="@Localizer[LanguageResource.MudInput_Clear]" *@
-          </MudStack>
-        </MudField>
-      }
-    </MudButtonGroup>
+    <InlineCreateFolder ></InlineCreateFolder>
   </MudToolBar>
 
   <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="1" Class="mud-width-full">
@@ -100,41 +56,142 @@
       </MudMenu>
     </MudToolBar>
   </MudStack>
-
-
-
-  @* <div class="d-flex align-center">
-    <input type="file" multiple style="display:none" @ref="fileInput" @onchange="HandleUpload" />
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Upload"
-               OnClick="TriggerFileInput">Upload</MudButton>
-
-    <MudButton Variant="Variant.Outlined" Class="ms-2" OnClick="ToggleNewFolder">
-      <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Class="me-1" /> New Folder
-    </MudButton>
-
-    <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="Refresh" Class="ms-2" />
-
-  </div> *@
 </MudStack>
 
-@* @if (ShowNewFolderInput)
-{
-  <MudStack Direction="Row" AlignItems="AlignItems.Center" Class="mb-3">
-    <MudTextField @bind-Value="NewFolderName" Placeholder="Folder name" Immediate="true" />
-    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateFolder" Class="ms-2">
-      Create
-    </MudButton>
-    <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="ToggleNewFolder" Class="ms-2">
-      Cancel
-    </MudButton>
-  </MudStack>
-}
- *@
 <MudDivider Class="mb-3" />
 
 <Explorer ExplorerType="EnumExplorerType.DefaultExplorer" />
 
 <MudDivider Class="mb-3" />
+
+@code {
+  [Inject] IFileExplorerStateService StateService { get; set; } = default!;
+  // [Parameter] public required ICollection<FolderModel> Folders { get; set; }
+  [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
+  [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
+
+  // [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
+  // [Parameter, EditorRequired] public EventCallback<bool> OnToggleFileBrowserTree { get; set; }
+
+  [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+  [Inject] IJSRuntime JSRuntime { get; set; } = default!;
+
+
+  private string Breadcrumb => $"/{CurrentFolder.Name}";
+
+
+
+
+  // private List<string> DummyMenu = ["Item01", "Item03", "Item03",];
+  // [Inject] IClientPreferenceManager ClientPreferences { get; set; } = default!;
+
+  private ClientPreference? _themePreference;
+  bool _isFolersTreeOpen { get; set; } = true;
+  public void ToggleFileBrowserTree()
+  {
+    _isFolersTreeOpen = !_isFolersTreeOpen;
+    // OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
+    StateService.NotifyFileBrowserTreeToogled(_isFolersTreeOpen);
+  }
+  protected override async Task OnInitializedAsync()
+  {
+    _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+    if (_themePreference == null) _themePreference = new ClientPreference();
+
+  }
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+    }
+    ClientPreferences.SetPreference(_themePreference);
+    await base.OnAfterRenderAsync(firstRender);
+  }
+  private async Task<bool> IsDarkModeAsync()
+  {
+    _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+    if (_themePreference == null) _themePreference = new ClientPreference();
+    return _themePreference.IsDarkMode;
+  }
+
+
+
+
+
+
+
+  void Refresh()
+  {
+    // Replace with re-fetch from server
+    Toast.Add("Refreshed.", Severity.Info);
+    StateHasChanged();
+  }
+
+  string GetFileIcon(string fileName)
+  {
+    var ext = Path.GetExtension(fileName).ToLowerInvariant();
+    return ext switch
+    {
+      ".jpg" or ".jpeg" or ".png" or ".gif" => Icons.Material.Filled.Image,
+      ".pdf" => Icons.Material.Filled.PictureAsPdf,
+      ".mp4" or ".mov" => Icons.Material.Filled.Movie,
+      ".txt" or ".md" => Icons.Material.Filled.Description,
+      ".doc" or ".docx" => Icons.Material.Filled.Article,
+      _ => Icons.Material.Filled.InsertDriveFile
+    };
+  }
+
+  async Task DownloadFile(FileModel f)
+  {
+    // Replace with actual file download logic (link to blob or invoking API).
+    Toast.Add($"Simulated download: {f.Name}", Severity.Info);
+  }
+
+  async Task DeleteFile(FileModel f)
+  {
+    bool? result = await DialogService.ShowMessageBoxAsync(
+        "Confirm Delete",
+        $"Delete file '{f.Name}'?",
+        yesText: "Delete",
+        noText: "Cancel",
+        options: new DialogOptions { CloseButton = true }
+    );
+
+    if (result == true)
+    {
+      CurrentFolder.RemoveFile(f);
+      Toast.Add($"Deleted {f.Name}", Severity.Success);
+      StateHasChanged();
+    }
+  }
+
+  async Task RenameFilePrompt(FileModel f)
+  {
+    var parameters = new DialogParameters { ["CurrentName"] = f.Name };
+    var dialog = await DialogService.ShowAsync<RenameDialog>("Rename file", parameters);
+    var res = await dialog.Result;
+    if (!res.Canceled && res.Data is string newName && !string.IsNullOrWhiteSpace(newName))
+    {
+      var folder = CurrentFolder.Files.First(x => x.Id == f.Id);
+      if (folder is not null)
+      {
+        // CurrentFolder.Files[idx] = f with { Name = newName };
+        // CurrentFolder.Files[idx].Name = newName;
+        folder.Name = newName;
+        Toast.Add($"Renamed to {newName}", Severity.Success);
+      }
+    }
+  }
+
+  string FormatSize(long size)
+  {
+    if (size >= 1 << 30) return $"{size / (1 << 30)} GB";
+    if (size >= 1 << 20) return $"{size / (1 << 20)} MB";
+    if (size >= 1 << 10) return $"{size / (1 << 10)} KB";
+    return $"{size} B";
+  }
+}
   <style>
   :root {
     --file-explorer-breadcrumb-height: 3.5rem;
