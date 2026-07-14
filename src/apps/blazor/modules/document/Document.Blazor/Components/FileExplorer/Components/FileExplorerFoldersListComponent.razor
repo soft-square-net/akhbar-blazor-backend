@@ -1,4 +1,4 @@
- @using MudBlazor
+  @using MudBlazor
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 
@@ -8,7 +8,8 @@
     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
 
 <MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list">
-    <FileExplorerFoldersTreeView OnFolderUpdated="HandleFolderUpdated" OnNodeSelected="HandleNodeSelected"/>
+    @* <FileExplorerFoldersTreeView OnFolderUpdated="HandleFolderUpdated" OnNodeSelected="HandleNodeSelected"/> *@
+    <FileExplorerFoldersTreeView  />
 </MudList>
 
 <MudPaper Width="100%" Elevation="0" Class="border-0 file-explorer-folders-list">

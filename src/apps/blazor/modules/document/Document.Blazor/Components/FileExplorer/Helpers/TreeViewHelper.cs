@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,55 @@ public static class TreeViewHelper<TDataModel> where TDataModel : IExplorerItemM
         }
         return false;
     }
+    public static bool GetByIdAndSelect(IReadOnlyCollection<ITreeItemData<TDataModel>> items, Guid Id, out ITreeItemData<TDataModel> matchedNode)
+    {
+        matchedNode = null!;
+        foreach (var item in items)
+        {
+            // Match rule
+            if (item.Value != null && item.Value.Id == Id)
+            {
+                item.Selected = true;
+                matchedNode = item;
+                return true;
+            }
 
+            // Recursive step
+            if (item.Children != null && item.Children.Any())
+            {
+                if (GetByIdAndSelect(item.Children, Id, out matchedNode))
+                {
+                    item.Expanded = true; // Expand parents from bottom up
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public static bool GetByIdAndSelect(IReadOnlyCollection<TDataModel> items, Guid Id, out TDataModel? matchedNode)
+    {
+        matchedNode = default!;
+        foreach (var item in items)
+        {
+            // Match rule
+            if (item != null && item.Id == Id)
+            {
+                matchedNode = item;
+                return true;
+            }
+
+            // Recursive step
+            if (item.Children != null && item.Children.Any())
+            {
+                if (GetByIdAndSelect(item.Children as ReadOnlyCollection<TDataModel>, Id, out matchedNode))
+                {
+                    item.SetExposed(); // Expand parents from bottom up
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     private static bool SearchAndSelectSingle(IReadOnlyCollection<ITreeItemData<TDataModel>> items, string targetText, out ITreeItemData<TDataModel> matchedNode)
     {
         matchedNode = null!;

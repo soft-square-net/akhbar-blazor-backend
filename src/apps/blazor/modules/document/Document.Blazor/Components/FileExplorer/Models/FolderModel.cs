@@ -6,8 +6,9 @@ using Nextended.Core.Extensions;
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public class FolderModel: BaseExplorerItemModel, IExplorerFolder
 {
-    public FolderModel(string name, FileModel[]? files= null, FolderModel[]? children = null )
+    public FolderModel(Guid id, string name, FileModel[]? files= null, FolderModel[]? children = null )
     {
+        Id = id;
         Name = name;
         SetAsFolder();
         if (files is not null)

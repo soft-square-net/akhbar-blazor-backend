@@ -48,7 +48,7 @@
     StateService.OnFolderUpdated += OnFolderUpdated;
     StateService.OnToggleFileBrowserTree += ToggleFileBrowserTree;
 
-    var root = new FolderModel($"Root", new[] {
+    var root = new FolderModel(Guid.NewGuid(),$"Root", new[] {
                     new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
                     new FileModel(Guid.NewGuid(), $"door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
                     new FileModel(Guid.NewGuid(), $"iceland.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
@@ -65,19 +65,19 @@
                     new FileModel(Guid.NewGuid(), $"Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
         },
        new[] {
-                new FolderModel("Projects", new[] {
+                new FolderModel(Guid.NewGuid(), "Projects", new[] {
                             new FileModel(Guid.NewGuid(), "project1.png", 512_000, DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-10)),
                             new FileModel(Guid.NewGuid(), "project2.png", 768_000, DateTime.Now.AddDays(-12), DateTime.Now.AddDays(-8))
                         } ){ Path = $"{Constants._content}/img/projects", AllowedExtensions="mpeg" },
-                new FolderModel("Vacations", new[]{
+                new FolderModel(Guid.NewGuid(), "Vacations", new[]{
                             new FileModel(Guid.NewGuid(), "beach.png", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
                             new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
                         }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="jpg" },
-                new FolderModel("Docs files", new[]{
+                new FolderModel(Guid.NewGuid(), "Docs files", new[]{
                             new FileModel(Guid.NewGuid(), "Doc01.pdf", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
                             new FileModel(Guid.NewGuid(), "doc02.docx", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
                         }){Path = $"{Constants._content}/documents" , AllowedExtensions="pdf,docx" },
-                new FolderModel("Music files", new[]{
+                new FolderModel(Guid.NewGuid(), "Music files", new[]{
                             new FileModel(Guid.NewGuid(), "voice.wav", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
                             new FileModel(Guid.NewGuid(), "video.mp4", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
                         }){Path = $"{Constants._content}/music" , AllowedExtensions="mp3,mp4" }
@@ -88,14 +88,14 @@
 
     Folders.Add(root);
 
-    var shared = new FolderModel("Shared", new[]
+    var shared = new FolderModel(Guid.NewGuid(), "Shared", new[]
     {
             new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
         })
     { Path = $"{Constants._content}/Shared" };
 
     Folders.Add(shared);
-    var archive = new FolderModel("Archive") { Path = $"{Constants._content}/archive" };
+    var archive = new FolderModel(Guid.NewGuid(), "Archive") { Path = $"{Constants._content}/archive" };
 
     Folders.Add(archive);
 

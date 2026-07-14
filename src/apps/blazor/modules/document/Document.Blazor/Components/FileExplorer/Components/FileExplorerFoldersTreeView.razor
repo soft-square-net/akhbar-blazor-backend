@@ -1,53 +1,69 @@
 ﻿@using System.IO
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Helpers
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
-
 @using MudBlazor
 
-<MudTreeView T="FolderModel" Items="_treeItems" Hover="true"
-             ReadOnly="false"
-             SelectedValue="SelectedTreeItemData">
 
+<MudTreeView @ref="FoldersTreeView" T="FolderModel" Items="_treeItems" Hover AutoExpand="@AutoExpand"
+             ReadOnly="false"
+             SelectedValue="@SelectedTreeItemData">
+  @*              Expanded="@context.Value.IsExpanded" *@
   <ItemTemplate>
     <MudTreeViewItem T="FolderModel" Text="@(context.Text)"
+                     Expanded="@context.Value.IsExpanded"
                      SelectedChanged="@((bool selected) => HandleSelectedChanged(selected, context))"
-                     Expanded="@context.Expanded"
                      ExpandedChanged="@((bool isExpanded) => OnExpandedChanged(isExpanded, context))"
                      Value="@context.Value"
                      Items="@context.Children"
                      Icon="@(context.Value != null?GetIcon(context):null)"
-                     IconExpanded="@Icons.Custom.Uncategorized.FolderOpen" 
-                     EndIcon="@Icons.Material.Outlined.Refresh" 
-                     EndIconColor="Color.Secondary"
-                     />
+                     IconExpanded="@Icons.Custom.Uncategorized.FolderOpen"
+                     EndIcon="@Icons.Material.Outlined.Refresh"
+                     EndIconColor="Color.Secondary" />
 
   </ItemTemplate>
 </MudTreeView>
 
-@if (SelectedNode != null)
+@if (CurrentFolder != null)
 {
   <MudText Typo="Typo.body1" Class="mt-4">
-    Selected: <b>@SelectedNode.Path</b>
+    Selected: <b>@CurrentFolder.Path</b>
   </MudText>
 }
 
 @code {
+  public MudTreeView<FolderModel> FoldersTreeView;
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
 
-  // [Parameter] public required ICollection<FolderModel> Folders { get; set; }
   [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
-  [Parameter] public EventCallback<TreeItemData<FolderModel>> OnNodeSelected { get; set; }
-  [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
+  [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
+
+  // [Parameter] public EventCallback<TreeItemData<FolderModel>> OnNodeSelected { get; set; }
+  // [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
 
   private List<TreeItemData<FolderModel>> _treeItems = new();
-  private FolderModel? SelectedTreeItemData { get; set; }
-
-  public FolderModel? SelectedNode => SelectedTreeItemData;
+  private FolderModel? _SelectedTreeItemData { get; set; }
+  public bool AutoExpand = true;
+  private FolderModel? SelectedTreeItemData
+  {
+    get => _SelectedTreeItemData;
+    set
+    {
+      if (_SelectedTreeItemData != value)
+      {
+        _SelectedTreeItemData = value;
+        StateHasChanged();
+      }
+    }
+  }
+  // public FolderModel? SelectedNode => SelectedTreeItemData;
 
   // private IReadOnlyCollection<TreeItemData<FolderModel>> _items => Items.Select(f => new TreeItemData<FolderModel> { Value = f }).ToList().AsReadOnly();
   protected override void OnInitialized()
   {
     StateService.OnFolderUpdated += HandleOnFolderUpdated;
+    StateService.OnFolderCreated += HandleOnFolderCreated;
+    StateService.OnFolderSelectionChanged += HandleOnFolderSelectionChanged;
     // Replace with your target Windows directory path
     string targetPath = @"C:\YourTargetFolder";
 
@@ -61,23 +77,65 @@
 
   }
 
-  private async Task HandleOnFolderUpdated(FolderModel model)
+  private async Task HandleOnFolderSelectionChanged(BaseExplorerItemModel model)
   {
-    // ensure the component re-renders on the UI thread
     await InvokeAsync(StateHasChanged);
   }
 
-  private List<TreeItemData<FolderModel>> MapFoldersToTreeItemData(ICollection<FolderModel> folders)
+  private async Task SelectAsync(FolderModel folder)
   {
-    if (folders == null) return new List<TreeItemData<FolderModel>>();
+    TreeViewHelper<FolderModel>.GetByIdAndSelect(_treeItems, folder.Id, out var matchedNode);
+    CurrentFolder = matchedNode?.Value ?? folder;
+    SelectedTreeItemData = matchedNode?.Value;
+  }
 
-    return folders.Select(f => new TreeItemData<FolderModel>
+  private async Task HandleOnFolderCreated(FolderModel folder)
+  {
+    // ensure the component re-renders on the UI thread
+
+
+    // var newNode = new TreeItemData<FolderModel> { Value = folder, Text = folder.Name };
+    // var selectNode = currentTreeNode;
+    // selectNode.Children.Append(newNode);
+    // selectNode.Expandable = true;
+    // selectNode.Expanded = true;
+    // selectNode.Value.IsExpanded = true;
+    // selectNode.Selected = true;
+    // newNode.Value.Select();
+    // CurrentFolder.AddFolder(newNode?.Value);
+    CurrentFolder.AddFolder(folder);
+    // CurrentFolder = newNode?.Value ?? folder;
+    CurrentFolder.IsExpanded = true;
+
+
+    if(TreeViewHelper<FolderModel>.GetByIdAndSelect(_treeItems, CurrentFolder.Id, out var matchedNode))
     {
-      Value = f,
-      Text = f.Name,
-      // Recursively maps all levels of your child sub-folders safely
-      Children = f.Folders != null ? MapFoldersToTreeItemData(f.Folders) : null
-    }).ToList();
+      await HandleSelectedChanged(true, matchedNode);
+    }
+
+    
+    // await StateService.NotifyFolderUpdated(folder);
+    // await StateService.NotifyFolderSelectionChanged(folder);
+
+   
+    // TreeViewHelper<FolderModel>.GetByIdAndSelect(_treeItems, SelectedTreeItemData.Id, out var currentTreeNode);
+
+    // StateHasChanged();
+    await InvokeAsync(StateHasChanged);
+  }
+
+  private async Task HandleOnFolderUpdated(FolderModel folder)
+  {
+    // ensure the component re-renders on the UI thread
+    // await SelectAsync(model);
+    if (TreeViewHelper<FolderModel>.GetByIdAndSelect(Folders, SelectedTreeItemData.Id, out var currentTreeFolder))
+    {
+      currentTreeFolder.Select();
+    }
+    CurrentFolder = folder;
+    folder.Select();
+    _treeItems = MapFoldersToTreeItemData(Folders);
+    await InvokeAsync(StateHasChanged);
   }
 
 
@@ -87,20 +145,24 @@
     {
       FolderModel rawFolder = context.Value;
       SelectedTreeItemData = context.Value;
-      await OnNodeSelected.InvokeAsync(context as TreeItemData<FolderModel>);
+      // await OnNodeSelected.InvokeAsync(context as TreeItemData<FolderModel>);
+      await StateService.NotifyFolderUpdated(SelectedTreeItemData);
+      await StateService.NotifyFolderSelectionChanged(SelectedTreeItemData);
+
       // Your custom logic runs cleanly here for both parents and nested children
+      await InvokeAsync(StateHasChanged);
     }
     else
     {
       // if the item that became unselected was the currently selected node, clear the selection
       if (SelectedTreeItemData == context.Value)
       {
-        SelectedTreeItemData = null;
+        // SelectedTreeItemData = null;
       }
     }
 
     // ensure the component re-renders on the UI thread
-    await InvokeAsync(StateHasChanged);
+
   }
 
   private string GetIcon(ITreeItemData<FolderModel> item)
@@ -124,12 +186,24 @@
   {
     // Update the visual property state
     node.Value.IsExpanded = isExpanded;
-
     // Perform conditional action on expand
     if (isExpanded && (node.Value.Folders == null || !node.Value.Folders.Any()))
     {
       await node.Value.LoadFolders(); // LoadChildDataAsync(node);
     }
+  }
+
+  private List<TreeItemData<FolderModel>> MapFoldersToTreeItemData(ICollection<FolderModel> folders)
+  {
+    if (folders == null) return new List<TreeItemData<FolderModel>>();
+
+    return folders.Select(f => new TreeItemData<FolderModel>
+    {
+      Value = f,
+      Text = f.Name,
+      // Recursively maps all levels of your child sub-folders safely
+      Children = f.Folders != null ? MapFoldersToTreeItemData(f.Folders) : null
+    }).ToList();
   }
 
 
@@ -141,7 +215,7 @@
     var node = new TreeItemData<FolderModel>
     {
       // Value = new FolderModel(di.Name,di.GetFiles(),[])
-      Value = new FolderModel(di.Name, null, [])
+      Value = new FolderModel(Guid.NewGuid(), di.Name, null, [])
     };
 
     try

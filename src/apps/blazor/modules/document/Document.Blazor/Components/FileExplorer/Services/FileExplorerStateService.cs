@@ -4,30 +4,36 @@ using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Service
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
 public class FileExplorerStateService: IFileExplorerStateService
 {
+
+
     public event Action? OnChange;
-    public event Action<ICollection<FolderModel>>? OnFoldersChanged;
-    public event Func<BaseExplorerItemModel, Task>? OnFolderSelectionChanged;
-    public event Action? OnFileExplorerClearSelection;
-    public event Action<FolderModel>? OnFolderCreated;
-    public event Action<FolderModel>? OnFolderDeleted;
-    public event Func<FolderModel, Task>? OnFolderUpdated;
-    public event Action<FileModel>? OnFileCreated;
-    public event Action<FileModel>? OnFileDeleted;
-    public event Action<FileModel>? OnFileUpdated;
     public event Action<bool>? OnToggleFileBrowserTree;
+    public event Action? OnFileExplorerClearSelection;
+
+    public event Func<ICollection<FolderModel>, Task>? OnFoldersChanged;
+    public event Func<BaseExplorerItemModel, Task>? OnFolderSelectionChanged;
+    public event Func<FolderModel, Task>? OnFolderCreated;
+    public event Func<FolderModel, Task>? OnFolderDeleted;
+    public event Func<FolderModel, Task>? OnFolderUpdated;
+    public event Func<FileModel, Task>? OnFileCreated;
+    public event Func<FileModel, Task>? OnFileDeleted;
+    public event Func<FileModel, Task>? OnFileUpdated;
 
     public void NotifyStateChanged() => OnChange?.Invoke();
-    public void NotifyFoldersChanged(ICollection<FolderModel> folders) => OnFoldersChanged?.Invoke(folders);
-    public async Task NotifyFolderSelectionChanged(BaseExplorerItemModel item) => await OnFolderSelectionChanged?.Invoke(item);
+    public void NotifyFileBrowserTreeToogled(bool opened) => OnToggleFileBrowserTree?.Invoke(opened);
     public void NotifyFileExplorerClearSelection() => OnFileExplorerClearSelection?.Invoke();
 
-    public void NotifyFolderCreated(FolderModel folder) => OnFolderCreated?.Invoke(folder);
-    public void NotifyFolderDeleted(FolderModel folder) => OnFolderDeleted?.Invoke(folder);
-    public async Task NotifyFolderUpdated(FolderModel folder) => OnFolderUpdated?.Invoke(folder);
-    public void NotifyFileCreated(FileModel file) => OnFileCreated?.Invoke(file);
-    public void NotifyFileDeleted(FileModel file) => OnFileDeleted?.Invoke(file);
-    public void NotifyFileUpdated(FileModel file) => OnFileUpdated?.Invoke(file);
-    public void NotifyFileBrowserTreeToogled(bool opened) => OnToggleFileBrowserTree?.Invoke(opened);
+    public async Task NotifyFoldersChanged(ICollection<FolderModel> folders) => await OnFoldersChanged?.Invoke(folders);
+    public async Task NotifyFolderSelectionChanged(BaseExplorerItemModel item) => await OnFolderSelectionChanged?.Invoke(item);
+
+    public async Task NotifyFolderCreated(FolderModel folder) => await OnFolderCreated?.Invoke(folder);
+    public async Task NotifyFolderDeleted(FolderModel folder) => await OnFolderDeleted?.Invoke(folder);
+    public async Task NotifyFolderUpdated(FolderModel folder) => await OnFolderUpdated?.Invoke(folder);
+    public async Task NotifyFileCreated(FileModel file) => await OnFileCreated?.Invoke(file);
+    public async Task NotifyFileDeleted(FileModel file) => await OnFileDeleted?.Invoke(file);
+    public async Task NotifyFileUpdated(FileModel file) => await OnFileUpdated?.Invoke(file);
+
+
     public void Dispose()
     {
         OnChange = null;

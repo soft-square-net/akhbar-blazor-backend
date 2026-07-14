@@ -10,25 +10,27 @@ public interface IFileExplorerStateService : IDisposable
 {
     public event Action? OnChange;
     public event Action<bool>? OnToggleFileBrowserTree;
-    public event Action<ICollection<FolderModel>>? OnFoldersChanged;
-    public event Func<BaseExplorerItemModel, Task>? OnFolderSelectionChanged;
     public event Action? OnFileExplorerClearSelection;
-    public event Action<FolderModel>? OnFolderCreated;
-    public event Action<FolderModel>? OnFolderDeleted;
+
+    public event Func<ICollection<FolderModel>, Task>? OnFoldersChanged;
+    public event Func<BaseExplorerItemModel, Task>? OnFolderSelectionChanged;
+    public event Func<FolderModel, Task>? OnFolderCreated;
+    public event Func<FolderModel, Task>? OnFolderDeleted;
     public event Func<FolderModel, Task>? OnFolderUpdated;
-    public event Action<FileModel>? OnFileCreated;
-    public event Action<FileModel>? OnFileDeleted;
-    public event Action<FileModel>? OnFileUpdated;
+    public event Func<FileModel, Task>? OnFileCreated;
+    public event Func<FileModel, Task>? OnFileDeleted;
+    public event Func<FileModel, Task>? OnFileUpdated;
 
     public void NotifyStateChanged();
     public void NotifyFileBrowserTreeToogled(bool opened);
-    public void NotifyFoldersChanged(ICollection<FolderModel> folders);
-    public Task NotifyFolderSelectionChanged(BaseExplorerItemModel item);
     public void NotifyFileExplorerClearSelection();
-    public void NotifyFolderCreated(FolderModel folder);
-    public void NotifyFolderDeleted(FolderModel folder);
+
+    public Task NotifyFoldersChanged(ICollection<FolderModel> folders);
+    public Task NotifyFolderSelectionChanged(BaseExplorerItemModel item);
+    public Task NotifyFolderCreated(FolderModel folder);
+    public Task NotifyFolderDeleted(FolderModel folder);
     public Task NotifyFolderUpdated(FolderModel folder);
-    public void NotifyFileCreated(FileModel file);
-    public void NotifyFileDeleted(FileModel file);
-    public void NotifyFileUpdated(FileModel file);
+    public Task NotifyFileCreated(FileModel file);
+    public Task NotifyFileDeleted(FileModel file);
+    public Task NotifyFileUpdated(FileModel file);
 }

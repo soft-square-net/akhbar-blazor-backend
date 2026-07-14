@@ -32,7 +32,7 @@
   <MudStack Row Class="mud-input"
             Spacing="0" AlignItems="AlignItems.Center" tabindex="-1">
     @* <input @bind:get="NewFolderName" @bind:event="oninput" placeholder="New folder name.." class="@InputClassname" /> *@
-    <input @ref="fileNameInput" value="@NewFolderName"
+    <input value="@NewFolderName"
            @oninput="@((ChangeEventArgs e) => NewFolderName = e.Value.ToString())"
            placeholder="New folder name.." class="@InputClassname" />
 
@@ -55,7 +55,7 @@
 </MudField>
       }
 </MudButtonGroup>
-@code {
+  @code {
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
   [Inject] IJSRuntime JSRuntime { get; set; } = default!;
 
@@ -63,7 +63,7 @@
 
   // UI refs & state
   private ElementReference fileInput;
-  private ElementReference fileNameInput;
+  // private ElementReference fileNameInput;
 
   private bool ShowNewFolderInput;
   private string NewFolderName = string.Empty;
@@ -81,7 +81,7 @@
     NewFolderName = string.Empty;
   }
 
-  void CreateFolder()
+  async Task CreateFolder()
   {
     var name = (NewFolderName ?? string.Empty).Trim();
     if (string.IsNullOrWhiteSpace(name))
@@ -96,14 +96,15 @@
       return;
     }
 
-    var folder = new FolderModel(name);
+    var folder = new FolderModel(Guid.NewGuid(), name, null, []) { Folder = CurrentFolder};
     // Folders.Add(folder);
-    CurrentFolder.AddFolder(folder);
-    CurrentFolder = folder;
+    // CurrentFolder.AddFolder(folder);
+    await StateService.NotifyFolderCreated(folder);
+    // await StateService.NotifyFolderUpdated(CurrentFolder);
 
+    // CurrentFolder = folder;
     ShowNewFolderInput = false;
     // OnFolderUpdated.InvokeAsync(Folders)
-    StateService.NotifyFolderUpdated(CurrentFolder);
     Toast.Add($"Folder '{name}' created.", Severity.Success);
     StateHasChanged();
   }
