@@ -3,6 +3,7 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
+@implements System.IDisposable
 
 <CascadingValue Value="@Folders" Name="Folders">
   <CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
@@ -44,9 +45,7 @@
   }
   protected override void OnInitialized()
   {
-    StateService.OnFileExplorerClearSelection += ClearSelection;
-    StateService.OnFolderUpdated += OnFolderUpdated;
-    StateService.OnToggleFileBrowserTree += ToggleFileBrowserTree;
+    
 
     var root = new FolderModel(Guid.NewGuid(),$"Root", new[] {
                     new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
@@ -104,6 +103,18 @@
     CurrentFolder = Folders.First();
   }
 
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      StateService.OnFileExplorerClearSelection += ClearSelection;
+      StateService.OnCurrentFolderChanged += HandleOnCurrentFolderChanged;
+      StateService.OnToggleFileBrowserTree += ToggleFileBrowserTree;
+      // await StateService.NotifyCurrentFolderChanged(CurrentFolder);
+
+    }
+  }
+  
   void OnFolderSelected(FolderModel folder)
   {
     // _currentFolder = folder;
@@ -112,7 +123,7 @@
   }
 
 
-  void ClearSelection()
+  async Task ClearSelection()
   {
     if (!AllowMultipleSelection)
     {
@@ -139,7 +150,7 @@
 
 
   //async Task OnFolderUpdated(ICollection<FolderModel> updatedFolders)
-  async Task OnFolderUpdated(FolderModel folder)
+  async Task HandleOnCurrentFolderChanged(FolderModel folder)
   {
     // Folders = updatedFolders.ToList();
     CurrentFolder = folder;
@@ -152,6 +163,8 @@
   public void Dispose()
   {
     StateService.OnFileExplorerClearSelection -= ClearSelection;
+    StateService.OnCurrentFolderChanged -= HandleOnCurrentFolderChanged;
+    StateService.OnToggleFileBrowserTree -= ToggleFileBrowserTree;
   }
 }
 

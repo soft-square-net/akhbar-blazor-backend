@@ -1,10 +1,12 @@
-﻿<MudAppBar Color="Color.Surface" Elevation="0">
+﻿<link href="@($"{typeof(Constants).Assembly.GetName().Name}.styles.css")" rel="stylesheet" />
+
+<MudAppBar Color="Color.Surface" Elevation="0">
   <MudTooltip Text="Toggle Drawer">
     <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
                    OnClick="@((e) => DrawerToggle())" />
   </MudTooltip>
   <MudButton Variant="Variant.Text" Color="Color.Transparent" Href="/" DropShadow="false">
-    fullstackhero
+    @PageTitle
   </MudButton>
   <MudSpacer />
   <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="true">
@@ -75,6 +77,7 @@
       </MudMenuItem>
     </MudMenu>
   </MudHidden>
+  @* <MudMenu DropShadow="false" PopoverClass="mud-elevation-25" AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight"> *@
   <MudMenu DropShadow="false" PopoverClass="mud-elevation-25" AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
     <ActivatorContent>
       @* <MudIconButton OnClick="@context.ToggleAsync" Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" /> *@

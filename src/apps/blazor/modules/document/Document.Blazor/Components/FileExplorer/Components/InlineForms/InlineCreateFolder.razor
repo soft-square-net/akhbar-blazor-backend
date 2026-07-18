@@ -99,9 +99,10 @@
     var folder = new FolderModel(Guid.NewGuid(), name, null, []) { Folder = CurrentFolder};
     // Folders.Add(folder);
     // CurrentFolder.AddFolder(folder);
+    await StateService.NotifySelectionCleared();
+
     await StateService.NotifyFolderCreated(folder);
     // await StateService.NotifyFolderUpdated(CurrentFolder);
-
     // CurrentFolder = folder;
     ShowNewFolderInput = false;
     // OnFolderUpdated.InvokeAsync(Folders)

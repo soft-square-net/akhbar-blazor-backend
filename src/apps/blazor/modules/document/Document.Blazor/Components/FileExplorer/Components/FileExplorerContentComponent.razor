@@ -110,8 +110,8 @@
   }
   private async Task<bool> IsDarkModeAsync()
   {
-    _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
-    if (_themePreference == null) _themePreference = new ClientPreference();
+    // _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+    // if (_themePreference == null) _themePreference = new ClientPreference();
     return _themePreference.IsDarkMode;
   }
 

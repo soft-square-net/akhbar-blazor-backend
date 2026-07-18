@@ -2,12 +2,15 @@
 using System.Diagnostics.CodeAnalysis;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer;
 using FSH.Starter.BlazorShared;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Document;
 // [Microsoft.AspNetCore.Components.Route("/documents/list")]
 public partial class List : MobulePageBase
 {
+    [CascadingParameter(Name = "PageTitle")] public string PageTitle { get; set; }
+
     protected override string Path { get; set; }
 
     private MudSplitPanel _splitPanel;
@@ -17,6 +20,12 @@ public partial class List : MobulePageBase
     private bool _elevation = true;
     private bool _transparent;
 
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        PageTitle = "Document List";
+    }
     private Task OpenDialogAsync()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraExtraLarge, BackdropClick = false };

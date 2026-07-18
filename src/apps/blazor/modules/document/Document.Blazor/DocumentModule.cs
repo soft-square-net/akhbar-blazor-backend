@@ -44,7 +44,7 @@ public sealed class DocumentModule : BlazorModuleBase
         {
             client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
         });
-        services.AddScoped<IFileExplorerStateService, FileExplorerStateService>();
+        services.AddSingleton<IFileExplorerStateService, FileExplorerStateService>();
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
 

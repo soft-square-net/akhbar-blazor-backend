@@ -30,7 +30,9 @@
                        ThemePreferenceChanged="ThemePreferenceChanged" />
           <ThemeButton OnClick="@(() => _themeDrawerOpen = true)" />
           <FSHMainLayout OnDarkModeToggle="ToggleDarkLightMode">
-            @Body
+            <CascadingValue Value="@PageTitle" Name="PageTitle">
+              @Body
+            </CascadingValue>
           </FSHMainLayout>
         </MudLayout>
       </MudRTLProvider>

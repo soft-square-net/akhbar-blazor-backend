@@ -5,7 +5,7 @@
 @inject IDialogService DialogService
 @using FSH.Starter.Blazor.Modules.Document.Blazor
 
-<link href="@($"{_content}.styles.css")" rel="stylesheet" />
+<link href="@($"{typeof(Constants).Assembly.GetName().Name}.styles.css")" rel="stylesheet" />
 
 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
   @Loc["Modules.Document.Title"] Open File Explorer

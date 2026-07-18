@@ -61,8 +61,8 @@
   private async Task ChangeFolder(FolderModel f)
   {
     CurrentFolder = f;
-    await StateService.NotifyFolderUpdated(f);
-
+    // await StateService.NotifyFolderUpdated(f);
+    await StateService.NotifyCurrentFolderChanged(f);
     await StateService.NotifyFolderSelectionChanged(f);
     // await OnFolderSelected.InvokeAsync(f);
   }

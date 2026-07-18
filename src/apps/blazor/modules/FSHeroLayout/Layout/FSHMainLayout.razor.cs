@@ -8,6 +8,8 @@ namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
 
 public partial class FSHMainLayout
 {
+    [CascadingParameter(Name = "PageTitle")] public string PageTitle { get; set; }
+
     [Parameter]
     public RenderFragment ChildContent { get; set; } = default!;
     [Parameter]
@@ -28,6 +30,7 @@ public partial class FSHMainLayout
             _drawerOpen = preferences.IsDrawerOpen;
             _isDarkMode = preferences.IsDarkMode;
         }
+        PageTitle = "FullstackHero 2026";
     }
 
     public async Task ToggleDarkMode()

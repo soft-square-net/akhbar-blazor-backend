@@ -9,7 +9,7 @@ namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
 public partial class FSHeroLayout
 {
     [Parameter] public RenderFragment? ChildContent { get; set; } = null;
-    
+    [CascadingParameter(Name = "PageTitle")] public string PageTitle { get; set; }
     private ClientPreference? _themePreference;
     private MudTheme _currentTheme = new FshTheme();
     private bool _themeDrawerOpen;
