@@ -9,7 +9,7 @@ namespace FSH.Starter.WebApi.Document.Domain;
 public class AccessRule : AuditableEntity, IAggregateRoot
 {
     public StorageAccount StorageAccount { get; private set; }
-    public Guid ResourceOwnerId { get; private set; }
+    public string ResourceOwnerId { get; private set; } = string.Empty;
     public ResourceOwnerType ResourceOwnerType { get; private set; }
     public bool IsEnabled { get; private set; } = true;
     public bool Read { get; private set; } = true;
@@ -24,7 +24,7 @@ public class AccessRule : AuditableEntity, IAggregateRoot
 
     private AccessRule() { }
 
-    private AccessRule(Guid id, StorageAccount storageAccount, ResourceOwnerType resourceOwnerType, Guid resourceOwnerId, Bucket bucket, string rootPath = "", bool enabled = true, bool read = true, bool write = false, bool execute = false, string? description = "")
+    private AccessRule(Guid id, StorageAccount storageAccount, ResourceOwnerType resourceOwnerType, string resourceOwnerId, Bucket bucket, string rootPath = "", bool enabled = true, bool read = true, bool write = false, bool execute = false, string? description = "")
     {
         Id = id;
         StorageAccount = storageAccount;
@@ -38,7 +38,7 @@ public class AccessRule : AuditableEntity, IAggregateRoot
         QueueDomainEvent(new AccessRuleCreated { AccessRule = this });
     }
 
-    public static AccessRule Create(StorageAccount storageAccount, ResourceOwnerType resourceOwnerType, Guid resourceOwnerId, Bucket bucket, string rootPath = "", bool enabled = true, bool read = true, bool write = false, bool execute = false, string? description = "")
+    public static AccessRule Create(StorageAccount storageAccount, ResourceOwnerType resourceOwnerType, string resourceOwnerId, Bucket bucket, string rootPath = "", bool enabled = true, bool read = true, bool write = false, bool execute = false, string? description = "")
     {
         return new AccessRule(Guid.NewGuid(), storageAccount, resourceOwnerType, resourceOwnerId, bucket, rootPath, enabled, read, write, execute, description);
     }

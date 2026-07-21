@@ -8,7 +8,7 @@ namespace FSH.Starter.WebApi.Document.Appication.AccessRules.Create.v1;
 
 public sealed record CreateAccessRuleCommand(
     StorageAccount StorageAccount,
-    Guid ResourceOwnerId,
+    string ResourceOwnerId,
     ResourceOwnerType ResourceOwnerType,
     [property: DefaultValue(true)] bool IsEnabled,
     [property: DefaultValue(true)] bool Read,

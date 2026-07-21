@@ -1,0 +1,175 @@
+﻿@using System.IO
+
+<div class="explorer-path-container" @onclick="EnableEditMode">
+  <!-- Left Side Icon (Simulating the Explorer Folder Icon) -->
+  <MudIcon Icon="@Icons.Material.Filled.Folder" Color="Color.Warning" Class="mr-2 ms-2" />
+
+  @if (_isEditing)
+  {
+    <!-- Text Edit Input Mode -->
+    <MudTextField @bind-Value="CurrentPath"
+                  @ref="_textFieldRef"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  FullWidth="true"
+                  OnKeyDown="HandleKeyDown"
+                  OnBlur="DisableEditMode"
+                  Class="explorer-text-input"
+                  Immediate="true" />
+  }
+  else
+  {
+    <!-- Interactive Breadcrumb Segment Mode -->
+    <div class="explorer-breadcrumbs">
+      @foreach (var segment in GetPathSegments())
+      {
+        <button type="button" class="breadcrumb-segment-btn" @onclick:stopPropagation @onclick="() => NavigateTo(segment.FullPath)">
+          @segment.Name
+        </button>
+        <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Size="Size.Small" Class="breadcrumb-arrow" />
+      }
+    </div>
+  }
+</div>
+
+@code {
+  [Parameter] public string CurrentPath { get; set; } = @"C:\Users\Admin\Documents\Projects";
+  [Parameter] public EventCallback<string> CurrentPathChanged { get; set; }
+
+  private bool _isEditing = false;
+  private MudTextField<string>? _textFieldRef;
+
+  private async Task EnableEditMode()
+  {
+    if (_isEditing) return;
+    _isEditing = true;
+
+    // Give Blazor time to render the input element before focusing
+    await Task.Delay(50);
+    if (_textFieldRef != null)
+    {
+      await _textFieldRef.FocusAsync();
+      await _textFieldRef.SelectAsync();
+    }
+  }
+
+  private async Task DisableEditMode()
+  {
+    _isEditing = false;
+    await CurrentPathChanged.InvokeAsync(CurrentPath);
+  }
+
+  private async Task HandleKeyDown(KeyboardEventArgs e)
+  {
+    if (e.Key == "Enter")
+    {
+      await DisableEditMode();
+    }
+    else if (e.Key == "Escape")
+    {
+      _isEditing = false; // Discard changes if preferred
+    }
+  }
+
+  private void NavigateTo(string targetPath)
+  {
+    CurrentPath = targetPath;
+    CurrentPathChanged.InvokeAsync(CurrentPath);
+  }
+
+  // Splits the directory path string into incremental paths for breadcrumbs
+  private List<PathSegment> GetPathSegments()
+  {
+    var segments = new List<PathSegment>();
+    if (string.IsNullOrWhiteSpace(CurrentPath)) return segments;
+
+    var normalizedPath = CurrentPath.Replace("/", "\\");
+    var parts = normalizedPath.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+
+    string runningPath = "";
+
+    // Handle Windows Drive Letters (e.g., "C:")
+    for (int i = 0; i < parts.Length; i++)
+    {
+      if (i == 0 && parts[i].Contains(":"))
+      {
+        runningPath = parts[i] + "\\";
+        segments.Add(new PathSegment { Name = parts[i], FullPath = runningPath });
+      }
+      else
+      {
+        runningPath = Path.Combine(runningPath, parts[i]);
+        segments.Add(new PathSegment { Name = parts[i], FullPath = runningPath });
+      }
+    }
+    return segments;
+  }
+
+  private class PathSegment
+  {
+    public string Name { get; set; } = string.Empty;
+    public string FullPath { get; set; } = string.Empty;
+  }
+}
+
+
+      <style>
+  .explorer-path-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--mud-palette-lines);
+    background-color: var(--mud-palette-background);
+    border-radius: 4px;
+    height: 36px;
+    width: 100%;
+    cursor: text;
+    overflow: hidden;
+    padding-right: 8px;
+  }
+
+    .explorer-path-container:hover {
+      border-color: var(--mud-palette-text-primary);
+    }
+
+  .explorer-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 100%;
+  }
+
+  .breadcrumb-segment-btn {
+    background: none;
+    border: none;
+    padding: 0 6px;
+    height: 100%;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--mud-palette-text-primary);
+    display: flex;
+    align-items: center;
+    border-radius: 2px;
+  }
+
+    .breadcrumb-segment-btn:hover {
+      background-color: var(--mud-palette-action-default-hover);
+    }
+
+  .breadcrumb-arrow {
+    color: var(--mud-palette-text-disabled);
+    user-select: none;
+  }
+
+  /* Strips MudTextField margins to let it sit flush within the custom box container */
+  .explorer-text-input .mud-input-control {
+    margin-top: 0 !important;
+  }
+
+  .explorer-text-input input {
+    font-size: 14px !important;
+    padding: 4px 0 !important;
+  }
+
+      </style>

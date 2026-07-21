@@ -6,7 +6,7 @@ namespace FSH.Starter.WebApi.Document.Application.AccessRules.Get.v1;
 public sealed record AccessRuleResponse(
     Guid? Id,
     StorageAccount? StorageAccount,
-    Guid? ResourceOwnerId,
+    string? ResourceOwnerId,
     ResourceOwnerType? ResourceOwnerType,
     bool IsEnabled,
     bool Read,

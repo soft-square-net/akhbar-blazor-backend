@@ -12,6 +12,7 @@ using Mapster;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Nextended.Core.Extensions;
+using static FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Storage.Accounts;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Storage;
 
@@ -32,6 +33,8 @@ public partial class Buckets : MobulePageBase
     private List<StorageAccountResponse> _storageAccounts = new();
     private List<RegionResponse> _regions = new();
 
+    private bool _loadingRegions;
+    private Guid _currentStorageAccountId;
     bool _canViewBuckets;
     // Advanced Search
 
@@ -129,9 +132,28 @@ public partial class Buckets : MobulePageBase
         }
     }
 
+    private async Task<IEnumerable<string>> SearchRegions(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        // await Task.Delay(1000, token);
+        _loadingRegions = true;
+        // if text is null or empty, show complete list
+        var filter = new Filter() { Field = "systemName", Operator = "Contains", Value = value };
+        if(_currentStorageAccountId == Guid.Empty)
+        {
+            _logger.LogWarning($"StorageAccountId is null or empty, cannot search regions");
+            return new List<string>();
+        }
+
+        if (string.IsNullOrEmpty(value))
+           return (await _client.ListRegionsEndpointAsync(new ListRegionsRequest() { StorageAccountId = _currentStorageAccountId })).Items.Select(x => x.SystemName);   
+        // return _regions.Where(x => x.DisplayName.Contains(value, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.SystemName);
+        return (await _client.ListRegionsEndpointAsync(new ListRegionsRequest { StorageAccountId = _currentStorageAccountId, Keyword = value })).Items.Select(x => x.SystemName);
+    }
     private async Task StorageAccountValueChanged(Guid? newValue)
     {
-        Context.AddEditModal.RequestModel.Name = "AAALLLLLSSSSBBBB";
+        _currentStorageAccountId = newValue ?? Guid.Empty;
+        // Context.AddEditModal.RequestModel.Name = "AAALLLLLSSSSBBBB";
         // Guid? newValue = Context.AddEditModal.RequestModel.StorageAccountId;
         _logger.LogInformation($"StorageAccountId changed to {newValue}");
         if (newValue != null && newValue != Guid.Empty)

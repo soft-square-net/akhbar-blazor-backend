@@ -10386,7 +10386,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public StorageAccount StorageAccount { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
-        public System.Guid ResourceOwnerId { get; set; } = default!;
+        public string? ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
@@ -10618,7 +10618,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public StorageAccount StorageAccount { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
-        public System.Guid? ResourceOwnerId { get; set; } = default!;
+        public string? ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
@@ -10681,12 +10681,12 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
         public System.Guid StorageAccountId { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
-        public System.Guid ResourceOwnerId { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
         public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public string? ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
         public bool IsEnabled { get; set; } = default!;

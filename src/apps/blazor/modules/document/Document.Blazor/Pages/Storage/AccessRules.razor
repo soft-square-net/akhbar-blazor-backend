@@ -1,5 +1,7 @@
 ﻿@page "/storage/access-rules"
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
+@using FSH.Starter.BlazorShared.Components
 @using FSH.Starter.BlazorShared.Components.EntityTable;
 @using FSH.Starter.Blazor.Infrastructure.Api;
 @using FSH.Starter.BlazorShared
@@ -10,9 +12,9 @@
 
 <PageHeader Title="Access Rules" Header="Access Rules" SubHeader="Manage your Access Rules." />
 
-<EntityTable @ref="_table" TEntity="AccessRuleResponse" TId="Guid" TRequest="AccessRuleVM" Context="@Context" >
+<EntityTable @ref="_table" TEntity="AccessRuleResponse" TId="Guid" TRequest="AccessRuleVM" Context="@Context">
 
-  <AdvancedSearchContent>
+  @* <AdvancedSearchContent>
     <MudSelect T="Guid?" Label="Brand" @bind-Value="SearchAccessRuleId">
       <MudSelectItem T="Guid?" Value="null">Buckets</MudSelectItem>
       @foreach (var bucket in _buckets)
@@ -22,24 +24,30 @@
 
     </MudSelect>
     <MudSlider T="decimal" @bind-value="SearchMinimumRate" Min="0" Max="9999" Step="100">Minimum Rate: @_searchMinimumRate.ToString()</MudSlider>
-    <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider>
-  </AdvancedSearchContent> 
+    <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider> 
+  </AdvancedSearchContent> *@
 
   <EditFormContent>
+    <ValidationSummary />
     @{
       // bool IsCreate = Context.AddEditModal.IsCreate;
       bool IsCreate = context.Id == Guid.Empty;
     }
-    }
+
     @if (!IsCreate)
     {
       <MudItem xs="12" md="6">
-        <MudTextField Value="context.Id" Underline=false ReadOnly Label="Access Rule Id" />
+        <MudTextField Value="context.Id" Underline="false" ReadOnly Label="Access Rule Id" />
       </MudItem>
     }
+
+    <MudItem xs="12" md="12">
+      <ExplorerAddressBreadcrumbs CurrentPathChanged="@(newPath => {})" ></ExplorerAddressBreadcrumbs>
+    </MudItem>
+
     <MudItem xs="12" md="6">
-      <MudSelect T="Guid?" Label="Bucket" Value="context.BucketId">
-        @if(context.BucketId == Guid.Empty)
+      <MudSelect T="Guid?" Label="Bucket" Value="context.BucketId" ValueChanged="id => OnBucketIdChanged(context, id)">
+        @if (context.BucketId == Guid.Empty)
         {
           <MudSelectItem T="Guid?" Value="Guid.Empty">..Please Select a Bucket..</MudSelectItem>
         }
@@ -49,24 +57,52 @@
         }
       </MudSelect>
     </MudItem>
-    <MudItem xs="12" md="6">
-      <MudSelect T="ResourceOwnerType" Label="Resource Type" @bind-Value="context.ResourceOwnerType">
-        @foreach (ResourceOwnerType RO in Enum.GetValues<ResourceOwnerType>())
-        {
-          <MudSelectItem T="ResourceOwnerType" Value="RO">@RO</MudSelectItem>
-        }
-      </MudSelect>
+
+    <MudItem xs="12" md="12">
+      <ResourceOwnerSelector Value="_resourceOwnerDto" ValueChanged="@(val => OnResourceOwnerChanged(context, val))" />
     </MudItem>
+
     <MudItem xs="12" md="12">
-      <MudSwitch Label="Read" For="@(() => context.Read)" @bind-Value="context.Read" />
-      <MudSwitch Label="Write" For="@(() => context.Write)" @bind-Value="context.Write" />
-      <MudSwitch Label="Execute" For="@(() => context.Execute)" @bind-Value="context.Execute" />
-    </MudItem>`
+      <MudStack Row="true" Spacing="2">
+
+        <!-- FIX 1: Native get/set binding engine on the master Enabled switch -->
+        <MudSwitch T="bool"
+                   Value="context.IsEnabled"
+                   ValueChanged="@((bool val) => OnEnabledStateToggled(ref context, val))"
+                   Label="@(context.IsEnabled?"Enabled":"Disabled")" LabelPlacement="Placement.Right" Color="Color.Secondary" UncheckedColor="Color.Default" />
+
+        <MudSpacer />
+
+        <!-- FIX 2: Replaced old @bind-Checked with modern @bind-Value so the form doesn't crash -->
+        <MudSwitch T="bool" ReadOnly="!context.IsEnabled" Label="Read" LabelPlacement="Placement.Right" @bind-Value="context.Read" Color="Color.Success" UncheckedColor="Color.Default" />
+        <MudSwitch T="bool" ReadOnly="!context.IsEnabled" Label="Write" LabelPlacement="Placement.Right" @bind-Value="context.Write" Color="Color.Warning" UncheckedColor="Color.Default" />
+        <MudSwitch T="bool" ReadOnly="!context.IsEnabled" Label="Execute" LabelPlacement="Placement.Right" @bind-Value="context.Execute" Color="Color.Error" UncheckedColor="Color.Default" />
+      </MudStack>
+
+      <MudDivider Class="my-2" />
+
+      <!-- Dynamic UI Section that reacts to the state -->
+      @if (context.IsEnabled)
+      {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Filled">
+          The Event FIRED! Status is Enabled.
+        </MudAlert>
+      }
+      else
+      {
+        <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined">
+          Status is Disabled. Click the switch above.
+        </MudAlert>
+      }
+
+      <MudText Typo="Typo.caption" Class="mt-2">
+        <strong>Raw Model State:</strong> IsEnabled = @context.IsEnabled.ToString()
+      </MudText>
+    </MudItem>
+
     <MudItem xs="12" md="12">
-      <MudTextField Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
+      <MudTextField Lines="3" Variant="Variant.Outlined" Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
     </MudItem>
   </EditFormContent>
 
 </EntityTable>
-
-

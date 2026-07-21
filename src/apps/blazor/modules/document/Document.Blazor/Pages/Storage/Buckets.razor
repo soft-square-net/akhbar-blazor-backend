@@ -39,13 +39,20 @@
       </MudSelect>
     </MudItem>
    
-    <MudItem xs="12" md="6">
+    @* <MudItem xs="12" md="6">
       <MudSelect T="string" Label="Region" @bind-Value="context.Region">
         @foreach (var region in _regions)
         {
           <MudSelectItem T="string" Value="region?.SystemName">@region?.DisplayName</MudSelectItem>
         }
       </MudSelect>
+    </MudItem> *@
+    <MudItem xs="12" sm="6" md="6"> 
+      <MudAutocomplete T="string" Label="Region" @bind-Value="context.Region"  SearchFunc="@SearchRegions" ShowProgressIndicator="true">
+        <ProgressIndicatorTemplate>
+          <MudProgressLinear Size="Size.Small" Indeterminate="true" Color="Color.Success" />
+        </ProgressIndicatorTemplate>
+      </MudAutocomplete>
     </MudItem>
     <MudItem xs="12" md="12">
       <MudTextField Label="Name" For="@(() => context.Name)" @bind-Value="context.Name" />
@@ -54,7 +61,6 @@
       <MudTextField Lines="3" MaxLines="3" Variant="Variant.Outlined" Label="Description" For="@(() => context.Description)" @bind-Value="context.Description" />
     </MudItem>
 
-        
 
     <MudItem xs="12" md="12">
       <MudItem>

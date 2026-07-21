@@ -6,6 +6,7 @@ using FSH.Starter.Blazor.Infrastructure.Auth;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.Components.EntityTable;
+using FSH.Starter.BlazorShared.Components;
 using FSH.Starter.Shared.Authorization;
 using Mapster;
 using Microsoft.AspNetCore.Components;
@@ -24,7 +25,9 @@ public partial class AccessRules : MobulePageBase
 
     // private List<AccessRuleResponse> _accessRules = new();
     private List<BucketResponse> _buckets = new();
+    private ResourceOwnerDto _resourceOwnerDto {  get; set; } = default!;
 
+    public bool IsBucketEnabled { get; set; } = false;
     bool _canViewAccessRules;
     // Advanced Search
 
@@ -106,21 +109,21 @@ public partial class AccessRules : MobulePageBase
                 new(accessRule => accessRule.Read, "Read", "Read"),
                 new(accessRule => accessRule.Description, "Description", "Description")
         },
-        enableAdvancedSearch: true,
-        idFunc: storageAccount => storageAccount.Id!.Value,
+        enableAdvancedSearch: false,
+        idFunc: accessRule => accessRule.Id!.Value,
         searchFunc: async filter =>
         {
-            var storageAccountCommand = filter.Adapt<SearchAccessRulesCommand>();
-            var result = await _client.SearchAccessRulesEndpointAsync(storageAccountCommand);
+            var accessRuleCommand = filter.Adapt<SearchAccessRulesCommand>();
+            var result = await _client.SearchAccessRulesEndpointAsync(accessRuleCommand);
             return result.Adapt<PaginationResponse<AccessRuleResponse>>();
         },
-        createFunc: async storageAccount =>
+        createFunc: async accessRule =>
         {
-            await _client.CreateAccessRuleEndpointAsync(storageAccount.Adapt<CreateAccessRuleCommand>());
+            await _client.CreateAccessRuleEndpointAsync(accessRule.Adapt<CreateAccessRuleCommand>());
         },
-        updateFunc: async (id, storageAccount) =>
+        updateFunc: async (id, accessRule) =>
         {
-            await _client.UpdateAccessRuleEndpointAsync(id, storageAccount.Adapt<UpdateAccessRuleCommand>());
+            await _client.UpdateAccessRuleEndpointAsync(id, accessRule.Adapt<UpdateAccessRuleCommand>());
         },
         deleteFunc: async id => await _client.DeleteAccessRuleEndpointAsync(id));
     }
@@ -135,20 +138,36 @@ public partial class AccessRules : MobulePageBase
         }
     }
 
-
-    //private async Task LoadBucketAsync()
-    //{
-    //    if (_buckets.Count == 0)
-    //    {
-
-    //        var response = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { });
-    //        if (response?.Items != null)
-    //        {
-    //            _buckets = response.Items.ToList();
-    //        }
-    //    }
-    //}
-    public class AccessRuleVM : UpdateAccessRuleCommand
+    private void OnBucketIdChanged(AccessRuleVM? context, Guid? bucketId)
     {
+        if (context != null)
+            context.BucketId = bucketId ?? Guid.Empty;
+    }
+    public class AccessRuleVM : UpdateAccessRuleCommand { }
+
+    private void OnResourceOwnerChanged(AccessRuleVM context, ResourceOwnerDto dto)
+    {
+        _resourceOwnerDto = dto;
+        context.ResourceOwnerType = dto.ResourceOwnerType;
+        context.ResourceOwnerId = dto.ResourceOwnerId;
+        StateHasChanged();
+    }
+
+    private void OnEnabledStateToggled(ref AccessRuleVM contextModel, bool newValue)
+    {
+        // 1. Force state modification direct into the active form context instance
+        contextModel.IsEnabled = newValue;
+
+        // 2. Cascade down to sub-properties if disabled
+        if (!newValue)
+        {
+            contextModel.Read = false;
+            contextModel.Write = false;
+            contextModel.Execute = false;
+        }
+        StateHasChanged();
+        // 3. FORCE FULLSTACKHERO'S MODAL WRAPPER TO FORCE AN INTERNAL RERENDER PASS
+        // This targets the underlying MudDialog state container instead of the base page background
+        Context.AddEditModal?.ForceRender();
     }
 }

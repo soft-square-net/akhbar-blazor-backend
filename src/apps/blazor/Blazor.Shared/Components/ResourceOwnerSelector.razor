@@ -1,0 +1,179 @@
+﻿@implements IDisposable
+
+<MudStack Row="true" Spacing="2">
+  <MudItem xs="12" md="6">
+    <MudSelect Dense="true" Margin="Margin.Dense" Variant="Variant.Outlined" T="ResourceOwnerType?" Label="Resource Type" Value="@((Value?.ResourceOwnerType) ?? ResourceOwnerType.Role)" ValueChanged="OnTypeChanged">
+      @if (Value?.ResourceOwnerType is null)
+      {
+        <MudSelectItem T="Guid?" Value="Guid.Empty">..Select a Resource Type</MudSelectItem>
+      }
+      @foreach (ResourceOwnerType RO in Enum.GetValues<ResourceOwnerType>())
+      {
+        <MudSelectItem T="ResourceOwnerType?" Value="RO">@RO</MudSelectItem>
+      }
+    </MudSelect>
+  </MudItem>
+
+  <MudItem xs="12" md="6">
+    @switch (Value?.ResourceOwnerType)
+    {
+
+      case ResourceOwnerType.User:
+        <MudAutocomplete T="UserDetail?"
+                         Value="_selectedUser"
+                         ValueChanged="OnUserChanged"
+                         SearchFunc="_searchUsersFunc"
+                         ToStringFunc="_userToStringFunc"
+                         Label="Select User"
+                         Variant="Variant.Outlined"
+                         Dense="true"
+                         Clearable="true"
+                         ResetValueOnEmptyText="true"
+                         CoerceText="true"
+                         Margin="Margin.Dense" />
+        break;
+      case ResourceOwnerType.Role:
+        <MudAutocomplete T="RoleDto?"
+                         Value="_selectedRole"
+                         ValueChanged="OnRoleChanged"
+                         SearchFunc="_searchRolesFunc"
+                         ToStringFunc="_roleToStringFunc"
+                         Label="Select Role"
+                         Variant="Variant.Outlined"
+                         Dense="true"
+                         Clearable="true"
+                         ResetValueOnEmptyText="true"
+                         CoerceText="true"
+                         Margin="Margin.Dense" />
+        break;
+      case null:
+        <MudAlert> Please Select a resource type</MudAlert>
+        break;
+    }
+  </MudItem>
+</MudStack>
+
+@code {
+  [Inject]
+  protected IApiClient _client { get; set; } = default!;
+  // [Parameter, EditorRequired]
+  // public ResourceOwnerType resourceOwnerType { get; set; }
+  [Parameter]
+  public ResourceOwnerDto? Value { get; set; }
+  [Parameter]
+  public EventCallback<ResourceOwnerDto?> ValueChanged { get; set; }
+  private List<UserDetail> _users = new();
+  private List<RoleDto> _roles = new();
+  private UserDetail? _selectedUser;
+  private RoleDto? _selectedRole;
+
+  protected override Task OnParametersSetAsync()
+  {
+    Value = Value ?? new ResourceOwnerDto(ResourceOwnerType.Role, string.Empty);
+    return base.OnParametersSetAsync();
+  }
+  // protected override async Task OnAfterRenderAsync(bool firstRender)
+  // {
+  //   if (firstRender)
+  //   {
+  //     if (Value?.ResourceOwnerType == ResourceOwnerType.User && !string.IsNullOrWhiteSpace(Value?.ResourceOwnerId))
+  //     {
+  //       var user = await _client.GetUserEndpointAsync(Value.ResourceOwnerId, CancellationToken.None);
+  //       _selectedUser = user;
+  //     }
+  //     else if (Value?.ResourceOwnerType == ResourceOwnerType.Role && !string.IsNullOrWhiteSpace(Value?.ResourceOwnerId))
+  //     {
+  //       var role = await _client.GetRoleByIdEndpointAsync(Value.ResourceOwnerId, CancellationToken.None);
+  //       _selectedRole = role;
+  //     }
+  //     StateHasChanged();
+  //     await ValueChanged.InvokeAsync(Value);
+  //   }
+
+  //   base.OnAfterRenderAsync(firstRender);
+  // }
+
+
+  private async Task<List<UserDetail>> LoadUsersAsync(string keyword, CancellationToken cancellationToken)
+  {
+    if (_users.Count == 0)
+    {
+      var result = await _client.GetUsersListEndpointAsync(cancellationToken);
+      _users = result.ToList();
+    }
+    if (!string.IsNullOrWhiteSpace(keyword))
+      return _users.Where(e =>
+          e.Email.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+          || $"{e.FirstName} {e.LastName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
+          || $"{e.LastName} {e.FirstName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
+      ).ToList();
+    return _users;
+  }
+  private async Task<List<RoleDto>> LoadRolesAsync(string keyword, CancellationToken cancellationToken)
+  {
+    if (_roles.Count == 0)
+    {
+      var result = await _client.GetRolesEndpointAsync(cancellationToken);
+      _roles = result.ToList();
+    }
+
+    if (!string.IsNullOrWhiteSpace(keyword))
+      return _roles.Where(e => e.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+    return _roles;
+  }
+
+  Func<string, CancellationToken, Task<IEnumerable<UserDetail>>> _searchUsersFunc => async (keyword, ct) => await LoadUsersAsync(keyword, ct);
+  Func<string, CancellationToken, Task<IEnumerable<RoleDto>>> _searchRolesFunc => async (keyword, ct) => await LoadRolesAsync(keyword, ct);
+  Func<RoleDto, string> _roleToStringFunc => (role) => role?.Name ?? "";
+  Func<UserDetail, string> _userToStringFunc => (user) => $"{user?.FirstName ?? ""} {user?.LastName ?? ""}";
+
+  private async Task OnUserChanged()
+  {
+    Value = new ResourceOwnerDto(ResourceOwnerType.User, _selectedUser?.Id.ToString());
+    await ValueChanged.InvokeAsync(Value);
+  }
+
+  private async Task OnRoleChanged()
+  {
+    Value = new ResourceOwnerDto(ResourceOwnerType.Role, _selectedRole?.Id);
+    await ValueChanged.InvokeAsync(Value);
+  }
+
+  private async Task OnTypeChanged(ResourceOwnerType? val)
+  {
+    switch (val)
+    {
+      case ResourceOwnerType.User:
+        Value = new ResourceOwnerDto(ResourceOwnerType.User, _selectedUser?.Id.ToString() ?? string.Empty);
+        break;
+      case ResourceOwnerType.Role:
+        Value = new ResourceOwnerDto(ResourceOwnerType.Role, _selectedRole?.Id ?? string.Empty);
+        break;
+      case ResourceOwnerType.Anonymous:
+        Value = new ResourceOwnerDto(ResourceOwnerType.Anonymous, string.Empty);
+        break;
+      case ResourceOwnerType.Group:
+        Value = new ResourceOwnerDto(ResourceOwnerType.Group, string.Empty);
+        break;
+      case ResourceOwnerType.ManagedIdentity:
+        Value = new ResourceOwnerDto(ResourceOwnerType.ManagedIdentity, string.Empty);
+        break;
+      case ResourceOwnerType.ServicePrincipal:
+        Value = new ResourceOwnerDto(ResourceOwnerType.ServicePrincipal, string.Empty);
+        break;
+      default:
+        // Value = Value ?? new ResourceOwnerDto(ResourceOwnerType.Role, null);
+        break;
+    }
+    // StateHasChanged();
+    await ValueChanged.InvokeAsync(Value);
+  }
+
+  public void Dispose()
+  {
+    _users = null;
+    _roles = null;
+    _selectedUser = null;
+    _selectedRole = null;
+  }
+}

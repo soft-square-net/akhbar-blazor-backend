@@ -7,8 +7,8 @@ namespace FSH.Starter.WebApi.Document.Application.AccessRules.Update.v1;
 public sealed record UpdateAccessRuleCommand(
     Guid Id,
     Guid StorageAccountId,
-    Guid ResourceOwnerId,
     ResourceOwnerType ResourceOwnerType,
+    string ResourceOwnerId,
     bool IsEnabled,
     bool Read,
     bool Write,
