@@ -5,11 +5,12 @@ using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Blazor.Infrastructure.Auth;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 using FSH.Starter.BlazorShared;
-using FSH.Starter.BlazorShared.Components.EntityTable;
 using FSH.Starter.BlazorShared.Components;
+using FSH.Starter.BlazorShared.Components.EntityTable;
 using FSH.Starter.Shared.Authorization;
 using Mapster;
 using Microsoft.AspNetCore.Components;
+using static FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Storage.Buckets;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Storage;
 
@@ -25,7 +26,8 @@ public partial class AccessRules : MobulePageBase
 
     // private List<AccessRuleResponse> _accessRules = new();
     private List<BucketResponse> _buckets = new();
-    private ResourceOwnerDto _resourceOwnerDto {  get; set; } = default!;
+    private List<StorageAccountResponse> _storageAccounts = new();
+    private ResourceOwnerDto _resourceOwnerDto { get; set; } = default!;
 
     public bool IsBucketEnabled { get; set; } = false;
     bool _canViewAccessRules;
@@ -88,7 +90,8 @@ public partial class AccessRules : MobulePageBase
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            await PopulateBucketValues();
+            // await PopulateBucketValues();
+            await PopulateStorageAccountsValues();
         }
     }
     private void PopulateContext()
@@ -133,17 +136,60 @@ public partial class AccessRules : MobulePageBase
     {
         if (_buckets.Count == 0)
         {
-            var result = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { OrderBy = [], PageNumber = 1, PageSize = 10 });
+            var result = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { OrderBy = [], PageNumber = 1, PageSize = 100 });
             _buckets = result.Items.ToList();
         }
     }
+    private async Task PopulateStorageAccountsValues()
+    {
+        if (_buckets.Count == 0)
+        {
+            var result = await _client.SearchStorageAccountsEndpointAsync(new SearchStorageAccountsCommand() { OrderBy = [], PageNumber = 1, PageSize = 100 });
+            _storageAccounts = result.Items.ToList();
+        }
+    }
 
-    private void OnBucketIdChanged(AccessRuleVM? context, Guid? bucketId)
+    private async Task OnBucketIdChanged(AccessRuleVM? context, Guid? bucketId)
     {
         if (context != null)
             context.BucketId = bucketId ?? Guid.Empty;
+
+        //var command = new SearchStorageAccountsCommand()
+        //{
+        //    AdvancedFilter = new Filter
+        //    {
+        //        // must match the C# property path on the server model
+        //        Field = "BucketId",
+        //        // supported operators: "eq","neq","lt","lte","gt","gte","contains","startswith","endswith"
+        //        Operator = "eq",
+        //        // Guid, string, number, etc. (will be serialized to JSON)
+        //        Value = bucketId
+        //    },
+        //    OrderBy = new[] { "accountName" },
+        //    PageNumber = 1,
+        //    PageSize = 100
+        //};
+        //_storageAccounts = (await _client.SearchStorageAccountsEndpointAsync(command)).Items.ToList();
+        // context.StorageAccountId = _buckets.FirstOrDefault(b => b.Id == bucketId)?.StorageAccount?.Id ?? Guid.Empty;
     }
-    public class AccessRuleVM : UpdateAccessRuleCommand { }
+    private async Task OnStorageAccountIdChanged(AccessRuleVM? context, Guid? id)
+    {
+        if (context != null)
+            context.StorageAccountId = id ?? Guid.Empty;
+        context.BucketId = Guid.Empty;
+        _buckets = (await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest()
+        {
+            AdvancedFilter = new Filter
+            {
+                Field = "storageAccountId",
+                Operator = "eq",
+                Value = id
+            },
+            OrderBy = ["name"],
+            PageNumber = 1,
+            PageSize = 100
+        })).Items.ToList();
+    }
 
     private void OnResourceOwnerChanged(AccessRuleVM context, ResourceOwnerDto dto)
     {
@@ -170,4 +216,7 @@ public partial class AccessRules : MobulePageBase
         // This targets the underlying MudDialog state container instead of the base page background
         Context.AddEditModal?.ForceRender();
     }
+
+    public class AccessRuleVM : UpdateAccessRuleCommand { }
+
 }

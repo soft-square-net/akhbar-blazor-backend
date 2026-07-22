@@ -10382,15 +10382,21 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     public partial class CreateAccessRuleCommand
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
-        public StorageAccount StorageAccount { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
-        public string? ResourceOwnerId { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
+        public System.Guid StorageAccountId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
         public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public string? ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
         public bool IsEnabled { get; set; } = true;
@@ -10403,12 +10409,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("execute")]
         public bool Execute { get; set; } = false;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
-        public Bucket Bucket { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
-        public string? RootPath { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
         public string? Description { get; set; } = "Descriptive Description";
@@ -10689,10 +10689,10 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public string? ResourceOwnerId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
-        public bool IsEnabled { get; set; } = default!;
+        public bool IsEnabled { get; set; } = true;
 
         [System.Text.Json.Serialization.JsonPropertyName("read")]
-        public bool Read { get; set; } = default!;
+        public bool Read { get; set; } = true;
 
         [System.Text.Json.Serialization.JsonPropertyName("write")]
         public bool Write { get; set; } = default!;

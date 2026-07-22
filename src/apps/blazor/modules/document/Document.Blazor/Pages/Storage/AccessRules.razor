@@ -24,7 +24,7 @@
 
     </MudSelect>
     <MudSlider T="decimal" @bind-value="SearchMinimumRate" Min="0" Max="9999" Step="100">Minimum Rate: @_searchMinimumRate.ToString()</MudSlider>
-    <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider> 
+    <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider>
   </AdvancedSearchContent> *@
 
   <EditFormContent>
@@ -40,31 +40,52 @@
         <MudTextField Value="context.Id" Underline="false" ReadOnly Label="Access Rule Id" />
       </MudItem>
     }
-
     <MudItem xs="12" md="12">
-      <ExplorerAddressBreadcrumbs CurrentPathChanged="@(newPath => {})" ></ExplorerAddressBreadcrumbs>
+      <ExplorerAddressBreadcrumbs CurrentPath="@context.RootPath" CurrentPathChanged="@(newPath => { context.RootPath = newPath; })"></ExplorerAddressBreadcrumbs>
     </MudItem>
-
-    <MudItem xs="12" md="6">
-      <MudSelect T="Guid?" Label="Bucket" Value="context.BucketId" ValueChanged="id => OnBucketIdChanged(context, id)">
-        @if (context.BucketId == Guid.Empty)
-        {
-          <MudSelectItem T="Guid?" Value="Guid.Empty">..Please Select a Bucket..</MudSelectItem>
-        }
-        @foreach (var bucket in _buckets)
-        {
-          <MudSelectItem T="Guid?" Value="bucket?.Id">@bucket?.Name</MudSelectItem>
-        }
-      </MudSelect>
+    @* Select the Storage Account and Bucket to which this Access Rule applies. Then select the permissions for this Access Rule. You can also provide a description for this Access Rule. *@
+    <MudItem xs="12" md="12">
+      <MudStack Row="true" Spacing="2">
+        <MudItem xs="12" md="6">
+          <MudSelect T="Guid?"
+                     Label="Storage Account"
+                     Value="context.StorageAccountId"
+                     ValueChanged="id => OnStorageAccountIdChanged(context, id)"
+                     Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense">
+            @if (context.StorageAccountId == Guid.Empty)
+            {
+              <MudSelectItem T="Guid?" Value="Guid.Empty">Select Account..</MudSelectItem>
+            }
+            @foreach (var _account in _storageAccounts)
+            {
+              <MudSelectItem T="Guid?" Value="_account?.Id">@_account?.AccountName</MudSelectItem>
+            }
+          </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="6">
+          <MudSelect T="Guid?"
+                     Label="Bucket"
+                     Value="context.BucketId"
+                     ValueChanged="id => OnBucketIdChanged(context, id)"
+                     Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense">
+            @if (context.BucketId == Guid.Empty)
+            {
+              <MudSelectItem T="Guid?" Value="Guid.Empty">Select Bucket..</MudSelectItem>
+            }
+            @foreach (var bucket in _buckets)
+            {
+              <MudSelectItem T="Guid?" Value="bucket?.Id">@bucket?.Name</MudSelectItem>
+            }
+          </MudSelect>
+        </MudItem>
+      </MudStack>
     </MudItem>
-
+    @* Resource Owner:  *@
     <MudItem xs="12" md="12">
       <ResourceOwnerSelector Value="_resourceOwnerDto" ValueChanged="@(val => OnResourceOwnerChanged(context, val))" />
     </MudItem>
-
     <MudItem xs="12" md="12">
       <MudStack Row="true" Spacing="2">
-
         <!-- FIX 1: Native get/set binding engine on the master Enabled switch -->
         <MudSwitch T="bool"
                    Value="context.IsEnabled"
@@ -78,26 +99,6 @@
         <MudSwitch T="bool" ReadOnly="!context.IsEnabled" Label="Write" LabelPlacement="Placement.Right" @bind-Value="context.Write" Color="Color.Warning" UncheckedColor="Color.Default" />
         <MudSwitch T="bool" ReadOnly="!context.IsEnabled" Label="Execute" LabelPlacement="Placement.Right" @bind-Value="context.Execute" Color="Color.Error" UncheckedColor="Color.Default" />
       </MudStack>
-
-      <MudDivider Class="my-2" />
-
-      <!-- Dynamic UI Section that reacts to the state -->
-      @if (context.IsEnabled)
-      {
-        <MudAlert Severity="Severity.Success" Variant="Variant.Filled">
-          The Event FIRED! Status is Enabled.
-        </MudAlert>
-      }
-      else
-      {
-        <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined">
-          Status is Disabled. Click the switch above.
-        </MudAlert>
-      }
-
-      <MudText Typo="Typo.caption" Class="mt-2">
-        <strong>Raw Model State:</strong> IsEnabled = @context.IsEnabled.ToString()
-      </MudText>
     </MudItem>
 
     <MudItem xs="12" md="12">

@@ -1,4 +1,5 @@
-﻿@implements IDisposable
+﻿#nullable enable
+@implements IDisposable
 
 <MudStack Row="true" Spacing="2">
   <MudItem xs="12" md="6">
@@ -21,7 +22,7 @@
       case ResourceOwnerType.User:
         <MudAutocomplete T="UserDetail?"
                          Value="_selectedUser"
-                         ValueChanged="OnUserChanged"
+                         ValueChanged="@(newUser => OnUserChanged(newUser))"
                          SearchFunc="_searchUsersFunc"
                          ToStringFunc="_userToStringFunc"
                          Label="Select User"
@@ -35,7 +36,7 @@
       case ResourceOwnerType.Role:
         <MudAutocomplete T="RoleDto?"
                          Value="_selectedRole"
-                         ValueChanged="OnRoleChanged"
+                         ValueChanged="@(newRole => OnRoleChanged(newRole))"
                          SearchFunc="_searchRolesFunc"
                          ToStringFunc="_roleToStringFunc"
                          Label="Select Role"
@@ -54,6 +55,7 @@
 </MudStack>
 
 @code {
+  #nullable enable
   [Inject]
   protected IApiClient _client { get; set; } = default!;
   // [Parameter, EditorRequired]
@@ -98,27 +100,27 @@
   {
     if (_users.Count == 0)
     {
-      var result = await _client.GetUsersListEndpointAsync(cancellationToken);
-      _users = result.ToList();
+  var result = await _client.GetUsersListEndpointAsync(cancellationToken);
+  _users = result.ToList();
     }
     if (!string.IsNullOrWhiteSpace(keyword))
-      return _users.Where(e =>
-          e.Email.Contains(keyword, StringComparison.OrdinalIgnoreCase)
-          || $"{e.FirstName} {e.LastName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
-          || $"{e.LastName} {e.FirstName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
-      ).ToList();
+  return _users.Where(e =>
+      e.Email.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+      || $"{e.FirstName} {e.LastName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
+      || $"{e.LastName} {e.FirstName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
+  ).ToList();
     return _users;
   }
   private async Task<List<RoleDto>> LoadRolesAsync(string keyword, CancellationToken cancellationToken)
   {
     if (_roles.Count == 0)
     {
-      var result = await _client.GetRolesEndpointAsync(cancellationToken);
-      _roles = result.ToList();
+  var result = await _client.GetRolesEndpointAsync(cancellationToken);
+  _roles = result.ToList();
     }
 
     if (!string.IsNullOrWhiteSpace(keyword))
-      return _roles.Where(e => e.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+  return _roles.Where(e => e.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
     return _roles;
   }
 
@@ -127,14 +129,16 @@
   Func<RoleDto, string> _roleToStringFunc => (role) => role?.Name ?? "";
   Func<UserDetail, string> _userToStringFunc => (user) => $"{user?.FirstName ?? ""} {user?.LastName ?? ""}";
 
-  private async Task OnUserChanged()
+  private async Task OnUserChanged(UserDetail? user)
   {
+    _selectedUser = user;
     Value = new ResourceOwnerDto(ResourceOwnerType.User, _selectedUser?.Id.ToString());
     await ValueChanged.InvokeAsync(Value);
   }
 
-  private async Task OnRoleChanged()
+  private async Task OnRoleChanged(RoleDto? role)
   {
+    _selectedRole = role;
     Value = new ResourceOwnerDto(ResourceOwnerType.Role, _selectedRole?.Id);
     await ValueChanged.InvokeAsync(Value);
   }
@@ -171,8 +175,8 @@
 
   public void Dispose()
   {
-    _users = null;
-    _roles = null;
+    _users.Clear();
+    _roles.Clear();
     _selectedUser = null;
     _selectedRole = null;
   }
