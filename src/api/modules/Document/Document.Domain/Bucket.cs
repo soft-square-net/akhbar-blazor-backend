@@ -5,6 +5,7 @@ using FSH.Framework.Core.Domain;
 using FSH.Framework.Core.Domain.Contracts;
 using FSH.Framework.Core.Storage.File;
 using FSH.Starter.WebApi.Document.Domain.Events;
+using System.Text.Json.Serialization;
 using MediatR;
 using Shared.Enums;
 
@@ -25,6 +26,7 @@ public class Bucket : AuditableEntity, IAggregateRoot
     public long MaxSize { get; private set; }
     public string? Description { get; private set; }
 
+    [JsonIgnore]
     public StorageAccount StorageAccount { get; private set; } = null!;
     public IReadOnlyList<Domain.Folder> Folders => _Folders.ToList();
     // public ICollection<AccessRule> AccessRules { get; private set; } = new List<AccessRule>();  

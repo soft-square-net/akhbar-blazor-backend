@@ -10688,6 +10688,9 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
         public string? ResourceOwnerId { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
         public bool IsEnabled { get; set; } = true;
 
@@ -10695,19 +10698,16 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public bool Read { get; set; } = true;
 
         [System.Text.Json.Serialization.JsonPropertyName("write")]
-        public bool Write { get; set; } = default!;
+        public bool Write { get; set; } = false;
 
         [System.Text.Json.Serialization.JsonPropertyName("execute")]
-        public bool Execute { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
-        public System.Guid BucketId { get; set; } = default!;
+        public bool Execute { get; set; } = false;
 
         [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
-        public string? RootPath { get; set; } = default!;
+        public string? RootPath { get; set; } = "";
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
+        public string? Description { get; set; } = "";
 
     }
 

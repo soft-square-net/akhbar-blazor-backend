@@ -112,13 +112,28 @@ public partial class AccessRules : MobulePageBase
                 new(accessRule => accessRule.Read, "Read", "Read"),
                 new(accessRule => accessRule.Description, "Description", "Description")
         },
+        // Initialize data when the Add/Edit modal is created so selects have their items before render
+        editFormInitializedFunc: async () =>
+        {
+            await PopulateStorageAccountsValues();
+            // load all buckets so the bucket select can resolve the display name when editing
+            var bucketsResult = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { OrderBy = new string[] { "name" }, PageNumber = 1, PageSize = 100 });
+            _buckets = bucketsResult.Items.ToList();
+        },
         enableAdvancedSearch: false,
         idFunc: accessRule => accessRule.Id!.Value,
         searchFunc: async filter =>
         {
             var accessRuleCommand = filter.Adapt<SearchAccessRulesCommand>();
             var result = await _client.SearchAccessRulesEndpointAsync(accessRuleCommand);
-            return result.Adapt<PaginationResponse<AccessRuleResponse>>();
+            // Map the generated PagedList to our PaginationResponse without using Mapster to avoid mapping issues
+            return new PaginationResponse<AccessRuleResponse>
+            {
+                Items = result?.Items?.ToList() ?? new List<AccessRuleResponse>(),
+                TotalCount = result?.TotalCount ?? 0,
+                CurrentPage = result?.PageNumber ?? 1,
+                PageSize = result?.PageSize ?? 10
+            };
         },
         createFunc: async accessRule =>
         {
@@ -132,13 +147,20 @@ public partial class AccessRules : MobulePageBase
     }
 
 
-    private async Task PopulateBucketValues()
+    private async Task PopulateBucketValues(Guid? storageAccountId)
     {
-        if (_buckets.Count == 0)
+        _buckets = (await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest()
         {
-            var result = await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest() { OrderBy = [], PageNumber = 1, PageSize = 100 });
-            _buckets = result.Items.ToList();
-        }
+            AdvancedFilter = new Filter
+            {
+                Field = "storageAccountId",
+                Operator = "eq",
+                Value = storageAccountId
+            },
+            OrderBy = ["name"],
+            PageNumber = 1,
+            PageSize = 100
+        })).Items.ToList();
     }
     private async Task PopulateStorageAccountsValues()
     {
@@ -153,7 +175,7 @@ public partial class AccessRules : MobulePageBase
     {
         if (context != null)
             context.BucketId = bucketId ?? Guid.Empty;
-
+        Context.AddEditModal?.ForceRender();
         //var command = new SearchStorageAccountsCommand()
         //{
         //    AdvancedFilter = new Filter
@@ -177,26 +199,16 @@ public partial class AccessRules : MobulePageBase
         if (context != null)
             context.StorageAccountId = id ?? Guid.Empty;
         context.BucketId = Guid.Empty;
-        _buckets = (await _client.SearchBucketsEndpointAsync(new SearchBucketsRequest()
-        {
-            AdvancedFilter = new Filter
-            {
-                Field = "storageAccountId",
-                Operator = "eq",
-                Value = id
-            },
-            OrderBy = ["name"],
-            PageNumber = 1,
-            PageSize = 100
-        })).Items.ToList();
+        await PopulateBucketValues(id);
     }
 
     private void OnResourceOwnerChanged(AccessRuleVM context, ResourceOwnerDto dto)
     {
-        _resourceOwnerDto = dto;
         context.ResourceOwnerType = dto.ResourceOwnerType;
         context.ResourceOwnerId = dto.ResourceOwnerId;
-        StateHasChanged();
+        _resourceOwnerDto = dto;
+        // StateHasChanged();
+        Context.AddEditModal?.ForceRender();
     }
 
     private void OnEnabledStateToggled(ref AccessRuleVM contextModel, bool newValue)

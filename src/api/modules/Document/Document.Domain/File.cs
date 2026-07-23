@@ -1,6 +1,7 @@
 ﻿using FSH.Framework.Core.Domain;
 using FSH.Starter.WebApi.Document.Domain.Events;
 using Shared.Enums;
+using System.Text.Json.Serialization;
 
 namespace FSH.Starter.WebApi.Document.Domain;
 public class File : AuditableEntity
@@ -16,6 +17,7 @@ public class File : AuditableEntity
     public long? Size { get; private set; }
     public bool IsPublic { get; private set; } = true;
 
+    [JsonIgnore]
     public Folder Folder { get; private set; } = null!;
     private File() { }
 

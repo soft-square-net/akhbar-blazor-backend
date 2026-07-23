@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20251214152720_Add Document Schema")]
+    [Migration("20260722090157_Add Document Schema")]
     partial class AddDocumentSchema
     {
         /// <inheritdoc />
@@ -21,10 +21,84 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("document")
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.AccessRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BucketId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Execute")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ResourceOwnerId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("ResourceOwnerType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RootPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("StorageAccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("Write")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BucketId");
+
+                    b.HasIndex("StorageAccountId");
+
+                    b.ToTable("AccessRules", "document");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
 
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.Bucket", b =>
                 {
@@ -334,6 +408,25 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.ToTable("StorageAccounts", "document");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.AccessRule", b =>
+                {
+                    b.HasOne("FSH.Starter.WebApi.Document.Domain.Bucket", "Bucket")
+                        .WithMany()
+                        .HasForeignKey("BucketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.Starter.WebApi.Document.Domain.StorageAccount", "StorageAccount")
+                        .WithMany()
+                        .HasForeignKey("StorageAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bucket");
+
+                    b.Navigation("StorageAccount");
                 });
 
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.Bucket", b =>

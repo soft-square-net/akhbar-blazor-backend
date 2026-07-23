@@ -9,13 +9,13 @@ public sealed record UpdateAccessRuleCommand(
     Guid StorageAccountId,
     ResourceOwnerType ResourceOwnerType,
     string ResourceOwnerId,
+    Guid BucketId,
     [property: DefaultValue(true)] bool IsEnabled,
     [property: DefaultValue(true)] bool Read,
-    bool Write,
-    bool Execute,
-    Guid BucketId,
-    string RootPath,
-    string Description
+    [property: DefaultValue(false)] bool Write,
+    [property: DefaultValue(false)] bool Execute,
+    [property: DefaultValue("")] string RootPath,
+    [property: DefaultValue("")] string Description
     // Bucket Bucket,
     // StorageAccount StorageAccount
     ) : IRequest<UpdateAccessRuleResponse>;

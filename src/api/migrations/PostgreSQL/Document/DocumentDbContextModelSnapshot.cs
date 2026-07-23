@@ -63,9 +63,10 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.Property<bool>("Read")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("ResourceOwnerId")
+                    b.Property<string>("ResourceOwnerId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("ResourceOwnerType")
                         .HasColumnType("integer");

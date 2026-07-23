@@ -36,6 +36,9 @@
 
     @if (!IsCreate)
     {
+      PopulateBucketValues(context.StorageAccountId);
+      _resourceOwnerDto = new ResourceOwnerDto(context.ResourceOwnerType, context.ResourceOwnerId);
+
       <MudItem xs="12" md="6">
         <MudTextField Value="context.Id" Underline="false" ReadOnly Label="Access Rule Id" />
       </MudItem>
@@ -52,10 +55,10 @@
                      Value="context.StorageAccountId"
                      ValueChanged="id => OnStorageAccountIdChanged(context, id)"
                      Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense">
-            @if (context.StorageAccountId == Guid.Empty)
-            {
+           @*  @if (context.StorageAccountId == Guid.Empty)
+            { *@
               <MudSelectItem T="Guid?" Value="Guid.Empty">Select Account..</MudSelectItem>
-            }
+           @*  } *@
             @foreach (var _account in _storageAccounts)
             {
               <MudSelectItem T="Guid?" Value="_account?.Id">@_account?.AccountName</MudSelectItem>
@@ -68,10 +71,10 @@
                      Value="context.BucketId"
                      ValueChanged="id => OnBucketIdChanged(context, id)"
                      Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense">
-            @if (context.BucketId == Guid.Empty)
-            {
+           @*  @if (context.BucketId == Guid.Empty)
+            { *@
               <MudSelectItem T="Guid?" Value="Guid.Empty">Select Bucket..</MudSelectItem>
-            }
+            @* } *@
             @foreach (var bucket in _buckets)
             {
               <MudSelectItem T="Guid?" Value="bucket?.Id">@bucket?.Name</MudSelectItem>

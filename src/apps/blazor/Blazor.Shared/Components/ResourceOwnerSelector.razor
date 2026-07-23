@@ -74,49 +74,50 @@
     Value = Value ?? new ResourceOwnerDto(ResourceOwnerType.Role, string.Empty);
     return base.OnParametersSetAsync();
   }
-  // protected override async Task OnAfterRenderAsync(bool firstRender)
-  // {
-  //   if (firstRender)
-  //   {
-  //     if (Value?.ResourceOwnerType == ResourceOwnerType.User && !string.IsNullOrWhiteSpace(Value?.ResourceOwnerId))
-  //     {
-  //       var user = await _client.GetUserEndpointAsync(Value.ResourceOwnerId, CancellationToken.None);
-  //       _selectedUser = user;
-  //     }
-  //     else if (Value?.ResourceOwnerType == ResourceOwnerType.Role && !string.IsNullOrWhiteSpace(Value?.ResourceOwnerId))
-  //     {
-  //       var role = await _client.GetRoleByIdEndpointAsync(Value.ResourceOwnerId, CancellationToken.None);
-  //       _selectedRole = role;
-  //     }
-  //     StateHasChanged();
-  //     await ValueChanged.InvokeAsync(Value);
-  //   }
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    base.OnAfterRenderAsync(firstRender);
 
-  //   base.OnAfterRenderAsync(firstRender);
-  // }
+    if (firstRender)
+    {
+      if (Value?.ResourceOwnerType == ResourceOwnerType.User && !string.IsNullOrWhiteSpace(Value?.ResourceOwnerId))
+      {
+        var user = await _client.GetUserEndpointAsync(Value.ResourceOwnerId, CancellationToken.None);
+        _selectedUser = user;
+      }
+      else if (Value?.ResourceOwnerType == ResourceOwnerType.Role && !string.IsNullOrWhiteSpace(Value?.ResourceOwnerId))
+      {
+        var role = await _client.GetRoleByIdEndpointAsync(Value.ResourceOwnerId, CancellationToken.None);
+        _selectedRole = role;
+      }
+      StateHasChanged();
+      await ValueChanged.InvokeAsync(Value);
+    }
+
+  }
 
 
   private async Task<List<UserDetail>> LoadUsersAsync(string keyword, CancellationToken cancellationToken)
   {
     if (_users.Count == 0)
     {
-  var result = await _client.GetUsersListEndpointAsync(cancellationToken);
-  _users = result.ToList();
+      var result = await _client.GetUsersListEndpointAsync(cancellationToken);
+      _users = result.ToList();
     }
     if (!string.IsNullOrWhiteSpace(keyword))
-  return _users.Where(e =>
-      e.Email.Contains(keyword, StringComparison.OrdinalIgnoreCase)
-      || $"{e.FirstName} {e.LastName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
-      || $"{e.LastName} {e.FirstName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
-  ).ToList();
+      return _users.Where(e =>
+          e.Email.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+          || $"{e.FirstName} {e.LastName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
+          || $"{e.LastName} {e.FirstName}".Contains(keyword, StringComparison.OrdinalIgnoreCase)
+      ).ToList();
     return _users;
   }
   private async Task<List<RoleDto>> LoadRolesAsync(string keyword, CancellationToken cancellationToken)
   {
     if (_roles.Count == 0)
     {
-  var result = await _client.GetRolesEndpointAsync(cancellationToken);
-  _roles = result.ToList();
+    var result = await _client.GetRolesEndpointAsync(cancellationToken);
+    _roles = result.ToList();
     }
 
     if (!string.IsNullOrWhiteSpace(keyword))

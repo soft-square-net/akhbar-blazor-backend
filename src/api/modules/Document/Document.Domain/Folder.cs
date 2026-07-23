@@ -3,6 +3,7 @@ using FSH.Framework.Core.Domain.Contracts;
 using FSH.Framework.Core.Storage.File;
 using FSH.Starter.WebApi.Document.Domain.Events;
 using Shared.Enums;
+using System.Text.Json.Serialization;
 
 namespace FSH.Starter.WebApi.Document.Domain;
 public class Folder : AuditableEntity
@@ -19,6 +20,7 @@ public class Folder : AuditableEntity
     public Guid BucketId { get; private set; }
     public Guid? ParentId { get; private set; }
 
+    [JsonIgnore]
     public Bucket Bucket { get; private set; }
     public Folder? Parent { get; private set; }
     public IReadOnlyList<Folder> Children  =>  _Children.ToList();
