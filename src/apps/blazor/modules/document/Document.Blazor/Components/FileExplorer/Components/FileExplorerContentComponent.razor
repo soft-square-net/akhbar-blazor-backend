@@ -7,7 +7,7 @@
 @using Nextended.Core.Helper
 
 @* <MudAlert Severity="Severity.Info" Elevation="0" Class="mb-3">@(_themePreference != null ? (_themePreference.IsDarkMode ? "Dark Mode" : "Light Mode") : "Unknown")</MudAlert>*@
-<MudStack  AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" >
+@* <MudStack  AlignItems="AlignItems.Start" JustifyContent="SpaceBetween" >
   
   <MudToolBar Dense="true" Class="px-0 align-self-start">
     <MudIconButton OnClick="ToggleFileBrowserTree" Class="ms-0" Icon="@Icons.Material.Rounded.Notes" 
@@ -56,9 +56,9 @@
       </MudMenu>
     </MudToolBar>
   </MudStack>
-</MudStack>
+</MudStack> 
 
-<MudDivider Class="mb-3" />
+<MudDivider Class="mb-3" />*@
 
 <Explorer ExplorerType="EnumExplorerType.DefaultExplorer" />
 
@@ -86,13 +86,13 @@
   // [Inject] IClientPreferenceManager ClientPreferences { get; set; } = default!;
 
   private ClientPreference? _themePreference;
-  bool _isFolersTreeOpen { get; set; } = true;
-  public void ToggleFileBrowserTree()
-  {
-    _isFolersTreeOpen = !_isFolersTreeOpen;
-    // OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
-    StateService.NotifyFileBrowserTreeToogled(_isFolersTreeOpen);
-  }
+  // bool _isFolersTreeOpen { get; set; } = true;
+  // public void ToggleFileBrowserTree()
+  // {
+  //   _isFolersTreeOpen = !_isFolersTreeOpen;
+  //   // OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
+  //   StateService.NotifyFileBrowserTreeToogled(_isFolersTreeOpen);
+  // }
   protected override async Task OnInitializedAsync()
   {
     _themePreference = await ClientPreferences.GetPreference() as ClientPreference;

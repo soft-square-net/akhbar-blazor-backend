@@ -4,9 +4,11 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 @implements System.IDisposable
 
-
+<div class="tree-container" style="height:100%; display:flex; flex-direction:column;">
 <MudTreeView Dense @ref="FoldersTreeView" T="FolderModel" Items="_treeItems" Hover AutoExpand="@AutoExpand"
              ReadOnly="false"
+             Class="mud-width-full mud-height-full"
+             Style="overflow-inline:scroll;flex:1; min-height:0; width:100%; overflow:auto;"
              SelectedValue="@SelectedTreeItemData">
   @*              Expanded="@context.Value.IsExpanded" *@
   <ItemTemplate Context="TItem">
@@ -32,7 +34,7 @@
                          @onmousedown:stopPropagation="true" />
         </div> *@
         <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
-          <MudText Style="justify-self: start;">@TItem.Text</MudText>
+          <MudText Style="justify-self: start;text-wrap:nowrap;text-wrap-mode:nowrap;">@TItem.Text</MudText>
           <div style="justify-self: end;">
             <MudIconButton Icon="@Icons.Material.Outlined.Refresh" Size="Size.Medium" Color="Color.Inherit" OnClick="@(async () => await OnEndIconClick(TItem))"
                            @onmousedown:stopPropagation="true" />
@@ -43,13 +45,13 @@
 
   </ItemTemplate>
 </MudTreeView>
-
-@if (CurrentFolder != null)
+</div>
+@* @if (CurrentFolder != null)
 {
   <MudText Typo="Typo.body1" Class="mt-4">
     Selected: <b>@CurrentFolder.Path</b>
   </MudText>
-}
+} *@
 
 @code {
   public MudTreeView<FolderModel> FoldersTreeView;

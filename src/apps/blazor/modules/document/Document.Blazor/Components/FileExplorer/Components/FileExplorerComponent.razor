@@ -1,3 +1,4 @@
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
@@ -8,22 +9,163 @@
 <CascadingValue Value="@Folders" Name="Folders">
   <CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
 
-  <MudPaper Style="overflow:hidden; position:relative;min-height:500px;">
-    <MudDrawerContainer Class="mud-height-full">
-      <MudDrawer Open="@_open" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
-        <MudPaper Outlined="false" Elevation="0">
-          @* <FileExplorerFoldersListComponent OnFolderUpdated="OnFolderUpdated" OnFolderSelected="OnFolderSelected" /> *@
-          <FileExplorerFoldersListComponent  />
-        </MudPaper>
-      </MudDrawer>
-      <MudPaper Class="pa-1 mt-1" Style="height:calc(100% - 0px);" Elevation="0">
-        @* <FileExplorerContentComponent OnFolderUpdated="OnFolderUpdated" OnToggleFileBrowserTree="ToggleFileBrowserTree" /> *@
-        <FileExplorerContentComponent  />
-      </MudPaper>
-    </MudDrawerContainer>
-  </MudPaper>
-  @* </MudGrid> *@
-</CascadingValue>
+    <MudPaper Style="overflow:hidden; position:relative;min-height:500px;" Elevation="8">
+      <MudItem xs="12" md="12">
+        <MudStack Spacing="0">
+          <MudToolBar Dense="true" Class="mx-0 ps-2 pe-0" Style="border: 1px solid var(--mud-palette-divider); background-color: var(--mud-palette-background-grey);width:100%;">
+            <!-- 4 Navigation Icons -->
+            <MudIconButton Class="me-6" Icon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
+            <MudIconButton Class="me-6" Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+            <MudIconButton Class="me-6" Icon="@Icons.Material.Filled.ArrowUpward" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" />
+
+            <!-- Path / Address Bar (Expands dynamically) -->
+            <div class="flex-grow-1 mx-4">
+              <div class="mud-input-slot mud-input-root-outlined mud-input-root-adorned-end" style="margin:4px;padding:0;color: currentcolor;border-color: currentcolor;-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                <ExplorerAddressBreadcrumbs CurrentPath="@CurrentFolder.Path" CurrentPathChanged="OnCurrentPathChanged" />
+              </div>
+            </div>
+
+            <!-- Search Bar (Fixed structural width) -->
+            <div style="width: 290px; min-width: 150px;">
+              <MudTextField T="string" IconSize="Size.Small" Typo="Typo.caption"
+                            @bind-Value="Search" Placeholder="Search..."
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense"
+                            Adornment="Adornment.End"
+                            AdornmentIcon="@Icons.Material.Filled.Search"
+                            FullWidth="true"
+                            Style="margin-inline-end:0.5rem;" />
+            </div>
+          </MudToolBar>
+          <MudToolBar Dense="true" Class="mx-0 ps-2 pe-0" Style="border: 1px solid var(--mud-palette-divider); background-color: var(--mud-palette-background-grey);width:100%;z-index: 1250; overflow: visible;">
+            @*-------------------- New Menu --------------------- *@
+            <MudMenu PopoverClass="no-shadow-menu" Class="file-explorer-icon-highlited" Label="New" Dense="true" Size="Size.Small" Variant="Variant.Text" StartIcon="@FileExplorerIcons.NewItemInside" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Style="color:var(--mud-palette-primary);text-transform:none">
+              <MudMenuItem Label="Create New Folder">
+                <div class="d-flex align-center">
+                  <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder"
+                           Style="@($"color: {"#ff9800"};padding-right:6px;")" />
+                  <MudText>Create New Folder</MudText>
+                </div>
+              </MudMenuItem>
+              <MudMenuItem Label="Item 3" />
+            </MudMenu>
+            <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Cut" />
+            <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Copy" />
+            <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Past" />
+            <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.RenameFolder" />
+            <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Share" />
+            <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Delete" />
+            <MudMenu PopoverClass="no-shadow-menu" Class="file-explorer-icon-highlited" Label="Sort" Dense="true" Size="Size.Small" Variant="Variant.Text" StartIcon="@FileExplorerIcons.SortingASC" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Style="color:var(--mud-palette-primary);text-transform:none">
+              <MudMenuItem Label="Create New Folder">
+                <div class="d-flex align-center">
+                  <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder"
+                           Style="@($"color: {"#ff9800"};padding-right:6px;")" />
+                  <MudText>Create New Folder</MudText>
+                </div>
+              </MudMenuItem><MudMenuItem Label="Item 3" />
+            </MudMenu>
+            <MudMenu PopoverClass="no-shadow-menu" Class="file-explorer-icon-highlited" Label="View" Dense="true" Size="Size.Small" Variant="Variant.Text" StartIcon="@FileExplorerIcons.View" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Style="color:var(--mud-palette-primary);text-transform:none">
+              <MudMenuItem Label="Create New Folder">
+                <div class="d-flex align-center">
+                  <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder"
+                           Style="@($"color: {"#ff9800"};padding-right:6px;")" />
+                  <MudText>Create New Folder</MudText>
+                </div>
+              </MudMenuItem>
+              <MudMenuItem Label="Item 3" />
+            </MudMenu>
+            <MudButton Class="action-icon-button" Variant="Variant.Text" StartIcon="@FileExplorerIcons.CompressFolder" Color="Color.Info" Size="Size.Small" Style="text-transform:none">Extract all</MudButton>
+
+              
+            <MudMenu PopoverClass="no-shadow-menu" Class="file-explorer-icon-highlited" AriaLabel="More" Dense="true" Size="Size.Small" Variant="Variant.Text" Icon="@Icons.Material.Filled.MoreHoriz" Style="color:var(--mud-palette-primary);">
+              <MudMenuItem Label="Create New Folder">
+                <div class="d-flex align-center">
+                  <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder"
+                           Style="@($"color: {"#ff9800"};padding-right:6px;")" />
+                  <MudText>Create New Folder</MudText>
+                </div>
+              </MudMenuItem>
+              <MudMenuItem Label="Item 3" />
+            </MudMenu>
+
+            <MudSpacer />
+
+            <MudButton OnClick="ToggleFoldersTree" Class="action-icon-button" Variant="Variant.Text" StartIcon="@FileExplorerIcons.Folders.ThisPc" Color="Color.Info" Size="Size.Medium" Style="text-transform:none">Details</MudButton>
+
+          </MudToolBar>
+        </MudStack>
+      </MudItem>
+      <MudItem xs="12" md="12" >
+
+        @* ////////////////////////////////////////////////////////////////// *@
+        <MudSplitPanel @ref="_splitPanel"
+                       Class="mud-width-full"
+                       Style="display:flex;"
+                       Horizontal="_horizontal"
+                       ResetOnDoubleClick="_resetOnDoubleClick"
+                       Rounded="_rounded"
+                       ClassFirstPanel="first-panel-wrapper"
+                       FirstPanelInitialSize="250"
+                       MinPanelSize="100"
+                       UseAsOverlay="false"
+                       Transparent="_transparent"
+                       Elevation="@(_elevation ? 0 : 0)">
+          <FirstPanel>
+            <MudStack Style=" display:flex;flex: 1 0 auto;height:100%" Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full ">
+              <MudPaper class="pa-2 mt-0 mx-1 ms-4 panel-inner-shadow mud-width-full mud-height-full"  Elevation="0">
+                @* <FileExplorerFoldersListComponent OnFolderUpdated="OnFolderUpdated" OnFolderSelected="OnFolderSelected" /> *@
+                <FileExplorerFoldersListComponent />
+              </MudPaper>
+            </MudStack>
+          </FirstPanel>
+          <SecondPanel>
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full mud-height-full" >
+              <MudDrawerContainer Class="mt-0 pe-3 mud-width-full mud-height-full">
+                <MudDrawer Open="@_open" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
+
+                </MudDrawer>
+                <MudPaper Class="pa-2 mt-0 mx-1 panel-inner-shadow mud-width-full mud-height-full" Elevation="0" Style="min-height:60vh !important;">
+                  @* <FileExplorerContentComponent OnFolderUpdated="OnFolderUpdated" OnToggleFileBrowserTree="ToggleFileBrowserTree" /> *@
+                  <InlineCreateFolder></InlineCreateFolder>
+                  <FileExplorerContentComponent />
+                </MudPaper>
+
+            
+              </MudDrawerContainer>
+
+            </MudStack>
+          </SecondPanel>
+        </MudSplitPanel>
+
+        @* ////////////////////////////////////////////////////////////////// *@
+
+        @* <MudButtonGroup Variant="Variant.Filled">
+          <MudTooltip Text="Toggle orientation">
+            <MudToggleIconButton @bind-Toggled="_horizontal" Icon="@Icons.Material.Outlined.Pause" ToggledIcon="@Icons.Material.Outlined.DragHandle" ToggledColor="@Color.Info" />
+          </MudTooltip>
+          <MudTooltip Text="Reset on double click">
+            <MudToggleIconButton @bind-Toggled="_resetOnDoubleClick" Icon="@Icons.Material.Outlined.RestartAlt" ToggledColor="@Color.Info" />
+          </MudTooltip>
+          <MudTooltip Text="Rounded">
+            <MudToggleIconButton @bind-Toggled="_rounded" Icon="@Icons.Material.Outlined.RoundedCorner" ToggledColor="@Color.Info" />
+          </MudTooltip>
+          <MudTooltip Text="Elevation">
+            <MudToggleIconButton @bind-Toggled="_elevation" Icon="@Icons.Material.Outlined.Landscape" ToggledColor="@Color.Info" />
+          </MudTooltip>
+          <MudTooltip Text="Transparent">
+            <MudToggleIconButton @bind-Toggled="_transparent" Icon="@Icons.Material.Outlined.Visibility" ToggledColor="@Color.Info" />
+          </MudTooltip>
+          <MudTooltip Text="Reset sizes">
+            <MudIconButton OnClick="@_splitPanel.ResetDividerPositionAsync" Icon="@Icons.Material.Outlined.Replay" Variant="Variant.Filled" />
+          </MudTooltip>
+        </MudButtonGroup> *@
+
+        @* ////////////////////////////////////////////////////////////////// *@
+
+      </MudItem>
+    </MudPaper>
+  </CascadingValue>
 </CascadingValue>
 
 @code {
@@ -35,19 +177,38 @@
   private List<FolderModel> Folders { get; set; } = new();
   private FolderModel CurrentFolder { get; set; }//=> _currentFolder ??= Folders.First();
   // private FolderModel? _currentFolder;
-  private bool _open = true;
+  private string Search = string.Empty;
+  public string SelectedFolder = string.Empty;
+  private bool _open = false;
 
+  //////////////// MudSpliter
+  private MudSplitPanel _splitPanel;
+  private bool _horizontal;
+  private bool _resetOnDoubleClick = true;
+  private bool _rounded = true;
+  private bool _elevation = true;
+  private bool _transparent;
+
+
+  
   private void ToggleFileBrowserTree(bool opened)
   {
     _open = opened;
     StateHasChanged();
     // StateService.NotifyStateChanged();
   }
+  bool _isFolersTreeOpen { get; set; } = true;
+  public void ToggleFoldersTree()
+  {
+    _isFolersTreeOpen = !_isFolersTreeOpen;
+    // OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
+    StateService.NotifyFileBrowserTreeToogled(_isFolersTreeOpen);
+  }
   protected override void OnInitialized()
   {
-    
 
-    var root = new FolderModel(Guid.NewGuid(),$"Root", new[] {
+
+    var root = new FolderModel(Guid.NewGuid(), $"Root", new[] {
                     new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
                     new FileModel(Guid.NewGuid(), $"door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
                     new FileModel(Guid.NewGuid(), $"iceland.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
@@ -63,7 +224,7 @@
                     new FileModel(Guid.NewGuid(), $"document_05.accdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
                     new FileModel(Guid.NewGuid(), $"Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
         },
-       new[] {
+           new[] {
                 new FolderModel(Guid.NewGuid(), "Projects", new[] {
                             new FileModel(Guid.NewGuid(), "project1.png", 512_000, DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-10)),
                             new FileModel(Guid.NewGuid(), "project2.png", 768_000, DateTime.Now.AddDays(-12), DateTime.Now.AddDays(-8))
@@ -80,9 +241,9 @@
                             new FileModel(Guid.NewGuid(), "voice.wav", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
                             new FileModel(Guid.NewGuid(), "video.mp4", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
                         }){Path = $"{Constants._content}/music" , AllowedExtensions="mp3,mp4" }
-       }
+           }
 
-    )
+        )
     { Path = $"{Constants._content}/img/" };
 
     Folders.Add(root);
@@ -114,7 +275,7 @@
 
     }
   }
-  
+
   void OnFolderSelected(FolderModel folder)
   {
     // _currentFolder = folder;
@@ -154,7 +315,7 @@
   {
     // Folders = updatedFolders.ToList();
     CurrentFolder = folder;
-    StateHasChanged(); 
+    StateHasChanged();
     // Ensure current folder reference is updated
     // _currentFolder = Folders.FirstOrDefault(f => f.Name == CurrentFolder.Name) ?? Folders.First();
     await InvokeAsync(StateHasChanged);
@@ -166,12 +327,48 @@
     StateService.OnCurrentFolderChanged -= HandleOnCurrentFolderChanged;
     StateService.OnToggleFileBrowserTree -= ToggleFileBrowserTree;
   }
+
+  private async Task OnCurrentPathChanged()
+  {
+    // Try to Query the Folder Api to get the folder with the exact Path
+    // set the CurrentFolder to the returned folder from the Query
+    await InvokeAsync(StateHasChanged);
+  }
 }
 
 <style>
   :root {
+    --file-explorer-Icon-text-color: var(--mud-palette-text-primary);
     --file-explorer-breadcrumb-height: 3.5rem;
+    --mud-elevation-8 = var(--mud-elevation-2);
     --inner-shadow: inset 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  }
+  /* This completely forces any element with mud-elevation-8 inside your menu to lose its shadow */
+  .no-shadow-menu .mud-elevation-8,
+  .no-shadow-menu.mud-elevation-8 {
+    box-shadow: none !important;
+  }
+
+  .file-explorer-icon-highlited .mud-button-label {
+    text-transform: none !important;
+  }
+
+    .file-explorer-icon-highlited .mud-button-label .mud-button-icon-start svg {
+      color: var(--mud-palette-primary);
+    }
+
+  .file-explorer-icon-highlited .mud-popover {
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .action-icon-button {
+    padding: 6px 12px;
+    color: var(--mud-palette-primary);
+  }
+
+  .action-icon-button {
+    padding: 6px 12px;
+    color: var(--mud-palette-primary);
   }
 
   .truncate {
@@ -179,5 +376,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .panel-inner-shadow{
+    box-shadow: inset 0px 3px 5px -1px rgba(0,0,0,0.2), inset 0px 5px 8px 0px rgba(0,0,0,0.14), inset 0px 1px 14px 0px rgba(0,0,0,0.12);
+  }
+  .first-panel-wrapper{
+      height: unset !important;
   }
 </style>

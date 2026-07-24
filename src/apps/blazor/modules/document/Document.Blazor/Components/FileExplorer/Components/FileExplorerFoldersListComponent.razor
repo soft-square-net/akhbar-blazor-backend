@@ -1,19 +1,13 @@
-  @using MudBlazor
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
-
-
-<MudTextField T="string" IconSize="Size.Small"  Typo="Typo.caption" @bind-Value="Search" Label="Search"
-    Variant="Variant.Text" Margin="Margin.Dense" Adornment=" Adornment.End"
-    AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Secondary" />
 
 <MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list">
     @* <FileExplorerFoldersTreeView OnFolderUpdated="HandleFolderUpdated" OnNodeSelected="HandleNodeSelected"/> *@
     <FileExplorerFoldersTreeView  />
 </MudList>
-
+@* 
 <MudPaper Width="100%" Elevation="0" Class="border-0 file-explorer-folders-list">
-</MudPaper>
+</MudPaper> *@
 
 @code{
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
@@ -21,8 +15,7 @@
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
   // [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
   // [Parameter] public EventCallback<FolderModel> OnFolderSelected { get; set; }
-  private string Search = string.Empty;
-  public string SelectedFolder = string.Empty;
+
   public bool ReadOnly = false;
   public SelectionMode SelectionMode = SelectionMode.SingleSelection;
 
