@@ -9,8 +9,11 @@
 <CascadingValue Value="@Folders" Name="Folders">
   <CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
 
-    <MudPaper Style="overflow:hidden; position:relative;min-height:500px;" Elevation="8">
-      <MudItem xs="12" md="12">
+    @* <MudPaper Style="overflow:hidden; position:relative;min-height:500px;" Elevation="8"> *@
+    <div style="display: flex; flex-direction: column; height: 100vh;min-height: 100vh;">
+
+      <!-- Item 1: Auto Height -->
+      <div style="flex: 0 1 auto;">
         <MudStack Spacing="0">
           <MudToolBar Dense="true" Class="mx-0 ps-2 pe-0" Style="border: 1px solid var(--mud-palette-divider); background-color: var(--mud-palette-background-grey);width:100%;">
             <!-- 4 Navigation Icons -->
@@ -41,14 +44,16 @@
           <MudToolBar Dense="true" Class="mx-0 ps-2 pe-0" Style="border: 1px solid var(--mud-palette-divider); background-color: var(--mud-palette-background-grey);width:100%;z-index: 1250; overflow: visible;">
             @*-------------------- New Menu --------------------- *@
             <MudMenu PopoverClass="no-shadow-menu" Class="file-explorer-icon-highlited" Label="New" Dense="true" Size="Size.Small" Variant="Variant.Text" StartIcon="@FileExplorerIcons.NewItemInside" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Style="color:var(--mud-palette-primary);text-transform:none">
-              <MudMenuItem Label="Create New Folder">
+              @*  <MudMenuItem Label="Create New Folder">
                 <div class="d-flex align-center">
                   <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder"
                            Style="@($"color: {"#ff9800"};padding-right:6px;")" />
                   <MudText>Create New Folder</MudText>
                 </div>
-              </MudMenuItem>
-              <MudMenuItem Label="Item 3" />
+              </MudMenuItem> *@
+              <MudMenuItem Label="Create New Folder" Icon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Warning" />
+
+              <MudMenuItem Label="Upload File" Icon="@Icons.Material.Filled.Upload" IconColor="Color.Warning" />
             </MudMenu>
             <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Cut" />
             <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Copy" />
@@ -95,17 +100,21 @@
 
           </MudToolBar>
         </MudStack>
-      </MudItem>
-      <MudItem xs="12" md="12" >
+
+      </div>
+
+      <!-- Item 2: Takes the remaining height -->
+      <div style="flex: 1 1 auto; overflow-y: scroll;">
 
         @* ////////////////////////////////////////////////////////////////// *@
         <MudSplitPanel @ref="_splitPanel"
+                       ClassDivider="mud-spliter-divider"
                        Class="mud-width-full"
                        Style="display:flex;"
                        Horizontal="_horizontal"
                        ResetOnDoubleClick="_resetOnDoubleClick"
                        Rounded="_rounded"
-                       ClassFirstPanel="first-panel-wrapper"
+                       ClassFirstPanel="first-panel-wrapper d-flex"
                        FirstPanelInitialSize="250"
                        MinPanelSize="100"
                        UseAsOverlay="false"
@@ -113,31 +122,33 @@
                        Elevation="@(_elevation ? 0 : 0)">
           <FirstPanel>
             <MudStack Style=" display:flex;flex: 1 0 auto;height:100%" Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full ">
-              <MudPaper class="pa-2 mt-0 mx-1 ms-4 panel-inner-shadow mud-width-full mud-height-full"  Elevation="0">
+              <MudPaper class="py-2 pe-2 mt-0 mb-0 ms-4  panel-inner-shadow mud-width-full mud-height-full" Elevation="0">
                 @* <FileExplorerFoldersListComponent OnFolderUpdated="OnFolderUpdated" OnFolderSelected="OnFolderSelected" /> *@
                 <FileExplorerFoldersListComponent />
               </MudPaper>
             </MudStack>
           </FirstPanel>
           <SecondPanel>
-            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full mud-height-full" >
-              <MudDrawerContainer Class="mt-0 pe-3 mud-width-full mud-height-full">
-                <MudDrawer Open="@_open" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
+            @*<MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full mud-height-full"> *@
+            <MudPaper Style="height:100%; position:relative; overflow:hidden;" Square="true">
+
+              <MudDrawerContainer Style="height: 100%; width: 100%;">
+                <MudDrawer Open="@_open" Fixed="false" Anchor="Anchor.End" Elevation="0" Variant="@DrawerVariant.Persistent" Color="Color.Primary">
 
                 </MudDrawer>
-                <MudPaper Class="pa-2 mt-0 mx-1 panel-inner-shadow mud-width-full mud-height-full" Elevation="0" Style="min-height:60vh !important;">
+                <MudPaper Class="pa-4 mt-0 mb-0 mx-0 panel-inner-shadow " Elevation="0" Style="min-height:60vh !important;height:60vh !important;max-height:60vh !important;overflow:scroll;">
                   @* <FileExplorerContentComponent OnFolderUpdated="OnFolderUpdated" OnToggleFileBrowserTree="ToggleFileBrowserTree" /> *@
                   <InlineCreateFolder></InlineCreateFolder>
-                  <FileExplorerContentComponent />
+                  <FileExplorerContentComponent /> 
                 </MudPaper>
 
             
               </MudDrawerContainer>
-
-            </MudStack>
+              </MudPaper>
+            @* </MudStack> *@
           </SecondPanel>
         </MudSplitPanel>
-
+      </div>
         @* ////////////////////////////////////////////////////////////////// *@
 
         @* <MudButtonGroup Variant="Variant.Filled">
@@ -163,10 +174,11 @@
 
         @* ////////////////////////////////////////////////////////////////// *@
 
-      </MudItem>
-    </MudPaper>
+        @* </MudPaper> *@
+      </div>
+
+    </CascadingValue>
   </CascadingValue>
-</CascadingValue>
 
 @code {
   //[Inject] ISnackbar Snackbar { get; set; } = default!;
@@ -377,10 +389,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .panel-inner-shadow{
+
+  .panel-inner-shadow {
     box-shadow: inset 0px 3px 5px -1px rgba(0,0,0,0.2), inset 0px 5px 8px 0px rgba(0,0,0,0.14), inset 0px 1px 14px 0px rgba(0,0,0,0.12);
   }
-  .first-panel-wrapper{
-      height: unset !important;
+
+  .first-panel-wrapper {
+    height: unset !important;
+  }
+
+  .mud-spliter-divider {
+    background-color: var(--mud-palette-background) !important;
+  }
+
+    .mud-spliter-divider:hover {
+      background-color: var(--mud-palette-primary) !important;
+    }
+
+  .mud-split-panel-first {
+    max-width: 500px !important;
   }
 </style>

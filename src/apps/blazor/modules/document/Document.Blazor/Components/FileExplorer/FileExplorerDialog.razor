@@ -5,19 +5,19 @@
 <PageTitle>Document List</PageTitle>
 
 @* <MudText Typo="Typo.h4" Class="mb-4">File Manager</MudText> *@
-<MudDialogResizable Style="height:900px; width:1200px"  Class="blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface" ActionsClass="dialog-background-surface">
+<MudDialogResizable Style="height:900px; width:1200px"  Class="explorer-dialog blur dialog-background" TitleClass="blur dialog-background-title" ContentClass="dialog-background-surface" ActionsClass="dialog-background-surface">
   <TitleContent>
     @* Use MudBlazor components for a custom look and layout *@
-    <MudToolBar>
-      <MudIconButton Icon="@Icons.Material.Outlined.Menu" Size="Size.Medium" Color="Color.Inherit" Class="mr-5" />
-      <MudIconButton Icon="@Icons.Material.Outlined.Add" />
-      <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
-      <MudIconButton Icon="@Icons.Material.Outlined.Remove" />
-      <MudSpacer />
-      <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
-      <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
-      <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
-      <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="Cancel" Color="Color.Inherit" />
+    <MudToolBar Dense>
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.Add" />
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.Edit" />
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.Remove" />
+      <MudSpacer />  
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.Notifications" />
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.PeopleAlt" />
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+      <MudIconButton Size="Size.Small"  Icon="@Icons.Material.Filled.Close" OnClick="Cancel" Color="Color.Inherit" />
     </MudToolBar>
   </TitleContent>
   <DialogContent>
@@ -32,28 +32,29 @@
 
 <style>
   .dialog-background{
-    background-color: black;
+    background-color: var(--mud-palette-background);
     opacity: 0.9;
   }
-  .mud-dialog .mud-dialog-content {
-    padding: 0 6px;
+  .mud-dialog.explorer-dialog.mud-dialog-content {
+    /* padding: 0 6px; */
   }
-  .mud-dialog .mud-dialog-title {
+
+  .explorer-dialog .mud-dialog-title {
     padding: 0;
   }
 
-  .mud-toolbar.mud-toolbar-gutters {
+  /* .mud-toolbar.mud-toolbar-gutters {
     padding-left: 5px;
     padding-right: 5px;
     --mud-internal-toolbar-height: 32px;
-  }
+  } */
 
   .mud-toolbar-gutters .mud-icon-button {
     border-radius: 0;
   }
 
   .mud-toolbar-gutters .mud-icon-button:hover {
-    background-color: red;
+    background-color: var(--mud-palette-secondary);
     color: white;
   }
 
