@@ -5,46 +5,45 @@
 @implements System.IDisposable
 
 <div class="tree-container" style="height:100%; display:flex; flex-direction:column;">
-<MudTreeView Dense @ref="FoldersTreeView" T="FolderModel" Items="_treeItems" Hover AutoExpand="@AutoExpand"
-             ReadOnly="false"
-             Class="mud-width-full mud-height-full"
-             Style="overflow-inline:scroll;flex:1; min-height:0; width:100%; overflow:auto;"
-             SelectedValue="@SelectedTreeItemData">
-  @*              Expanded="@context.Value.IsExpanded" *@
-  <ItemTemplate Context="TItem">
-    <MudTreeViewItem T="FolderModel" Text="@(TItem.Text)"
-                     Expanded="@TItem.Value.IsExpanded"
-                     SelectedChanged="@((bool selected) => HandleSelectedChanged(selected, TItem))"
-                     ExpandedChanged="@((bool isExpanded) => OnExpandedChanged(isExpanded, TItem))"
-                     Value="@TItem.Value"
-                     Items="@TItem.Children"
-                     Icon="@(TItem.Value != null?GetIcon(TItem):null)"
-                     IconExpanded="@Icons.Custom.Uncategorized.FolderOpen"
-                     EndIcon="@Icons.Material.Outlined.Refresh"
-                     EndIconColor="Color.Secondary" >
-      <BodyContent>
+  <MudTreeView T="FolderModel" Dense @ref="FoldersTreeView" Items="_treeItems" Hover AutoExpand="@AutoExpand"
+               ReadOnly="false"
+               Class="mud-width-full mud-height-full"
+               Style="overflow-inline:scroll;flex:1; min-height:0; width:100%; overflow:auto;"
+               SelectedValue="@SelectedTreeItemData">
+    @*              Expanded="@context.Value.IsExpanded" *@
+    <ItemTemplate Context="TItem">
+      <MudTreeViewItem T="FolderModel" Text="@(TItem.Text)"
+                       Expanded="@TItem.Value.IsExpanded"
+                       SelectedChanged="@((bool selected) => HandleSelectedChanged(selected, TItem))"
+                       ExpandedChanged="@((bool isExpanded) => OnExpandedChanged(isExpanded, TItem))"
+                       Value="@TItem.Value"
+                       Items="@TItem.Children"
+                       Icon="@(TItem.Value != null?GetIcon(TItem):null)"
+                       IconExpanded="@Icons.Custom.Uncategorized.FolderOpen"
+                       EndIconColor="Color.Secondary">
+        <BodyContent>
 
-        @* <div class="d-flex align-center flex-grow-1">
+          @* <div class="d-flex align-center flex-grow-1">
           <span class="mud-tree-view-item-content-text">@TItem.Text</span>
 
           <MudSpacer />
 
-          <MudIconButton Icon="@Icons.Material.Outlined.Refresh" 
+          <MudIconButton Icon="@Icons.Material.Outlined.Refresh"
                          OnClick="@(async () => await OnEndIconClick(TItem))"
                          @onmousedown:stopPropagation="true" />
         </div> *@
-        <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
-          <MudText Style="justify-self: start;text-wrap:nowrap;text-wrap-mode:nowrap;">@TItem.Text</MudText>
-          <div style="justify-self: end;">
-            <MudIconButton Icon="@Icons.Material.Outlined.Refresh" Size="Size.Medium" Color="Color.Inherit" OnClick="@(async () => await OnEndIconClick(TItem))"
-                           @onmousedown:stopPropagation="true" />
+          <div class="folder-tree-view-item" style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
+            <MudText Style="justify-self: start;text-wrap:nowrap;text-wrap-mode:nowrap;">@TItem.Text</MudText>
+            <div style="justify-self: end;">
+              <MudIconButton Class="folder-tree-view-btn-refresh" Icon="@Icons.Material.Outlined.Refresh" Size="Size.Medium" Color="Color.Inherit" OnClick="@(async () => await OnEndIconClick(TItem))"
+                             @onmousedown:stopPropagation="true" />
+            </div>
           </div>
-        </div>
-      </BodyContent>
-    </MudTreeViewItem>
+        </BodyContent>
+      </MudTreeViewItem>
 
-  </ItemTemplate>
-</MudTreeView>
+    </ItemTemplate>
+  </MudTreeView>
 </div>
 @* @if (CurrentFolder != null)
 {
@@ -56,7 +55,7 @@
 @code {
   public MudTreeView<FolderModel> FoldersTreeView;
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
-
+  [CascadingParameter(Name = "InstanceId")] public required Guid InstanceId { get; init; }
   [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
 
@@ -102,6 +101,7 @@
   {
     if (firstRender)
     {
+      DetatchActions();
       StateService.OnCurrentFolderChanged += HandleOnCurrentFolderChanged;
       StateService.OnFolderUpdated += HandleOnFolderUpdated;
       StateService.OnFolderCreated += HandleOnFolderCreated;
@@ -157,8 +157,9 @@
     SelectedTreeItemData = matchedNode?.Value;
   }
 
-  private async Task HandleOnFolderCreated(FolderModel folder)
+  private async Task HandleOnFolderCreated(Guid instanceId, FolderModel folder)
   {
+    if (instanceId != InstanceId) return;
     // ensure the component re-renders on the UI thread
 
 
@@ -199,12 +200,17 @@
   }
 
   // Ensure the Blazor runtime calls this when the component is removed
-  public void Dispose()
+  public void DetatchActions()
   {
     StateService.OnCurrentFolderChanged -= HandleOnCurrentFolderChanged;
     StateService.OnFolderUpdated -= HandleOnFolderUpdated;
     StateService.OnFolderCreated -= HandleOnFolderCreated;
     StateService.OnFolderSelectionChanged -= HandleOnFolderSelectionChanged;
+    _treeItems = null;
+  }
+  public void Dispose()
+  {
+    DetatchActions();
   }
 
 
@@ -312,3 +318,19 @@
 
 
 }
+
+<style>
+  .folder-tree-view-btn-refresh {
+    display: none;
+    opacity: 0;
+    /* Transition both opacity and display properties */
+    transition: opacity 0.5s ease, display 0.5s ease;
+    /* Crucial: Allows discrete properties like display to transition */
+    transition-behavior: allow-discrete;
+  }
+
+  .folder-tree-view-item:hover .folder-tree-view-btn-refresh {
+    display: block;
+    opacity: 1;
+  }
+</style>

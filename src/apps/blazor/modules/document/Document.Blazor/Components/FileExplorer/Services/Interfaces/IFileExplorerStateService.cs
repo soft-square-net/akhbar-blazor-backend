@@ -12,7 +12,7 @@ public interface IFileExplorerStateService : IDisposable
     public event Func<ICollection<FolderModel>, Task>? OnFoldersChanged;
     public event Func<BaseExplorerItemModel, Task>? OnFolderSelectionChanged;
     public event Func<FolderModel, Task>? OnCurrentFolderChanged;
-    public event Func<FolderModel, Task>? OnFolderCreated;
+    public event Func<Guid, FolderModel, Task>? OnFolderCreated;
     public event Func<FolderModel, Task>? OnFolderDeleted;
     public event Func<FolderModel, Task>? OnFolderUpdated;
     public event Func<FileModel, Task>? OnFileCreated;
@@ -42,7 +42,7 @@ public interface IFileExplorerStateService : IDisposable
     public Task NotifyFolderSelectionChanged(BaseExplorerItemModel item);
     public Task NotifyCurrentFolderChanged(FolderModel folder);
 
-    public Task NotifyFolderCreated(FolderModel folder);
+    public Task NotifyFolderCreated(Guid instanceId, FolderModel folder);
     public Task NotifyFolderDeleted(FolderModel folder);
     public Task NotifyFolderUpdated(FolderModel folder);
     public Task NotifyFileCreated(FileModel file);

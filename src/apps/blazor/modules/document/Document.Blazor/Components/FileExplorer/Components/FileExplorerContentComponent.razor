@@ -67,6 +67,7 @@
 @code {
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
   // [Parameter] public required ICollection<FolderModel> Folders { get; set; }
+  [CascadingParameter(Name = "InstanceId")] public required Guid InstanceId { get; init; }
   [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
 

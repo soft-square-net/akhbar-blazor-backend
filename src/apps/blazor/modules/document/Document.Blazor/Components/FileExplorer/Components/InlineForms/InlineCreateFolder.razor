@@ -2,6 +2,9 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
 @using MudBlazor.Utilities
 @using Nextended.Core.Helper
+
+@implements IDisposable;
+
 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" Class="ms-6">
   @if (!ShowNewFolderInput)
   {
@@ -14,10 +17,10 @@
   }
   else
   {
-@code {
+  @code {
 
-  private bool _shrinkLabel = false;
-
+    private bool _shrinkLabel = false;
+    private bool _isSubscribed = false;
   protected string InputClassname =>
   new CssBuilder("mud-input-slot")
   .AddClass("mud-input-root")
@@ -58,7 +61,7 @@
   @code {
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
   [Inject] IJSRuntime JSRuntime { get; set; } = default!;
-
+  [CascadingParameter(Name = "InstanceId")] public required Guid InstanceId { get; init; }
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
 
   // UI refs & state
@@ -101,7 +104,7 @@
     // CurrentFolder.AddFolder(folder);
     await StateService.NotifySelectionCleared();
 
-    await StateService.NotifyFolderCreated(folder);
+    await StateService.NotifyFolderCreated(InstanceId, folder);
     // await StateService.NotifyFolderUpdated(CurrentFolder);
     // CurrentFolder = folder;
     ShowNewFolderInput = false;
@@ -110,7 +113,7 @@
     StateHasChanged();
   }
 
-  
+
   async Task HandleUpload(ChangeEventArgs e)
   {
     // Using ChangeEventArgs because ElementReference click -> native input change
@@ -118,5 +121,10 @@
     // We'll try to cast: in Blazor wasm you'll likely use InputFile; this minimal handler simulates
     // NOTE: If you prefer InputFile, replace markup to <InputFile OnChange="OnInputFileChange" /> and implement OnInputFileChange(InputFileChangeEventArgs)
     Toast.Add("Files selected (simulate upload). Implement backend upload in HandleUpload.", Severity.Info);
+  }
+
+  public void Dispose()
+  {
+    
   }
 }

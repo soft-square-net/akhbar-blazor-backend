@@ -23,7 +23,7 @@ public class FileExplorerStateService: IFileExplorerStateService
     public event Func<BaseExplorerItemModel, Task>? OnFolderSelectionChanged;
     public event Func<ICollection<BaseExplorerItemModel>, Task>? OnFileExplorerSelectionAdded;
     public event Func<ICollection<BaseExplorerItemModel>, Task>? OnFileExplorerSelectionRemoved;
-    public event Func<FolderModel, Task>? OnFolderCreated;
+    public event Func<Guid,FolderModel, Task>? OnFolderCreated;
     public event Func<FolderModel, Task>? OnFolderDeleted;
     public event Func<FolderModel, Task>? OnFolderUpdated;
     public event Func<FileModel, Task>? OnFileCreated;
@@ -48,7 +48,7 @@ public class FileExplorerStateService: IFileExplorerStateService
     public async Task NotifyFoldersChanged(ICollection<FolderModel> folders) => await OnFoldersChanged?.Invoke(folders);
     public async Task NotifyFolderSelectionChanged(BaseExplorerItemModel item) => await OnFolderSelectionChanged?.Invoke(item);
     public async Task NotifyCurrentFolderChanged(FolderModel folder) => await OnCurrentFolderChanged.Invoke(folder);
-    public async Task NotifyFolderCreated(FolderModel folder) => await OnFolderCreated?.Invoke(folder);
+    public async Task NotifyFolderCreated(Guid instanceId, FolderModel folder) => await OnFolderCreated?.Invoke(instanceId, folder);
     public async Task NotifyFolderDeleted(FolderModel folder) => await OnFolderDeleted?.Invoke(folder);
     public async Task NotifyFolderUpdated(FolderModel folder) => await OnFolderUpdated?.Invoke(folder);
     public async Task NotifyFileCreated(FileModel file) => await OnFileCreated?.Invoke(file);

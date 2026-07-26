@@ -1,7 +1,7 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 
-<MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list">
+<MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list mud-height-full">
     @* <FileExplorerFoldersTreeView OnFolderUpdated="HandleFolderUpdated" OnNodeSelected="HandleNodeSelected"/> *@
     <FileExplorerFoldersTreeView  />
 </MudList>
@@ -11,6 +11,7 @@
 
 @code{
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
+  [CascadingParameter(Name = "InstanceId")] public required Guid InstanceId { get; init; }
   [CascadingParameter(Name = "Folders")] public required List<FolderModel> Folders { get; set; }
   [CascadingParameter(Name = "CurrentFolder")] public FolderModel CurrentFolder { get; set; } = default!;
   // [Parameter] public EventCallback<ICollection<FolderModel>> OnFolderUpdated { get; set; }
