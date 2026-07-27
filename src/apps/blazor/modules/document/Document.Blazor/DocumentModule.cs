@@ -48,7 +48,6 @@ public sealed class DocumentModule : BlazorModuleBase
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
 
-        
         return base.ConfigureModule(services, builder);
     }
 

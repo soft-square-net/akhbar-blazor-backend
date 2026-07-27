@@ -1,0 +1,69 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Menues
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.BlazorShared.Services
+@inject ContextMenuService MenuService
+
+<CascadingValue Value="Loading" Name="Loading">
+  @if (!Loading)
+  {
+    @* <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
+    <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)"      
+    @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
+    @oncontextmenu:preventDefault="true" >
+      @ContentView
+    </div>
+  }
+  else
+  {
+    @SkeletonView
+  }
+
+  <EditMenu @ref="_editMenu"></EditMenu>
+</CascadingValue>
+
+
+
+@code {
+
+  [Parameter] public bool Loading { get; set; }
+  [Parameter] public EventCallback<bool> OnLoadingChanged { get; set; }
+  [Parameter, EditorRequired] public BaseExplorerItemModel Model { get; set; }
+
+
+  [Parameter] public EventCallback<MouseEventArgs> OnContextMenu { get; set; }
+  [Parameter] public RenderFragment? ContentView { get; set; }
+  [Parameter] public RenderFragment? SkeletonView { get; set; }
+
+#nullable enable
+  private EditMenu _editMenu = null;
+
+  private void ShowContextMenu(MouseEventArgs e, BaseExplorerItemModel item)
+  {
+    // Pass mouse coordinates and the data model to the single instance
+    MenuService.Show(e.ClientX, e.ClientY, item);
+  }
+
+  private void CloseContextMenu()
+  {
+    // throw new NotImplementedException();
+  }
+
+  // private async Task OpenContextMenu(MouseEventArgs args)
+  // {
+  //   await _editMenu.OpenContextMenuAsync(args);
+  // }
+
+  // private async Task CloseContextMenu()
+  // {
+  //   await _editMenu.CloseContextMenuAsync();
+  // }
+
+
+}
+
+<style>
+
+  .file-explorer-loading-card {
+    width: 100%
+  }
+</style>

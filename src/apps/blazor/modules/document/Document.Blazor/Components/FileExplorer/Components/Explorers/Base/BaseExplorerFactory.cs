@@ -94,7 +94,7 @@ public abstract class BaseExplorerFactory : IExplorerFilesView, IDisposable
                         // sequence++; // For AddComponentParameter sequence number
                         break;
                 }
-                ;
+                
             }
             foreach (var item in CurrentFolder.Files)
             {

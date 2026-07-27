@@ -8,4 +8,8 @@
 		<AssemblyName>FSH.Starter.Blazor.Shared</AssemblyName>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
+	</ItemGroup>
+
 </Project>

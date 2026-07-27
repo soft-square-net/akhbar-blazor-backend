@@ -4,7 +4,7 @@ using MudBlazor;
 using Nextended.Core.Extensions;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-public class FolderModel: BaseExplorerItemModel, IExplorerFolder
+public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
 {
     public FolderModel(Guid id, string name, FileModel[]? files= null, FolderModel[]? children = null )
     {
@@ -63,8 +63,8 @@ public class FolderModel: BaseExplorerItemModel, IExplorerFolder
         _files.Remove(file);
     }
 
-    public async Task LoadFolders() { }
-    public async Task LoadFiles() { }
+    public async Task LoadFolders() { /* get the folders from the data source */ }
+    public async Task LoadFiles() { /* get the files from the data source */ }
     public async Task<IReadOnlyCollection<BaseExplorerItemModel>> LoadChildren() {
         if (_folders.IsNullOrEmpty()) LoadFolders(); 
         if (_files.IsNullOrEmpty()) LoadFiles(); 

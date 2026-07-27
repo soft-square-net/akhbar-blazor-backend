@@ -45,8 +45,6 @@ public class BaseExplorerItemModel : IExplorerItemModel
     {
 
         _isFolder = true;
-        // StateService.NotifyFileSelectionChanged();
-        // StateService.NotifyStateChanged();
     }
     protected void SetAsFile()
     {

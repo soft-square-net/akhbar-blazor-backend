@@ -65,6 +65,7 @@
   
   <ItemGroup>
     <Folder Include="Components\FileExplorer\Components\Explorers\Views\Tabular\FolderCards\" />
+    <Folder Include="Components\FileExplorer\Components\FileBrowser\Abstractions\" />
     <Folder Include="wwwroot\img\extensions\document\" />
     <Folder Include="wwwroot\img\extensions\audio\" />
     <Folder Include="wwwroot\img\extensions\code\" />

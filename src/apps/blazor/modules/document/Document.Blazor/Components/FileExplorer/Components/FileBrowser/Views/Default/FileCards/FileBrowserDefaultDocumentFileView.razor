@@ -1,0 +1,11 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Base
+
+@inherits BaseFileCard;
+
+<MudImage ObjectPosition="ObjectPosition.Bottom" Class="object-contain" Src="@($"{Constants._content}/img/extensions/document/{Model.Extension.TrimStart('.')}.png")" Width="80" ObjectFit="ObjectFit.Cover" Height="80" Style="object-fit:contain !important" />
+<MudText Typo="Typo.body2" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Model.Name</MudText>
+
+@code {
+
+}

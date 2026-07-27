@@ -1,0 +1,159 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Base
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Default.FileCards
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Default.FolderCards
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Default.Skeletons
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
+@using global::Shared.Enums;
+@inherits ComponentBase
+@inject IFileExplorerStateService StateService
+@implements System.IDisposable
+
+<MudPaper class="default-explorer-file-view d-flex flex-wrap gap-4 justify-start" Elevation="0">
+
+
+@foreach (FolderModel folder in CurrentFolder.Folders)
+{
+    <MudPaper @onclick="() => ToggleSelected(folder)" Width="100px" Class="@($" d-flex {GetSelectClass(folder)}")">
+
+  <LoadingCard Model="@folder">
+    <ContentView>
+      @switch (folder.GetFileType())
+      {
+        case FileType.Audio:
+          <FileBrowserDefaultAudioFolderView Model="folder" />
+          break;
+        case FileType.Code:
+          <FileBrowserDefaultCodeFolderView Model="folder" />
+          break;
+        case FileType.Document:
+          <FileBrowserDefaultDocumentFolderView Model="folder" />
+          break;
+        case FileType.Image:
+          <FileBrowserDefaultImageFolderView Model="folder" />
+          break;
+        case FileType.Other:
+          <FileBrowserDefaultOtherFolderView Model="folder" />
+          break;
+        case FileType.Video:
+          <FileBrowserDefaultVideoFolderView Model="folder" />
+          break;
+        default:
+          <FileBrowserDefaultOtherFolderView Model="folder" />
+          break;
+      }
+    </ContentView>
+    <SkeletonView>
+      <DefaultLoadongSkeleton />
+    </SkeletonView>
+  </LoadingCard>
+  </MudPaper>
+}
+
+@foreach (FileModel file in CurrentFolder.Files)
+{
+    <MudPaper @onclick="() => ToggleSelected(file)" Width="100px" Class="@($" d-flex {GetSelectClass(file)}")">
+
+     <LoadingCard Model="@file">
+    <ContentView>
+  @switch (file.GetFileType())
+  {
+    case FileType.Audio:
+      <FileBrowserDefaultAudioFileView Model="file" />
+      break;
+    case FileType.Code:
+      <FileBrowserDefaultCodeFileView Model="file" />
+      break;
+    case FileType.Document:
+      <FileBrowserDefaultDocumentFileView Model="file" />
+      break;
+    case FileType.Image:
+      <FileBrowserDefaultImageFileView Model="file" />
+      break;
+    case FileType.Other:
+      <FileBrowserDefaultOtherFileView Model="file" />
+      break;
+    case FileType.Video:
+      <FileBrowserDefaultVideoFileView Model="file" />
+      break;
+    default:
+      <FileBrowserDefaultOtherFileView Model="file" />
+      break;
+  }
+    </ContentView>
+    <SkeletonView>
+      <DefaultLoadongSkeleton />
+    </SkeletonView>
+  </LoadingCard>
+  </MudPaper>
+}
+</MudPaper>
+
+@code {
+
+  [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }
+
+  private string GetSelectClass(BaseExplorerItemModel model)
+  {
+    return model.IsSelected ? "mud-height-full default-file-view selected" : "mud-height-full default-file-view ";
+  }
+  private void ToggleSelected(BaseExplorerItemModel model)
+  {
+    // foreach (var folder in CurrentFolder.Folders)
+    // {
+    //   folder.UnSelect();
+    // }
+    // foreach (var file in CurrentFolder.Files)
+    // {
+    //   file.UnSelect();
+    // }
+
+    StateService.NotifySelectionCleared();
+
+    if (model.IsSelected)
+    {
+      // CssClass = "mud-height-full default-file-view ";
+      model.UnSelect();
+    }
+    else
+    {
+      // CssClass = "mud-height-full default-file-view selected ";
+      model.Select();
+    }
+    StateService.NotifyFolderSelectionChanged(model);
+    StateService.NotifyStateChanged();
+  }
+
+  public void Dispose()
+  {
+    // throw new NotImplementedException();
+  }
+}
+
+
+    
+<style>
+  .default-file-view {
+    cursor: pointer;
+    padding-block: 8px;
+    padding-inline: 0 !important;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+    text-align: center;
+    height: auto;
+  }
+
+    .default-file-view:hover {
+      /* border-color: var(--mud-palette-primary);
+            background-color: var(--mud-palette-secondary-lighten-5);*/
+      border-color: @Color.Primary;
+      background-color: @Colors.Blue.Lighten2;
+    }
+
+    .default-file-view.selected {
+      border-color: var(--mud-palette-secondary);
+      background-color: var(--mud-palette-secondary-lighten-5);
+    }
+
+</style>
+

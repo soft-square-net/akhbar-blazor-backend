@@ -1,4 +1,5 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Explorers
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
@@ -60,7 +61,9 @@
 
 <MudDivider Class="mb-3" />*@
 
-<Explorer ExplorerType="EnumExplorerType.DefaultExplorer" />
+@* <Explorer ExplorerType="EnumExplorerType.DefaultExplorer" />
+ *@
+<FileBrowser ExplorerType="EnumExplorerType.DefaultExplorer" />
 
 <MudDivider Class="mb-3" />
 

@@ -7,7 +7,7 @@ using Shared.Enums;
 using static MudBlazor.Colors;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-public class FileModel : BaseExplorerItemModel, IExplorerFile
+public class FileModel : BaseExplorerItemModel// , IExplorerFile
 {
     public FileModel(Guid id, string name, long size, DateTime created, DateTime modified)
     {
@@ -32,4 +32,5 @@ public class FileModel : BaseExplorerItemModel, IExplorerFile
     //}
     public string Extension { get { return System.IO.Path.GetExtension(Name).ToLowerInvariant(); } }
 
+    //public FileModel Model { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 }

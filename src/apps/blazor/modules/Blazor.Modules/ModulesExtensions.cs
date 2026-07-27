@@ -27,6 +27,7 @@ public static class ModulesExtensions
         services.AddScoped<IDynamicComponentService, DynamicComponentService>();
         services.AddScoped<ILayoutService, LayoutService>();
         services.AddSingleton<IAppNavigationService, BlazorAppNavigationService>();
+        services.AddScoped<ContextMenuService>();
 
         return services;
     }
