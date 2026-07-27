@@ -6,6 +6,8 @@
 @using FSH.Starter.BlazorShared.Services
 
 @inject ContextMenuService MenuService
+
+<div  @onclick="() => HideGlobalMenu()" @onblur="() => HideGlobalMenu()">
 @switch (ExplorerType)
 {
   case EnumExplorerType.DefaultExplorer:
@@ -17,35 +19,37 @@
   default:
     break;
 }
-
-@* Single instance definition with strongly-typed template content *@
-<ContextMenu>
-    @context {
-        @if (context is BaseExplorerItemModel item)
-        {
-            <button @onclick="() => EditItem(item)">Edit @item.Name</button>
-            <button @onclick="() => DeleteItem(item)">Delete</button>
-        }
-    }
-</ContextMenu>
+</div>
+@* Single instance definition with strongly-typed template content using generic ContextMenu *@
+<ContextMenuGeneric TItem="BaseExplorerItemModel" Context="ctx">
+  @if (ctx is BaseExplorerItemModel item)
+  {
+    <div @onblur="() => HideGlobalMenu()">
+    <MudPaper Elevation="1">
+      <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="() => EditItem(item)">Edit @item.Name</MudMenuItem>
+      <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteItem(item)">Delete</MudMenuItem>
+    </MudPaper>
+    </div>
+  }
+</ContextMenuGeneric>
 <div>
   Current Folder Items: @CurrentFolder.Files.Count
 </div>
-@code{
-    [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }
+@code {
+  [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }
   private void HideGlobalMenu() => MenuService.Hide();
-  private void EditItem(BaseExplorerItemModel item) { /* Your Logic */ }
-  private void DeleteItem(BaseExplorerItemModel item) { /* Your Logic */ }
+  private void EditItem(BaseExplorerItemModel item) { HideGlobalMenu(); /* Your Logic */ }
+  private void DeleteItem(BaseExplorerItemModel item) { HideGlobalMenu(); /* Your Logic */ }
 
-    [Parameter, EditorRequired]
-    public EnumExplorerType ExplorerType { get; set; } = EnumExplorerType.DefaultExplorer;
+  [Parameter, EditorRequired]
+  public EnumExplorerType ExplorerType { get; set; } = EnumExplorerType.DefaultExplorer;
 
 
-    RenderFragment Render()
+  RenderFragment Render()
+  {
+    return new RenderFragment(builder =>
     {
-      return new RenderFragment(builder =>
-      {
-        builder.AddContent(0, "my fragment");
-      });
-    }
+      builder.AddContent(0, "my fragment");
+    });
   }
+}

@@ -1,0 +1,108 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+
+@inject IJSRuntime JSRuntime
+
+
+  @if (!_isEditing)
+  {
+  <div tabindex="0" @ondblclick="() => _isEditing=true" @ondblclick:preventDefault @ondblclick:stopPropagation>
+    <MudText Typo="Typo.body2" Style="max-width: 15ch;text-wrap-style: balance; overflow-wrap: break-word; ">@Model.Name</MudText> 
+  </div>
+  }
+  else
+  {
+    <MudTextField 
+        tabindex="0" @ref="multilineReference"
+        T="string" 
+        id="fileExplorerRenameInput"
+        Typo="Typo.caption"
+        Style="text-align:center;" 
+        Lines="1" 
+        Sizing="InputSizing.Auto" 
+        MaxLines="6" 
+        Text="@Model.Name" 
+        ValueChanged=" newValue => NameValueChanged(newValue)" 
+        Variant="Variant.Outlined" 
+        Margin="Margin.Dense" 
+        Class="center-text-field" 
+                @onfocus="HandleFocus" OnKeyDown="(e) => HandelOnInputKeyDown(e)" />
+  }
+@code {
+  [Parameter, EditorRequired] public BaseExplorerItemModel Model { get; set; }
+  private MudTextField<string> multilineReference;
+
+  private bool _isEditing = false;
+
+
+
+  private void OnKeyPressed(KeyboardEventArgs e)
+  {
+
+    if(e.Code == "27")
+    {
+      _isEditing = !_isEditing;
+      if (_isEditing) multilineReference.SelectRangeAsync(0,Model.Name.Length - 4);
+    }
+  }
+
+  private async Task HandleFocus()
+  {
+    // Small delay ensures MudBlazor finishes rendering the focus state
+    // 1. Allow the default browser focus cycle to finish rendering
+    await Task.Delay(50);
+    // await JSRuntime.InvokeVoidAsync("helpers.selectFileNameWithoutExtension", "fileExplorerRenameInput");
+
+    // 2. Find the extension boundary
+    int dotIndex = Model.Name.LastIndexOf('.');
+    int selectionEnd = dotIndex != -1 ? dotIndex : Model.Name.Length;
+    // 3. Highlight from index 0 to the calculated boundary natively via MudBlazor
+    if (multilineReference != null)
+    {
+      await multilineReference.SelectRangeAsync(0, selectionEnd);
+    }
+  }
+
+  private void NameValueChanged(string newValue)
+  {
+     Model.Name = newValue;
+  }
+
+  private async Task HandelOnInputKeyDown(KeyboardEventArgs e)
+  {
+    // Check if the pressed key is Enter or NumpadEnter
+    if (e.Key == "Enter" || e.Key == "NumpadEnter")
+    {
+      
+
+      // if (_isEditing) multilineReference.SelectRangeAsync(0, Model.Name.Length - 4);
+      // Built-in MudBlazor method to remove focus from the input field
+      if (multilineReference != null)
+      {
+        Model.Name = multilineReference!.Value;
+        // Drop focus immediately on enter
+        await multilineReference.BlurAsync();
+        _isEditing = false;
+      }
+    }
+  }
+}
+
+    <style>
+  /* Center the text inside the input/textarea */
+  .center-text-field textarea,
+  .center-text-field input {
+    text-align: center !important;
+  }
+
+  /* Optional: Emulate the Windows Explorer compact border/padding look */
+  .explorer-rename-container {
+    max-width: 250px;
+    margin: 20px auto;
+  }
+
+  .center-text-field .mud-input-outlined-border {
+    border-color: #0078d7 !important; /* Windows blue highlight color */
+    border-width: 1px !important;
+  }
+
+    </style>

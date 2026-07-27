@@ -1,15 +1,15 @@
 ﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Menues
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
-@using FSH.Starter.BlazorShared.Services
+@using FSH.Starter.BlazorShared.Services;
 @inject ContextMenuService MenuService
 
 <CascadingValue Value="Loading" Name="Loading">
   @if (!Loading)
   {
     @* <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
-    <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)"      
-    @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
-    @oncontextmenu:preventDefault="true" >
+    <div tabindex="0" class="file-explorer-loading-card" @onblur="@(() => HideContextMenu())"
+         @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
+         @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
       @ContentView
     </div>
   }
@@ -43,9 +43,9 @@
     MenuService.Show(e.ClientX, e.ClientY, item);
   }
 
-  private void CloseContextMenu()
+  private void HideContextMenu()
   {
-    // throw new NotImplementedException();
+    MenuService.Hide();
   }
 
   // private async Task OpenContextMenu(MouseEventArgs args)

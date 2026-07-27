@@ -1,0 +1,57 @@
+@typeparam TItem
+@using FSH.Starter.BlazorShared.Services
+@inject ContextMenuService MenuService
+@implements IDisposable
+
+@if (isVisible)
+{
+  <div class="context-menu" style="position: fixed; left: @(x)px; top: @(y)px; z-index: 1000;">
+    @if (selectedItem is TItem t)
+    {
+        @ChildContent(t)
+    }
+  </div>
+}
+
+@code {
+  [Parameter]
+  public RenderFragment<TItem?> ChildContent { get; set; } = default!;
+
+  private bool isVisible;
+  private double x;
+  private double y;
+  private object? selectedItem;
+
+  protected override void OnInitialized()
+  {
+    MenuService.OnShow += ShowMenu;
+    MenuService.OnHide += HideMenu;
+  }
+
+  private void ShowMenu(double mouseX, double mouseY, object item)
+  {
+    if (item is TItem)
+    {
+      x = mouseX;
+      y = mouseY;
+      selectedItem = item;
+      isVisible = true;
+      StateHasChanged();
+    }
+  }
+
+  private void HideMenu()
+  {
+    if (isVisible)
+    {
+      isVisible = false;
+      StateHasChanged();
+    }
+  }
+
+  public void Dispose()
+  {
+    MenuService.OnShow -= ShowMenu;
+    MenuService.OnHide -= HideMenu;
+  }
+}

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Shared.Enums;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
-public class BaseExplorerItemModel : IExplorerItemModel
+public class BaseExplorerItemModel : IExplorerItemModel,IDisposable
 {
     // [Inject] public IFileExplorerStateService StateService { get; set; }
     public Guid Id { get; set; }
@@ -49,5 +49,10 @@ public class BaseExplorerItemModel : IExplorerItemModel
     protected void SetAsFile()
     {
         _isFolder = false;
+    }
+
+    public void Dispose()
+    {
+        
     }
 }
