@@ -5,12 +5,14 @@
 @implements System.IDisposable
 
 <div class="tree-container" style="height:100%; display:flex; flex-direction:column;">
-  <MudTreeView T="FolderModel" Dense @ref="FoldersTreeView" Items="_treeItems" Hover AutoExpand="@AutoExpand"
+  <MudTreeView T="FolderModel" Dense @ref="FoldersTreeView" Items="_treeItems" 
+            AutoExpand="@AutoExpand"  Hover="true" 
+               @bind-SelectedValue="@SelectedTreeItemData"
                ReadOnly="false"
                Class="mud-width-full mud-height-full"
                Style="overflow-inline:scroll;flex:1; min-height:0; width:100%; overflow:auto;"
-               SelectedValue="@SelectedTreeItemData">
-    @*              Expanded="@context.Value.IsExpanded" *@
+               >
+    @*   SelectedValue="@SelectedTreeItemData"    Expanded="@context.Value.IsExpanded" *@
     <ItemTemplate Context="TItem">
       <MudTreeViewItem T="FolderModel" Text="@(TItem.Text)"
                        Expanded="@TItem.Value.IsExpanded"
@@ -35,8 +37,12 @@
           <div class="folder-tree-view-item" style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
             <MudText Style="justify-self: start;text-wrap:nowrap;text-wrap-mode:nowrap;">@TItem.Text</MudText>
             <div style="justify-self: end;">
-              <MudIconButton Class="folder-tree-view-btn-refresh" Icon="@Icons.Material.Outlined.Refresh" Size="Size.Medium" Color="Color.Inherit" OnClick="@(async () => await OnEndIconClick(TItem))"
-                             @onmousedown:stopPropagation="true" />
+              <MudIconButton Class="folder-tree-view-btn-refresh"
+                    Icon="@Icons.Material.Outlined.Refresh" 
+                    Size="Size.Medium" 
+                    Color="Color.Inherit" 
+                    OnClick="@(async () => await OnEndIconClick(TItem))"
+                    @onmousedown:stopPropagation="true" />
             </div>
           </div>
         </BodyContent>
@@ -124,6 +130,7 @@
       currentTreeFolder.Select();
     }
     CurrentFolder = folder;
+    SelectedTreeItemData = CurrentFolder;
     // folder.Select();
     _treeItems = MapFoldersToTreeItemData(Folders);
     await InvokeAsync(StateHasChanged);
@@ -220,6 +227,7 @@
     {
       FolderModel rawFolder = context.Value;
       SelectedTreeItemData = context.Value;
+      CurrentFolder = context.Value;
       // await OnNodeSelected.InvokeAsync(context as TreeItemData<FolderModel>);
       // await StateService.NotifyFolderUpdated(SelectedTreeItemData);
       await StateService.NotifyCurrentFolderChanged(SelectedTreeItemData);
@@ -233,7 +241,7 @@
       // if the item that became unselected was the currently selected node, clear the selection
       if (SelectedTreeItemData == context.Value)
       {
-        SelectedTreeItemData = null;
+        // SelectedTreeItemData = null;
       }
     }
 

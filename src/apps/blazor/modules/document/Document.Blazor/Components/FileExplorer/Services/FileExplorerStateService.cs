@@ -45,8 +45,23 @@ public class FileExplorerStateService: IFileExplorerStateService
     public void NotifyStateChanged() => OnChange?.Invoke();
     public void NotifyFileBrowserTreeToogled(bool opened) => OnToggleFileBrowserTree?.Invoke(opened);
 
+    /// <summary>
+    /// When the Root folders array changed (Replaced)
+    /// </summary>
+    /// <param name="folders"></param>
+    /// <returns></returns>
     public async Task NotifyFoldersChanged(ICollection<FolderModel> folders) => await OnFoldersChanged?.Invoke(folders);
+    /// <summary>
+    /// When the selection inside the CurrentFolder Changed
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public async Task NotifyFolderSelectionChanged(BaseExplorerItemModel item) => await OnFolderSelectionChanged?.Invoke(item);
+    /// <summary>
+    /// When the Explorere navigate to another folder
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <returns></returns>
     public async Task NotifyCurrentFolderChanged(FolderModel folder) => await OnCurrentFolderChanged.Invoke(folder);
     public async Task NotifyFolderCreated(Guid instanceId, FolderModel folder) => await OnFolderCreated?.Invoke(instanceId, folder);
     public async Task NotifyFolderDeleted(FolderModel folder) => await OnFolderDeleted?.Invoke(folder);
