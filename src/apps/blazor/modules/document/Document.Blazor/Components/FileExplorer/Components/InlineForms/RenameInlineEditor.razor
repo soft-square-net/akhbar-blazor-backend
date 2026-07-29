@@ -4,9 +4,9 @@
 @inject IJSRuntime JSRuntime
 
 
-  @if (!_isEditing)
+  @if (!Model.IsEditing)
 {
-  <div tabindex="0" @onclick="() => MudTextClick()" @onclick:preventDefault >
+  <div tabindex="0" @onclick="() => MudTextClick()" @onclick:preventDefault>
     <MudText Typo="Typo.caption" Style="max-width:80px;margin-inline:auto;text-wrap-style: balance; overflow-wrap: break-word; ">@Model.Name</MudText>
   </div>
 }
@@ -27,7 +27,7 @@ else
                 Class="center-text-field"
                 @onfocus="HandleFocus"
                 OnKeyDown="(e) => HandelOnInputKeyDown(e)"
-                @onfocusout="(e) => HandelOnInputFocusOut(e)" 
+                @onfocusout="(e) => HandelOnInputFocusOut(e)"
                 Immediate="true"
                 Validation="@(new Func<string, string>(ValidateFileName))" />
 }
@@ -35,16 +35,16 @@ else
   [Parameter, EditorRequired] public BaseExplorerItemModel Model { get; set; }
   private MudTextField<string> multilineReference;
 
-  private bool _isEditing = false;
-  private bool _needsFocus = false;
+  // private bool _isEditing = false;
+  // private bool _needsFocus = false;
   private string _oldName = string.Empty;
 
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    if (_needsFocus && multilineReference != null)
+    if (Model.IsNeedsFocus && multilineReference != null)
     {
-      _needsFocus = false; // Reset flag immediately to prevent infinite loops
+      Model.IsNeedsFocus = false; // Reset flag immediately to prevent infinite loops
 
       await Task.Delay(50); // Small delay to let MudBlazor finish internal component setup
       await multilineReference.FocusAsync();
@@ -56,10 +56,11 @@ else
   #region MudText Read
   protected void MudTextClick()
   {
-    if (Model.IsSelected) { 
-      _isEditing = true; 
-      _oldName = Model.Name; 
-      _needsFocus = true;
+    if (Model.IsSelected)
+    {
+      Model.IsEditing = true;
+      _oldName = Model.Name;
+      Model.IsNeedsFocus = true;
     }
   }
   #endregion
@@ -82,10 +83,12 @@ else
     }
   }
 
-  private void NameValueChanged(string newValue)
+  private void NameValueChanged(string? newValue)
   {
-    Model.Name = newValue;
-    if (multilineReference is not null) multilineReference!.Value = newValue;
+    if (string.IsNullOrWhiteSpace(newValue)) return;
+    if (newValue.ToCharArray().First() == '\n' || newValue.ToCharArray().First() == '\r') return;
+    Model.Name = newValue.TrimEnd('\r', '\n');
+    if (multilineReference is not null) multilineReference!.Value = newValue.TrimEnd('\r', '\n');
   }
 
   private async Task HandelOnInputKeyDown(KeyboardEventArgs e)
@@ -96,18 +99,20 @@ else
     {
       // if (_isEditing) multilineReference.SelectRangeAsync(0, Model.Name.Length - 4);
       // Built-in MudBlazor method to remove focus from the input field
-      if (multilineReference != null)
+      if (multilineReference != null && multilineReference?.Value != null)
       {
         Model.Name = multilineReference!.Value;
         // Drop focus immediately on enter
         await multilineReference.BlurAsync();
-        _isEditing = false;
+        Model.IsEditing = false;
+        await InvokeAsync(StateHasChanged);
       }
     }
     else if (e.Key == "Escape")
     {
-      Model.Name = _oldName;
-      _isEditing = false;
+      if(!Model.Name.ToLowerInvariant().StartsWith("new folder")) Model.Name = _oldName;
+      Model.IsEditing = false;
+      await InvokeAsync(StateHasChanged);
     }
   }
   private async Task HandelOnInputFocusOut(FocusEventArgs e)
@@ -118,30 +123,47 @@ else
     Model.Name = multilineReference!.Value ?? _oldName;
     // // Drop focus immediately on enter
     await multilineReference.BlurAsync();
-    _isEditing = false;
+    Model.IsEditing = false;
+    await InvokeAsync(StateHasChanged);
     // }
   }
+
 
   private string ValidateFileName(string value)
   {
     if (string.IsNullOrWhiteSpace(value))
     {
+      Model.IsEditing = true;
       return Loc.GetString("File name cannot be empty.");
     }
-
     // Regex pattern for illegal characters: \ / : * ? " < > |
     // Note: We escape characters like \ and [ ] inside the regex pattern
     var illegalCharactersRegex = new Regex(@"[\\/:*?""<>|]");
 
     if (illegalCharactersRegex.IsMatch(value))
     {
+      Model.IsEditing = true;
       return Loc.GetString("Name cannot contain: \\ / : * ? \" < > |");
+    }
+    if (Model.Folder.Folders.Count(e => e.Name.Equals(value, StringComparison.OrdinalIgnoreCase)) > 1
+        || Model.Folder.Files.Count(e => e.Name.Equals(value, StringComparison.OrdinalIgnoreCase)) > 1)
+    {
+      Model.IsEditing = true;
+      return Loc.GetString("There is another Folder/File With the same name");
+    }
+
+    if (Model.IsFolder)
+    {
+    }
+    else
+    {
+
     }
 
     return null; // Returning null means the input is completely valid
   }
   #endregion
-  
+
 }
 
 <style>

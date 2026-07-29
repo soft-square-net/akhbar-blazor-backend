@@ -6,6 +6,7 @@
 @using MudBlazor
 @implements System.IDisposable
 
+
 <CascadingValue Value="@Folders" Name="Folders">
   <CascadingValue Value="@InstanceId" Name="InstanceId">
     <CascadingValue Value="@CurrentFolder" Name="CurrentFolder">
@@ -52,8 +53,7 @@
                   <MudText>Create New Folder</MudText>
                 </div>
               </MudMenuItem> *@
-                <MudMenuItem Label="Create New Folder" Icon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Warning" />
-
+                <MudMenuItem Label="Create New Folder" Icon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Warning" OnClick="ActionCreateFolder" />
                 <MudMenuItem Label="Upload File" Icon="@Icons.Material.Filled.Upload" IconColor="Color.Warning" />
               </MudMenu>
               <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Cut" />
@@ -106,7 +106,6 @@
 
         <!-- Item 2: Takes the remaining height -->
         <div style="flex: 1 1 auto; overflow-y: scroll;">
-
           @* ////////////////////////////////////////////////////////////////// *@
           <MudSplitPanel @ref="_splitPanel"
                          ClassDivider="mud-spliter-divider"
@@ -178,26 +177,12 @@
   private bool _rounded = true;
   private bool _elevation = true;
   private bool _transparent;
-
-
-
-  private void ToggleFileBrowserTree(bool opened)
-  {
-    _open = opened;
-    StateHasChanged();
-    // StateService.NotifyStateChanged();
-  }
   bool _isFolersTreeOpen { get; set; } = true;
-  public void ToggleFoldersTree()
-  {
-    _isFolersTreeOpen = !_isFolersTreeOpen;
-    // OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
-    StateService.NotifyFileBrowserTreeToogled(_isFolersTreeOpen);
-  }
+
+
+  #region Events
   protected override void OnInitialized()
   {
-
-
     var root = new FolderModel(Guid.NewGuid(), $"Root", new[] {
                     new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
                     new FileModel(Guid.NewGuid(), $"door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
@@ -269,6 +254,46 @@
       }
 
     }
+  }
+
+  #endregion
+
+  #region Actions
+  private void ActionCreateFolder()
+  {
+    string[] names = CurrentFolder.Folders.Select(e => e.Name.ToLowerInvariant()).Concat(CurrentFolder.Files.Select(e => e.Name.ToLowerInvariant())).ToArray();
+    string newFolderName = "New Folder";
+    var i = 1;
+    while (names.Contains(newFolderName.ToLowerInvariant()))
+    {
+      newFolderName = $"New Folder ({i++})";
+    }
+    if (newFolderName.EndsWith("\r\n"))
+    {
+      newFolderName = newFolderName.Substring(0, newFolderName.Length - 2);
+    }
+    else if (newFolderName.EndsWith("\n"))
+    {
+      newFolderName = newFolderName.Substring(0, newFolderName.Length - 1);
+    }
+    var fldr = new FolderModel(Guid.NewGuid(), newFolderName, []);
+    fldr.IsNeedsFocus = true; fldr.IsEditing = true;
+    fldr.Path = $"{CurrentFolder.Path}/{newFolderName}";
+    StateService.NotifyFolderCreated(InstanceId, fldr);
+    StateService.NotifyFolderSelectionChanged(fldr);
+  }
+  #endregion
+  private void ToggleFileBrowserTree(bool opened)
+  {
+    _open = opened;
+    StateHasChanged();
+    // StateService.NotifyStateChanged();
+  }
+  public void ToggleFoldersTree()
+  {
+    _isFolersTreeOpen = !_isFolersTreeOpen;
+    // OnToggleFileBrowserTree.InvokeAsync(_isFolersTreeOpen);
+    StateService.NotifyFileBrowserTreeToogled(_isFolersTreeOpen);
   }
 
   void OnFolderSelected(FolderModel folder)

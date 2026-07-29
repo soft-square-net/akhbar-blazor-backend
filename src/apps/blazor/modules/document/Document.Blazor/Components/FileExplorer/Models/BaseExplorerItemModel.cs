@@ -1,5 +1,4 @@
-﻿
-using System.Net.Mime;
+﻿using System.Net.Mime;
 
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
@@ -22,6 +21,8 @@ public class BaseExplorerItemModel : IExplorerItemModel,IDisposable
     public DateTime Modified { get; set; } = DateTime.Now;
     public FolderModel Folder { get; set; }
     private bool _selected { get; set; }
+    public bool IsEditing { get; set; }
+    public bool IsNeedsFocus { get; set; }
     public bool IsSelected => _selected;
 
     public void Select()

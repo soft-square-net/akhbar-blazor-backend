@@ -1,10 +1,11 @@
-﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Base
 
 @inherits BaseFileCard;
 
-<MudText Typo="Typo.h4">Code File</MudText>
-
+<MudText Typo="Typo.body2">Code File</MudText>
+<RenameInlineEditor Model ="Model"/>
 @code {
 
 }

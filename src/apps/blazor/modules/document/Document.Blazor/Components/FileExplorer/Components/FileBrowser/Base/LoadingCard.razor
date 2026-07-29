@@ -1,5 +1,6 @@
 ﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Menues
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
 @using FSH.Starter.BlazorShared.Services;
 @inject ContextMenuService MenuService
 
@@ -9,7 +10,8 @@
     @* <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
     <div tabindex="0" class="file-explorer-loading-card" @onblur="@(() => HideContextMenu())"
          @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
-         @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+         @oncontextmenu:preventDefault @oncontextmenu:stopPropagation  
+         @ondblclick="OnDblClick">
       @ContentView
     </div>
   }
@@ -24,6 +26,7 @@
 
 
 @code {
+  [Inject] IFileExplorerStateService StateService { get; set; } = default!;
 
   [Parameter] public bool Loading { get; set; }
   [Parameter] public EventCallback<bool> OnLoadingChanged { get; set; }
@@ -46,6 +49,15 @@
   private void HideContextMenu()
   {
     MenuService.Hide();
+  }
+
+  private async Task OnDblClick()
+  {
+    if (Model.IsFolder)
+    {
+      await StateService.NotifyCurrentFolderChanged(Model as FolderModel);
+      StateService.NotifyStateChanged();
+    }
   }
 
   // private async Task OpenContextMenu(MouseEventArgs args)
