@@ -89,7 +89,7 @@
 }
 </MudPaper>
 
-@code {
+  @code {
 
   [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }
 
@@ -110,16 +110,19 @@
 
     StateService.NotifySelectionCleared();
 
-    if (model.IsSelected)
-    {
-      // CssClass = "mud-height-full default-file-view ";
-      model.UnSelect();
-    }
-    else
-    {
-      // CssClass = "mud-height-full default-file-view selected ";
-      model.Select();
-    }
+    // if (StateService.AllowMultipleSelection)
+    // {
+      if (model.IsSelected)
+      {
+        // CssClass = "mud-height-full default-file-view ";
+        model.UnSelect();
+      }
+      else
+      {
+        // CssClass = "mud-height-full default-file-view selected ";
+        model.Select();
+      }
+    // }
     StateService.NotifyFolderSelectionChanged(model);
     StateService.NotifyStateChanged();
   }

@@ -1,8 +1,10 @@
 ﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Menues
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
-@using FSH.Starter.BlazorShared.Services;
+@using FSH.Starter.BlazorShared.Services
+
 @inject ContextMenuService MenuService
+@inject IJSRuntime JS
 
 <CascadingValue Value="Loading" Name="Loading">
   @if (!Loading)
@@ -11,7 +13,8 @@
     <div tabindex="0" class="file-explorer-loading-card" @onblur="@(() => HideContextMenu())"
          @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
          @oncontextmenu:preventDefault @oncontextmenu:stopPropagation  
-         @ondblclick="OnDblClick">
+         @ondblclick="OnDblClick"
+         @ref="_targetContainerRef" @onclick="HandleTargetClick">
       @ContentView
     </div>
   }
@@ -39,6 +42,15 @@
 
 #nullable enable
   private EditMenu _editMenu = null;
+  private ElementReference _targetContainerRef;
+
+  protected async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      await JS.InvokeVoidAsync("helpers.simulateCtrlClickByRef", _targetContainerRef);
+    }
+  }
 
   private void ShowContextMenu(MouseEventArgs e, BaseExplorerItemModel item)
   {
@@ -60,6 +72,17 @@
     }
   }
 
+  private void HandleTargetClick(MouseEventArgs e)
+  {
+    if (e.CtrlKey || e.MetaKey)
+    {
+      Console.WriteLine("Success! Target button caught a Ctrl+Click or Cmd+Click.");
+    }
+    else
+    {
+      Console.WriteLine("Target button clicked, but WITHOUT Ctrl modifier.");
+    }
+  }
   // private async Task OpenContextMenu(MouseEventArgs args)
   // {
   //   await _editMenu.OpenContextMenuAsync(args);

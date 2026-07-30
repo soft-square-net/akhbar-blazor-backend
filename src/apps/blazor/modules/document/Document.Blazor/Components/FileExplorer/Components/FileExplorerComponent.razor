@@ -1,11 +1,10 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
-@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
-@implements System.IDisposable
 
+@implements System.IDisposable
 
 <CascadingValue Value="@Folders" Name="Folders">
   <CascadingValue Value="@InstanceId" Name="InstanceId">
@@ -138,7 +137,10 @@
                   </MudDrawer>
                   <MudPaper Class="pa-4 mt-0 mb-0 mx-0 panel-inner-shadow " Elevation="0" Style="box-sizing: border-box; flex:1 1 auto; min-width:0; height: 60vh; overflow: auto;">
                     @* <FileExplorerContentComponent OnFolderUpdated="OnFolderUpdated" OnToggleFileBrowserTree="ToggleFileBrowserTree" /> *@
+                    @* /////////////////////////////////////////////// 
                     <InlineCreateFolder></InlineCreateFolder>
+                    /////////////////////////////////////////////// *@
+
                     <FileExplorerContentComponent />
                   </MudPaper>
 
@@ -246,6 +248,7 @@
       // DetatchActions();
       if (!_isSubscribed)
       {
+        StateService.AllowMultipleSelection = AllowMultipleSelection;
         StateService.OnFileExplorerClearSelection += ClearSelection;
         StateService.OnCurrentFolderChanged += HandleOnCurrentFolderChanged;
         StateService.OnToggleFileBrowserTree += ToggleFileBrowserTree;
@@ -306,7 +309,7 @@
 
   async Task ClearSelection()
   {
-    if (!AllowMultipleSelection)
+    if (!StateService.AllowMultipleSelection)
     {
       foreach (var folder in CurrentFolder.Folders)
       {
@@ -345,6 +348,7 @@
   {
     if (_isSubscribed)
     {
+      StateService.AllowMultipleSelection = false;
       StateService.OnFileExplorerClearSelection -= ClearSelection;
       StateService.OnCurrentFolderChanged -= HandleOnCurrentFolderChanged;
       StateService.OnToggleFileBrowserTree -= ToggleFileBrowserTree;

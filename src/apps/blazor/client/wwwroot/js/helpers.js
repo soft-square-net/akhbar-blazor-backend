@@ -10,23 +10,38 @@ window.helpers.registerResizeCallback = (dotnetHelper) => {
         dotnetHelper.invokeMethodAsync("OnBrowserResize", window.innerWidth, window.innerHeight);
     });
 };
-window.helpers.selectFileNameWithoutExtension = (elementId) => {
-  // MudTextField renders an inner 'input' or 'textarea'
-  const element = document.getElementById(elementId);
-  if (!element) return;
 
-  const input = element.querySelector('input') || element.querySelector('textarea');
-  if (!input) return;
+// window.helpers.selectFileNameWithoutExtension = (elementId) => {
+//   // MudTextField renders an inner 'input' or 'textarea'
+//   const element = document.getElementById(elementId);
+//   if (!element) return;
 
-  const fullText = input.value;
-  const lastDotIndex = fullText.lastIndexOf('.');
+//   const input = element.querySelector('input') || element.querySelector('textarea');
+//   if (!input) return;
 
-  // If there is no dot, or it starts with a dot, select everything
-  const selectionEnd = lastDotIndex > 0 ? lastDotIndex : fullText.length;
+//   const fullText = input.value;
+//   const lastDotIndex = fullText.lastIndexOf('.');
 
-  input.focus();
-  input.setSelectionRange(0, selectionEnd);
+//   // If there is no dot, or it starts with a dot, select everything
+//   const selectionEnd = lastDotIndex > 0 ? lastDotIndex : fullText.length;
+
+//   input.focus();
+//   input.setSelectionRange(0, selectionEnd);
+// };
+
+window.helpers.simulateCtrlClick = (elementId) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      const ctrlClickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        ctrlKey: true,  // For Windows / Linux
+        metaKey: true   // For macOS
+      });
+      element.dispatchEvent(ctrlClickEvent);
+    }
 };
+
 
 window.helpers.launchApp = () => { }
 

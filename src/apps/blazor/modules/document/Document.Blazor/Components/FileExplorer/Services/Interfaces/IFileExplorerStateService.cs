@@ -4,6 +4,7 @@ namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Ser
 public interface IFileExplorerStateService : IDisposable
 {
     public bool CanBrowseFiles { get; }
+    public bool AllowMultipleSelection { get; set; }
 
     public event Action? OnChange;
     public event Action<bool>? OnToggleFileBrowserTree;

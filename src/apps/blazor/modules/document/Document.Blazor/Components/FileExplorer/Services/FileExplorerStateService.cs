@@ -1,6 +1,7 @@
 ﻿using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 using Nextended.Core.Extensions;
+
 using static FSH.Starter.Blazor.Modules.Document.Blazor.FileExplorerIcons;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
@@ -35,6 +36,7 @@ public class FileExplorerStateService: IFileExplorerStateService
     public ICollection<BaseExplorerItemModel> GetSelection => Selection;
 
     public bool CanBrowseFiles => _canBrowseFiles;
+    public bool AllowMultipleSelection {  get; set; }
 
     public void NotifySetCommandList(ICollection<BaseExplorerItemModel> items) { 
         CommandList.Clear();  
