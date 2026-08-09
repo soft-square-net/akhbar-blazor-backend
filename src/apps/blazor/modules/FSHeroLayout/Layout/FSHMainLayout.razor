@@ -25,7 +25,7 @@
                          Color="@Color.Warning" title="EN" Class="d-flex ml-auto" ToggledIcon="@Icons.Material.Filled.FormatListNumberedRtl"
                          ToggledColor="@Color.Surface" toggledTitle="AR" style="left:8px!important" @onclick="@ToggleLanguage" />
 
-    <MudTooltip Text="Support">
+    @* <MudTooltip Text="Support">
       <MudMenu Icon="@Icons.Material.Filled.SupportAgent" Color="Color.Inherit" Dense="true" AnchorOrigin="Origin.CenterRight">
         <MudText Typo="Typo.body2" Class="px-4 py-2"><b>Community</b></MudText>
         <MudMenuItem Href="https://discord.gg/yQWpShsKrf" Target="_blank">Discord</MudMenuItem>
@@ -48,9 +48,9 @@
     <MudTooltip Text="Fork Repository">
       <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"
                      Href="https://github.com/fullstackhero/dotnet-starter-kit" Target="_blank" />
-    </MudTooltip>
+    </MudTooltip> *@
   </MudHidden>
-  <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+  @* <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
     <MudTooltip Text="Sponsor">
       <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Inherit"
                      Href="https://opencollective.com/fullstackhero" Target="_blank" />
@@ -76,12 +76,10 @@
         Quick-Start Guide
       </MudMenuItem>
     </MudMenu>
-  </MudHidden>
-  @* <MudMenu DropShadow="false" PopoverClass="mud-elevation-25" AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight"> *@
+  </MudHidden> *@
   <MudMenu DropShadow="false" PopoverClass="mud-elevation-25" AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
     <ActivatorContent>
       <MudIconButton OnClick="@context.ToggleAsync" Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" />
-      @* <MudIconButton Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" /> *@
     </ActivatorContent>
     <ChildContent>
       <div class="py-2" style="min-width: 220px">

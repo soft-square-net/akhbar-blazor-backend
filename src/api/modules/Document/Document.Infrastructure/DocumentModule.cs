@@ -79,6 +79,7 @@ public static class DocumentModule
             accessRuleGroup.MapAccessRuleDeleteEndpoint();
             accessRuleGroup.MapAccessRuleUpdateEndpoint();
             accessRuleGroup.MapGetAccessRuleEndpoint();
+            accessRuleGroup.MapGetUserAccessRulesEndpoint();
             accessRuleGroup.MapGetAccessRuleListEndpoint();
         }
     }

@@ -114,6 +114,27 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         System.Threading.Tasks.Task<AccessRuleResponse> GetAccessRuleEndpointAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </summary>
+        /// <remarks>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetUserAccessRulesResponse>> GetUserAccessRulesEndpointAsync(System.Guid userId);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </summary>
+        /// <remarks>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetUserAccessRulesResponse>> GetUserAccessRulesEndpointAsync(System.Guid userId, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Gets a list of storage accounts
         /// </summary>
         /// <remarks>
@@ -2076,6 +2097,100 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<AccessRuleResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </summary>
+        /// <remarks>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetUserAccessRulesResponse>> GetUserAccessRulesEndpointAsync(System.Guid userId)
+        {
+            return GetUserAccessRulesEndpointAsync(userId, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </summary>
+        /// <remarks>
+        /// gets (User &amp; User Roles) Access Rules
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<GetUserAccessRulesResponse>> GetUserAccessRulesEndpointAsync(System.Guid userId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (userId == null)
+                throw new System.ArgumentNullException("userId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/access-rules/UserAccessRules/{userId}"
+                    urlBuilder_.Append("api/v1/Document/access-rules/UserAccessRules/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(userId, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<GetUserAccessRulesResponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10425,6 +10540,46 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GetUserAccessRulesResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public string? ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
+        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
+        public bool IsEnabled { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("read")]
+        public bool Read { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("write")]
+        public bool Write { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("execute")]
+        public bool Execute { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
+        public Bucket Bucket { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateBucketCommand
     {
 
@@ -11114,9 +11269,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         [System.Text.Json.Serialization.JsonPropertyName("description")]
         public string? Description { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
-        public StorageAccount StorageAccount { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("folders")]
         public System.Collections.Generic.ICollection<Folder>? Folders { get; set; } = default!;
 
@@ -11180,9 +11332,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         [System.Text.Json.Serialization.JsonPropertyName("isPublic")]
         public bool IsPublic { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("folder")]
-        public Folder Folder { get; set; } = default!;
-
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -11236,9 +11385,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("parentId")]
         public System.Guid? ParentId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
-        public Bucket Bucket { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("parent")]
         public Folder Parent { get; set; } = default!;

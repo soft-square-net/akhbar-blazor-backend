@@ -31,8 +31,8 @@ public static class Extensions
             configuration.SnackbarConfiguration.NewestOnTop = false;
             configuration.SnackbarConfiguration.ShowCloseIcon = true;
             configuration.SnackbarConfiguration.VisibleStateDuration = 3000;
-            configuration.SnackbarConfiguration.HideTransitionDuration = 500;
-            configuration.SnackbarConfiguration.ShowTransitionDuration = 500;
+            configuration.SnackbarConfiguration.HideTransitionDuration = 100;
+            configuration.SnackbarConfiguration.ShowTransitionDuration = 100;
             configuration.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
             // configuration.PopoverOptions.OverflowBehavior = OverflowBehavior.FlipNever;
         });
@@ -53,6 +53,8 @@ public static class Extensions
         services.AddBlazoredLocalStorage();
         services.AddFSHLocalization();
         services.AddAuthentication(config);
+        // Current user helper for components and services
+        services.AddScoped<FSH.Starter.Blazor.Infrastructure.Auth.ICurrentUserService, FSH.Starter.Blazor.Infrastructure.Auth.CurrentUserService>();
         services.AddTransient<IApiClient, ApiClient>();
         services.AddHttpClient(ClientName, client =>
         {
