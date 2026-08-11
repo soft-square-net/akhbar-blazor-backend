@@ -1,6 +1,12 @@
+@using System.Security.Claims
+@using Blazored.LocalStorage
+@using FSH.Starter.Blazor.Infrastructure.Api
+@using FSH.Starter.Blazor.Infrastructure.Notifications
+@using FSH.Starter.Blazor.Infrastructure.Notifications.Users
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.InlineForms
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
+@using MediatR.Courier
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
@@ -160,9 +166,11 @@
 </CascadingValue>
 
 @code {
+  [Inject] protected ICourier Courier { get; set; } = default!;
   //[Inject] ISnackbar Snackbar { get; set; } = default!;
-  [Inject] IFileExplorerStateService StateService { get; set; } = default!;
-
+  [Inject] protected IFileExplorerStateService StateService { get; set; } = default!;
+  [Inject] protected ILocalStorageService _localStorage { get; set; } = default!;
+  [Inject] protected IApiClient _client { get; set; } = default!;
   [CascadingParameter]
   protected Task<AuthenticationState> AuthState { get; set; } = default!;
 
@@ -189,6 +197,7 @@
   #region Events
   protected override void OnInitialized()
   {
+    Courier.SubscribeWeak<NotificationWrapper<UserLoggedIn>>(HandleUserLoggedIn);
     var root = new FolderModel(Guid.NewGuid(), $"Root", new[] {
                     new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
                     new FileModel(Guid.NewGuid(), $"door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
@@ -244,6 +253,8 @@
     // _currentFolder = Folders.First();
     CurrentFolder = Folders.First();
   }
+
+  
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
@@ -362,6 +373,7 @@
 
   public void Dispose()
   {
+    Courier.UnSubscribe<NotificationWrapper<UserLoggedIn>>(HandleUserLoggedIn);
     DetatchActions();
   }
 
@@ -370,6 +382,13 @@
     // Try to Query the Folder Api to get the folder with the exact Path
     // set the CurrentFolder to the returned folder from the Query
     await InvokeAsync(StateHasChanged);
+  }
+
+
+  private async Task HandleUserLoggedIn(NotificationWrapper<UserLoggedIn> wrapper)
+  {
+    var user = wrapper.Notification.UserInfo;
+
   }
 }
 
