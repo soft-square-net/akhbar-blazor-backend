@@ -1,4 +1,5 @@
-﻿using FSH.Starter.Blazor.Shared.Notifications;
+﻿using FSH.Starter.Blazor.Infrastructure.Notifications.Users;
+using FSH.Starter.Blazor.Shared.Notifications;
 using MediatR;
 using MediatR.Courier;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,7 @@ internal static class Extensions
             })
             .AddCourier(assemblies)
             .AddTransient<INotificationPublisher, NotificationPublisher>();
-
+            // .AddSingleton<StatefulMessageBroker<NotificationWrapper<UserLoggedIn>>>();
         // Register handlers for all INotificationMessages
         foreach (var eventType in assemblies
             .SelectMany(a => a.GetTypes())

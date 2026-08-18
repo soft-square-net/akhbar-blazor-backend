@@ -67,7 +67,7 @@ public partial class Login()
             Toast,
             _customValidation))
         {
-            await Notifications.PublishAsync(new UserLoggedIn((await AuthState).User, "Logged in as {_tokenRequest.Email}"));
+            await Notifications.PublishAsync(new UserLoggedIn((await AuthState).User, $"Notification: Logged in as {_tokenRequest.Email}"));
             Toast.Add($"Logged in as {_tokenRequest.Email}", Severity.Info);
         }
 

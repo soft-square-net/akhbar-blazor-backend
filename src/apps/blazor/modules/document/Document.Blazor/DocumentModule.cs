@@ -5,6 +5,7 @@ using FSH.Starter.Blazor.Modules.Document.Blazor.Auth;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Layout;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Notifications;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Pages.Document;
 using FSH.Starter.BlazorShared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -48,12 +49,23 @@ public sealed class DocumentModule : BlazorModuleBase
         services.AddScoped<IFileExplorerFileActionsService, FileExplorerFileActionsService>();
         services.AddScoped<IFileExplorerFolderActionsService, FileExplorerFolderActionsService>();
 
+        services.AddScoped<IDocumentsStorageService, DocumentsStorageService>();
+
         return base.ConfigureModule(services, builder);
     }
 
-    public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
+    public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
-       return await base.UseModuleAsync(app);
+        await base.UseModuleAsync(app);
+        // Initialize DocumentsStorageService to register the UserLoggedIn, etc... notification handler
+        var documentsStorageService = app.Services.GetRequiredService<IDocumentsStorageService>();
+        // 2. Force instantiation
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    scope.ServiceProvider.GetRequiredService<IDocumentsStorageService>();
+        //}
+        return app;
+       
         // return await Task.FromResult(app);
     }
 }
