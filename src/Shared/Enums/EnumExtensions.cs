@@ -21,6 +21,13 @@ public static class EnumExtensions
 
         return value.ToString(); // Fallback to the enum name if no description is found
     }
+
+    public static bool NameEquals<T1, T2>(this T1 enumA, T2 enumB)
+            where T1 : struct, Enum
+            where T2 : struct, Enum
+    {
+        return Enum.GetName(typeof(T1), enumA) == Enum.GetName(typeof(T2), enumB);
+    }
 }
 
 

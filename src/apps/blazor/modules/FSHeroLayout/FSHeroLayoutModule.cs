@@ -41,7 +41,7 @@ public sealed class FSHeroLayoutModule : BlazorModuleBase
         return Task.CompletedTask;
     }
 
-    public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
+    public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
         
         return await base.UseModuleAsync(app);

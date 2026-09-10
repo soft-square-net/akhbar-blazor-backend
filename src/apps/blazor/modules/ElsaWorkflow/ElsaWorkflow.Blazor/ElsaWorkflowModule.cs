@@ -115,7 +115,7 @@ public class ElsaWorkflowModule : BlazorModuleBase
         return base.ConfigureModule(services, builder);
     }
 
-    public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
+    public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
         // Map Studio UI
         // app.MapElsaStudio("/workflows");

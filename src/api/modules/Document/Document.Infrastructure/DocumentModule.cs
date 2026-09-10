@@ -55,6 +55,8 @@ public static class DocumentModule
             bucketsGroup.MapBucketDeleteFolderEndpoint();
             bucketsGroup.MapBucketGetEndpoint();
             bucketsGroup.MapBucketGetFileEndpoint();
+            bucketsGroup.MapDownloadBucketFileEndpoint();
+            bucketsGroup.MapUploadBucketFileEndpoint();
             bucketsGroup.MapBucketGetFolderEndpoint();
             bucketsGroup.MapBucketListEndpoint();
             bucketsGroup.MapBucketListFilesEndpoint();

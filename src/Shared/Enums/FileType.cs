@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Shared.Enums;
 
+[JsonConverter(typeof(JsonStringEnumConverter))] // System.Text.Json
 public enum FileType
 {
     [Description(".aiff,.mp3,.wav,.aac,.m4a,.flac,.ogg")]

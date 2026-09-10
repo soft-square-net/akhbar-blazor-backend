@@ -53,7 +53,7 @@ public class DesktopLayoutModule : BlazorModuleBase
         return base.ConfigureModule(services, builder);
     }
 
-    public async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
+    public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
 
         return await base.UseModuleAsync(app);

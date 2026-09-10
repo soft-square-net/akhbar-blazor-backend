@@ -6,10 +6,11 @@ using Nextended.Core.Extensions;
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
 {
-    public FolderModel(Guid id, string name, FileModel[]? files= null, FolderModel[]? children = null )
+    public FolderModel(Guid id, string name,Guid bucketId, FileModel[]? files= null, FolderModel[]? children = null )
     {
         Id = id;
         Name = name;
+        BucketId = bucketId;
         SetAsFolder();
         if (files is not null)
         {
@@ -20,7 +21,7 @@ public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
             AddFolders(children);
         }
     }
-
+    public Guid BucketId { get; private set; }
     public new List<FolderModel> Children => _folders;
     private List<FileModel> _files { get; init; } = new();
     public IReadOnlyList<FileModel> Files => _files.AsReadOnly();
@@ -30,6 +31,7 @@ public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
 
     public string AllowedExtensions { get; set; } = string.Empty;
     public bool IsExpanded { get; set; }
+
     public void AddFolder(FolderModel folder)
     {
         folder.Folder = this;

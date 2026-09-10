@@ -99,7 +99,7 @@
       return;
     }
 
-    var folder = new FolderModel(Guid.NewGuid(), name, null, []) { Folder = CurrentFolder, Path = $"{CurrentFolder.Path}/{name}" };
+    var folder = new FolderModel(Guid.NewGuid(), name, CurrentFolder.BucketId, null, []) { Folder = CurrentFolder, Path = $"{CurrentFolder.Path}/{name}" };
     // Folders.Add(folder);
     // CurrentFolder.AddFolder(folder);
     await StateService.NotifySelectionCleared();

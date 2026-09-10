@@ -11321,6 +11321,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public string? Url { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("fileType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<FileType>))]
         public FileType FileType { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("folderId")]
@@ -11524,17 +11525,23 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     public enum FileType
     {
 
-        _0 = 0,
+        [System.Runtime.Serialization.EnumMember(Value = @"Audio")]
+        Audio = 0,
 
-        _1 = 1,
+        [System.Runtime.Serialization.EnumMember(Value = @"Code")]
+        Code = 1,
 
-        _2 = 2,
+        [System.Runtime.Serialization.EnumMember(Value = @"Document")]
+        Document = 2,
 
-        _3 = 3,
+        [System.Runtime.Serialization.EnumMember(Value = @"Image")]
+        Image = 3,
 
-        _4 = 4,
+        [System.Runtime.Serialization.EnumMember(Value = @"Video")]
+        Video = 4,
 
-        _5 = 5,
+        [System.Runtime.Serialization.EnumMember(Value = @"Other")]
+        Other = 5,
 
     }
 

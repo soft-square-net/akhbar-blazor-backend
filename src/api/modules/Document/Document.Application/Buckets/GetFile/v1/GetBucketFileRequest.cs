@@ -1,7 +1,5 @@
-﻿using FSH.Framework.Core.Storage.File;
-using FSH.Starter.WebApi.Document.Application.Buckets.Get.v1;
+﻿using FSH.Starter.WebApi.Document.Application.Buckets.Get.v1;
 using MediatR;
-using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
 public sealed class GetBucketFileRequest : IRequest<GetBucketFileResponse>

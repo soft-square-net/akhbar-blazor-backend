@@ -1,8 +1,10 @@
 ﻿@page "/document/list"
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Notifications
 @using FSH.Starter.BlazorShared
 @inherits MobulePageBase
 @inject IDialogService DialogService
+@inject IDocumentsStorageService DocumentsStorageService
 @using FSH.Starter.Blazor.Modules.Document.Blazor
 
 <link href="@($"_content/{typeof(Constants).Assembly.GetName().Name}.styles.css")" rel="stylesheet" />
@@ -10,6 +12,11 @@
 
 <FileExplorerComponent AllowMultipleSelection="false" />
 
+<MudFileUpload T="IBrowserFile" @ref="_fileUpload" 
+    @bind-Files="_file"
+    OnUploadSuccess="OnUploadSuccess" 
+    Accept=".png, .jpg, .tiff" />
+<MudIconButton Icon="@Icons.Material.Filled.UploadFile" Color="Color.Primary" OnClick="TriggerUpload" />
 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
   @Loc["Modules.Document.Title"] Open File Explorer
 </MudButton>
