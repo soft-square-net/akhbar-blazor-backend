@@ -12,8 +12,12 @@ public static class CreateBucketFileEndpoint
     public static RouteHandlerBuilder MapBucketFileCreationEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
+            //.MapPost("/{bucketId:guid}/folder/{parentFolderId:guid}/CreateFile", async (Guid bucketId, Guid parentFolderId, FileType fileType, IFormFile file, ISender mediator) =>
             .MapPost("/{bucketId:guid}/folder/{parentFolderId:guid}/CreateFile", async (Guid bucketId, Guid parentFolderId, FileType fileType, IFormFile file, ISender mediator) =>
             {
+                if (file == null || file.Length == 0)
+                    return Results.BadRequest("Invalid file stream payload.");
+
                 // if (bucketId != request.BucketId || parentFolderId != request.ParentFolderId) return Results.BadRequest();
                 var request = new CreateBucketFileCommand(bucketId, parentFolderId, fileType, file.FileName,file.ContentType, file.Length, file.OpenReadStream());
                 var response = await mediator.Send(request);

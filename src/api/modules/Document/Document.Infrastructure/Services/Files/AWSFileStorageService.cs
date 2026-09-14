@@ -1,5 +1,4 @@
-﻿
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -24,7 +23,13 @@ public class AWSFileStorageService : IFileStorageService
         AWSCredentials credentials = (AWSCredentials)refreshCeredintials;
         RegionEndpoint region = RegionEndpoint.GetBySystemName(configuration.GetValue<string>("AWS:Region")); // Specify your desired AWS region
         _refreshCeredintials = refreshCeredintials;
-        _s3Client = new AmazonS3Client(credentials, region);
+        var s3Config = new AmazonS3Config
+        {
+            ServiceURL = "http://localhost:9000",
+            ForcePathStyle = true,
+        };
+        _s3Client = new AmazonS3Client(credentials, s3Config);
+        // _s3Client = new AmazonS3Client("minioadmin", "minioadmin", s3Config);
     }
 
     public async Task CreateEmptyFolderAsync(string bucketName, string folderName, string accessKey, string secretKey)
@@ -166,7 +171,11 @@ public class AWSFileStorageService : IFileStorageService
         {
             BucketName = bucketName,
             Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimStart('/').TrimEnd('/')}/{fileName}",
-            InputStream = fileStream
+            InputStream = fileStream,
+
+            // Disable strict AWS validation mechanisms for MinIO compatibility
+            DisablePayloadSigning = false,
+            DisableDefaultChecksumValidation = true
         };
         request.Metadata.Add("Content-Type", contentType);
         PutObjectResponse res = await _s3Client.PutObjectAsync(request, cancellationToken);

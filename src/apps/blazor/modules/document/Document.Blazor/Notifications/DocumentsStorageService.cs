@@ -68,12 +68,14 @@ public class DocumentsStorageService: IDocumentsStorageService
         return new FileStream(filePath, FileMode.Open, FileAccess.Read);
     }
 
-    public async Task<FileModel> UploadFile(Stream stream, string fileName, FolderModel folder, CancellationToken cancellationToken)
+    public async Task<FileModel> UploadFile(FileParameter fileParameter, string fileName, FolderModel folder, int fileSize, CancellationToken cancellationToken)
     {
-        var fileModel = new FileModel(Guid.NewGuid(), fileName, stream.Length, DateTime.Now, DateTime.Now);
+        var fileModel = new FileModel(Guid.NewGuid(), fileName, fileSize, DateTime.Now, DateTime.Now);
         FileType fileType = (FileType)Enum.Parse(typeof(FileType), Enum.GetName(typeof(global::Shared.Enums.FileType), fileModel.GetFileType())!, true);
-        var file = await _apiClient.CreateBucketFileEndpointAsync(folder.BucketId, folder.Id, fileType, new FileParameter(stream, fileName, fileModel.GetMIMEType()));
+        // var file = await _apiClient.CreateBucketFileEndpointAsync(folder.BucketId, folder.Id, fileType, new FileParameter(stream, fileName, fileModel.GetMIMEType()));
+        var file = await _apiClient.CreateBucketFileEndpointAsync(folder.BucketId, folder.Id, fileType, fileParameter);
         GetBucketFileResponse? result = await _apiClient.GetBucketFileEndpointAsync(folder.BucketId, folder.Id, (Guid)file.Id);
+        // GetBucketFileResponse? result = await _apiClient.GetBucketFileEndpointAsync(folder.BucketId, folder.Id, Guid.NewGuid());
 
         return result.Adapt<FileModel>();
     }

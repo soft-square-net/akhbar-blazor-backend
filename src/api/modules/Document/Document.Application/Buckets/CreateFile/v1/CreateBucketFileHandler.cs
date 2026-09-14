@@ -25,8 +25,9 @@ public sealed class CreateBucketFileHandler(
         var filenExtension = request.FileName.Split(".").Last();
         string Key = await service.UploadFileAsync(request.FileContent, bucket.Name, request.FileName, request.ContentType, request.FileType, filenExtension, parentFolder?.FullPath,bucket.StorageAccount.AccessKey,bucket.StorageAccount.SecretKey, cancellationToken);
         logger.LogInformation("File \"{Key}\" created in bucket {BucketId}", Key, request.BucketId);
-        String uri = String.Format("s3://{0}/{1}/{3}", bucket.Name,parentFolder?.FullPath.TrimStart('/'), request.FileName);
-        String objectArn = String.Format("arn:aws:s3:::{0}/{1}/{2}", bucket.Name,parentFolder?.FullPath.TrimStart('/'), request.FileName);
+        // String uri = String.Format("s3://{0}/{1}/{3}", bucket.Name,parentFolder?.FullPath?.TrimStart('/') ?? "", request.FileName);
+        String uri = $"s3://{bucket.Name}/{parentFolder?.FullPath?.TrimStart('/') ?? ""}/{request.FileName}";
+        String objectArn = $"arn:aws:s3:::{bucket.Name}/{parentFolder?.FullPath?.TrimStart('/') ?? ""}/{request.FileName}";
         bucket.AddFile(parentFolder?.Id ?? bucket.Folders[0].Id, Key, request.FileName, filenExtension, objectArn, request.FileType, request.FileSize, false, "");
         await repository.UpdateAsync(bucket, cancellationToken);
         return new CreateBucketFileResponse(bucket.Id);
