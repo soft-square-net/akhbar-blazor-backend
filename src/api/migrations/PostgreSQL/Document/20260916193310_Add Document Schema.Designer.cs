@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20260722090157_Add Document Schema")]
+    [Migration("20260916193310_Add Document Schema")]
     partial class AddDocumentSchema
     {
         /// <inheritdoc />
@@ -211,6 +211,9 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
             modelBuilder.Entity("FSH.Starter.WebApi.Document.Domain.File", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BucketId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("Created")

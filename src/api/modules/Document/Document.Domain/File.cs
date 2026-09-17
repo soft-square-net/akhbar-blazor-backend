@@ -1,10 +1,11 @@
 ﻿using FSH.Framework.Core.Domain;
+using FSH.Framework.Core.Domain.Contracts;
 using FSH.Starter.WebApi.Document.Domain.Events;
 using Shared.Enums;
 using System.Text.Json.Serialization;
 
 namespace FSH.Starter.WebApi.Document.Domain;
-public class File : AuditableEntity
+public class File : AuditableEntity, IAggregateRoot
 {
     public string Key { get; private set; } = string.Empty; 
     public string Name { get; private set; } = string.Empty;
@@ -14,6 +15,7 @@ public class File : AuditableEntity
     public string Url { get; private set; } = string.Empty;
     public FileType FileType { get; private set; } = FileType.Other;
     public Guid FolderId { get; private set; }
+    public Guid BucketId { get; private set; }
     public long? Size { get; private set; }
     public bool IsPublic { get; private set; } = true;
 
@@ -21,9 +23,10 @@ public class File : AuditableEntity
     public Folder Folder { get; private set; } = null!;
     private File() { }
 
-    protected File(Guid id, Guid folderId, string key, string name, string extension,string url, FileType fileType, long size, bool isBublic, string? description)
+    protected File(Guid id, Guid bucketId, Guid folderId, string key, string name, string extension,string url, FileType fileType, long size, bool isBublic, string? description)
     {
         Id = id;
+        BucketId = bucketId;
         FolderId = folderId;
         Key = key;
         Name = name;
@@ -38,7 +41,7 @@ public class File : AuditableEntity
 
     public static File Create(Folder folder, string key, string name, string extension, string url, FileType fileType, long size, bool isBublic, string? description)
     {
-        return new File(Guid.NewGuid(), folder.Id, key, name, extension, url, fileType, size, isBublic, description);
+        return new File(Guid.NewGuid(), folder.BucketId, folder.Id, key, name, extension, url, fileType, size, isBublic, description);
     }
 
     internal File Update(string? name, string? description)

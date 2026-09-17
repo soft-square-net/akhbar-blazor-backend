@@ -108,12 +108,13 @@ public class Bucket : AuditableEntity, IAggregateRoot
         }
         return this;
     }
-    public void AddFile(Guid folderId, string key, string name, string extension, string fileUrl, FileType fileType, long size, bool isPublic, string? description = null) { 
+    public File AddFile(Guid folderId, string key, string name, string extension, string fileUrl, FileType fileType, long size, bool isPublic, string? description = null) { 
         // File file = new File(Guid.NewGuid(), folderId, key, name, extension, fileUrl, fileType, size, isPublic, description);
         // File file = File.Create(Guid.NewGuid(), folderId, key, name, extension, fileUrl, fileType, size, isPublic, description);
-        Folders.SingleOrDefault(f => f.Id == folderId)?
+        var result = Folders.SingleOrDefault(f => f.Id == folderId)?
             .AddFile( key, name, extension, fileUrl, fileType, size, isPublic, description);
         UpdateSize(Size + size, MaxSize);
+        return result;
     }
     //public void AddFile(Folder folder,File file)
     //{

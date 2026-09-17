@@ -10,11 +10,12 @@ public static class GetBucketFileEndpoint
     public static RouteHandlerBuilder MapBucketGetFileEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapGet("/{id:guid}/Folder/{folderid:guid}/File{fileid:guid}/", async (Guid id, Guid folderid, Guid fileid,ISender mediator) =>
+            .MapGet("/{id:guid}/Folder/{folderid:guid}/File/{fileid:guid}/", async (Guid id, Guid folderid, Guid fileid,ISender mediator) =>
             {
                 var response = await mediator.Send(new GetBucketFileRequest(id,folderid,fileid));
-                byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");
-                return Results.File(fileBytes, "application/pdf", "document.pdf");
+                // byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");
+                // return Results.File(fileBytes, "application/pdf", "document.pdf");
+                return Results.Ok(response);
             })
             .WithName(nameof(GetBucketFileEndpoint))
             .WithSummary("Get bucket File by Id")

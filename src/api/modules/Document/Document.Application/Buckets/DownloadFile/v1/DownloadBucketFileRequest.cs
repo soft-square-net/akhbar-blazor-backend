@@ -2,4 +2,4 @@
 
 namespace FSH.Starter.WebApi.Document.Appication.Buckets.DownloadFile.v1;
 
-public sealed record DownloadBucketFileRequest(Guid BucketId, Guid FolderId, Guid FileId) : IRequest<DownloadBucketFileResponse>;
+public sealed record DownloadBucketFileRequest(Guid BucketId, Guid FileId) : IRequest<DownloadBucketFileResponse>;

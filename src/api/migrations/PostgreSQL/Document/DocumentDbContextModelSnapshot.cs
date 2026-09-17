@@ -210,6 +210,9 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("BucketId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 

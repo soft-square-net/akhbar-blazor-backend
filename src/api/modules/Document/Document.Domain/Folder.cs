@@ -6,7 +6,7 @@ using Shared.Enums;
 using System.Text.Json.Serialization;
 
 namespace FSH.Starter.WebApi.Document.Domain;
-public class Folder : AuditableEntity
+public class Folder : AuditableEntity, IAggregateRoot
 {
     private readonly List<Folder> _Children  = new();
     private readonly List<File> _Files  = new();
@@ -68,9 +68,11 @@ public class Folder : AuditableEntity
         }
         return this;
     }
-    internal void AddFile(string key, string name, string extension, string fileUrl, FileType fileType, long size, bool isPublic, string? description = null)
+    internal File AddFile(string key, string name, string extension, string fileUrl, FileType fileType, long size, bool isPublic, string? description = null)
     {
-        _Files.Add(File.Create(this, key, name, extension, fileUrl, fileType, size, isPublic, description));
+        var file = File.Create(this, key, name, extension, fileUrl, fileType, size, isPublic, description);
+        _Files.Add(file);
+        return file;
     }
 
     internal Folder UpdateFile(File file)
@@ -186,4 +188,11 @@ public class Folder : AuditableEntity
         }
         return this;
     }
+
+    //public async Task<List<File>> SearchFilesInBucketAsync(int bucketId, string searchTerm)
+    //{
+    //    return await _Files
+    //        .Where(f => f.Folder.BucketId == bucketId && f.Name.Contains(searchTerm))
+    //        .ToListAsync();
+    //}
 }

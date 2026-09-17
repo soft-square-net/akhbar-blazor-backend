@@ -47,7 +47,7 @@ internal sealed class DocumentDbInitializer(
         if (storageAccount is not null && !await context.Buckets.AnyAsync().ConfigureAwait(false))
         {
             // var bucket = Bucket.Create(storageAccount, "us-east-1", "akhbar-demo", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
-            var bucket = Bucket.Create(storageAccount, "us-east-1", "Default", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
+            var bucket = Bucket.Create(storageAccount, "us-east-1", "fsh-uploads", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
             // bucket.Folders.Add(Domain.Folder.Create(bucket));
             await context.Buckets.AddAsync(bucket, cancellationToken);
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

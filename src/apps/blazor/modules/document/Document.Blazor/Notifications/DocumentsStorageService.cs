@@ -8,6 +8,8 @@ using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 using FSH.Starter.Shared.Authorization;
 using Mapster;
 using MediatR.Courier;
+using OneOf.Types;
+using static FSH.Starter.Blazor.Modules.Document.Blazor.FileExplorerIcons;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Notifications;
 
@@ -55,7 +57,8 @@ public class DocumentsStorageService: IDocumentsStorageService
 
     public async Task<FileStream> DownloadFile(FileModel model, string filePath, CancellationToken cancellationToken)
     {
-        GetBucketFileResponse? fileData = await _apiClient.GetBucketFileEndpointAsync(model.Folder.BucketId, model.Folder.Id, model.Id, cancellationToken);
+        //GetBucketFileResponse? fileData = await _apiClient.GetBucketFileEndpointAsync(model.Folder.BucketId, model.Folder.Id, model.Id, cancellationToken);
+        DownloadBucketFileResponse fileData = await _apiClient.DownloadBucketFileEndpointAsync(model.Folder.BucketId, model.Id);
 
         // Create the FileStream and write the bytes to disk
         using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
@@ -74,10 +77,29 @@ public class DocumentsStorageService: IDocumentsStorageService
         FileType fileType = (FileType)Enum.Parse(typeof(FileType), Enum.GetName(typeof(global::Shared.Enums.FileType), fileModel.GetFileType())!, true);
         // var file = await _apiClient.CreateBucketFileEndpointAsync(folder.BucketId, folder.Id, fileType, new FileParameter(stream, fileName, fileModel.GetMIMEType()));
         var file = await _apiClient.CreateBucketFileEndpointAsync(folder.BucketId, folder.Id, fileType, fileParameter);
-        GetBucketFileResponse? result = await _apiClient.GetBucketFileEndpointAsync(folder.BucketId, folder.Id, (Guid)file.Id);
+        // GetBucketFileResponse? result = await _apiClient.GetBucketFileEndpointAsync(folder.BucketId, folder.Id, (Guid)file.Id);
         // GetBucketFileResponse? result = await _apiClient.GetBucketFileEndpointAsync(folder.BucketId, folder.Id, Guid.NewGuid());
+        try
+        {
+            var result = await _apiClient.GetBucketFileEndpointAsync(folder.BucketId, folder.Id, file.FileId, cancellationToken);
+            return result.Adapt<FileModel>();
+        }
+        catch (FSH.Starter.Blazor.Infrastructure.Api.ApiException ex)
+        {
+            Console.Error.WriteLine("Status: " + ex.StatusCode);
+            Console.Error.WriteLine("Response body raw: " + (ex.Response ?? "<null or empty>"));
 
-        return result.Adapt<FileModel>();
+            // Guard example: treat empty response as missing content
+            if (string.IsNullOrWhiteSpace(ex.Response))
+            {
+                // handle appropriately: return null, throw more specific, or try alternative endpoint
+                throw new InvalidOperationException("GetBucketFile returned an empty body.");
+            }
+
+            throw;
+        }
+
+
     }
     public Task<bool> Copy(List<BaseExplorerFactory> sources)
     {

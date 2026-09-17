@@ -11,11 +11,13 @@ public static class UploadBucketFileEndpoint
     public static RouteHandlerBuilder MapUploadBucketFileEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapGet("/{id:guid}/Folder/{folderid:guid}/File{fileid:guid}/", async (Guid id, Guid folderid, Guid fileid,ISender mediator) =>
+            .MapPost("/{id:guid}/Folder/{folderid:guid}/File{fileid:guid}/UploadFile/", async (Guid id, Guid folderid, Guid fileid,ISender mediator) =>
             {
                 var response = await mediator.Send(new UploadBucketFileRequest(id,folderid,fileid));
-                byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");
-                return Results.File(fileBytes, "application/pdf", "document.pdf");
+                return Results.Ok(response);
+                // byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");
+                // return Results.File(fileBytes, "application/pdf", "document.pdf");
+
             })
             .WithName(nameof(UploadBucketFileEndpoint))
             .WithSummary("Get bucket File by Id")

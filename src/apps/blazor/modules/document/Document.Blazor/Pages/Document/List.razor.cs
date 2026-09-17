@@ -63,7 +63,8 @@ public partial class List : MobulePageBase
         formData.Add(streamContent, "file", _file.Name);
         if (streamContent != null)
         {
-            FolderModel folderModel = new FolderModel(new Guid("5ad4c6c0-2166-4eeb-94cd-15be7c1c203a"), "Trash", new Guid("aea438af-be96-471c-b7f1-02d3444e2ac5"));
+            FolderModel folderModel = new FolderModel(new Guid("9d4bdbef-0df8-4e41-bd38-4082734e71ae"), "Trash", new Guid("7703de7b-e583-4feb-a753-5556a9061d13"));
+            folderModel.Path = "/Trash";
             await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, new CancellationToken());
         }
     }

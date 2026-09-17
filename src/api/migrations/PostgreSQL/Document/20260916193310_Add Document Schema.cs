@@ -187,6 +187,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     Url = table.Column<string>(type: "text", nullable: false),
                     FileType = table.Column<int>(type: "integer", nullable: false),
                     FolderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BucketId = table.Column<Guid>(type: "uuid", nullable: false),
                     Size = table.Column<long>(type: "bigint", nullable: true),
                     IsPublic = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
