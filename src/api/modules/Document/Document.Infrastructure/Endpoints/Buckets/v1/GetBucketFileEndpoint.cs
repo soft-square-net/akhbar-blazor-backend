@@ -1,8 +1,9 @@
 ﻿using FSH.Framework.Infrastructure.Auth.Policy;
-using FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.GetBucketFile.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Routing;
 namespace FSH.Starter.WebApi.Document.Infrastructure.Endpoints.Buckets.v1;
 public static class GetBucketFileEndpoint
@@ -10,7 +11,7 @@ public static class GetBucketFileEndpoint
     public static RouteHandlerBuilder MapBucketGetFileEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapGet("/{id:guid}/Folder/{folderid:guid}/File/{fileid:guid}/", async (Guid id, Guid folderid, Guid fileid,ISender mediator) =>
+            .MapGet("/GetFile/{id:guid}/Folder/{folderid:guid}/File/{fileid:guid}/", async (Guid id, Guid folderid, Guid fileid, HttpRequest request, ISender mediator) =>
             {
                 var response = await mediator.Send(new GetBucketFileRequest(id,folderid,fileid));
                 // byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");

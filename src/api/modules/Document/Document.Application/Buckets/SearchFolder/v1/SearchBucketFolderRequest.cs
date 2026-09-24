@@ -1,6 +1,6 @@
 
 using FSH.Framework.Core.Paging;
-using FSH.Starter.WebApi.Document.Appication.Buckets.GetFolder.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.GetFolder.v1;
 using MediatR;
 
 namespace FSH.Starter.WebApi.Document.Application.Buckets.SearchFolder.v1;

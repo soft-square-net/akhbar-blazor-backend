@@ -10,7 +10,8 @@
 @using MediatR.Courier
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
-@using MudBlazor
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs;
+
 
 @implements System.IDisposable
 
@@ -60,8 +61,8 @@
                   <MudText>Create New Folder</MudText>
                 </div>
               </MudMenuItem> *@
-                <MudMenuItem Label="Create New Folder" Icon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Warning" OnClick="ActionCreateFolder" />
-                <MudMenuItem Label="Upload File" Icon="@Icons.Material.Filled.Upload" IconColor="Color.Warning" />
+                <MudMenuItem Label="Folder" Icon="@Icons.Material.Filled.CreateNewFolder" IconColor="Color.Warning" OnClick="ActionCreateFolder" />
+                <MudMenuItem Label="File" Icon="@Icons.Material.Filled.Upload" IconColor="Color.Warning" OnClick="OpenUploadFileDialogAsync" />
               </MudMenu>
               <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Cut" />
               <MudIconButton class="action-icon-button" Icon="@FileExplorerIcons.Copy" />
@@ -131,7 +132,10 @@
               <MudStack Style=" display:flex;flex: 1 0 auto;height:100%" Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full ">
                 <MudPaper class="py-2 pe-2 mt-0 mb-0 ms-4  panel-inner-shadow mud-width-full mud-height-full" Elevation="0">
                   @* <FileExplorerFoldersListComponent OnFolderUpdated="OnFolderUpdated" OnFolderSelected="OnFolderSelected" /> *@
-                  <FileExplorerFoldersListComponent />
+                  @* <FileExplorerFoldersListComponent /> *@
+                  <MudList T="FolderModel" Dense="true" Class="border-0 file-explorer-folders-list mud-height-full">
+                    <FileExplorerFoldersTreeView />
+                  </MudList>
                 </MudPaper>
               </MudStack>
             </FirstPanel>
@@ -199,7 +203,7 @@
   #region Events
   protected override void OnInitialized()
   {
-      var bucket = new Bucket();
+    var bucket = new Bucket();
     // Courier.SubscribeWeak<NotificationWrapper<UserLoggedIn>>(HandleUserLoggedIn);
     var root = new FolderModel(Guid.NewGuid(), $"Root", bucket.Id, new[] {
                     new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
@@ -387,6 +391,12 @@
     await InvokeAsync(StateHasChanged);
   }
 
+  private Task OpenUploadFileDialogAsync()
+  {
+    var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraExtraLarge, BackdropClick = false,  CloseButton=true  };
+    var uploadDialogParameters = new DialogParameters<UploadBucketFileDialog> { { x => x.CurrentFolder, CurrentFolder } };
+    return DialogService.ShowAsync<UploadBucketFileDialog>("Upload File", uploadDialogParameters, options);
+  }
 
   private async Task HandleUserLoggedIn(NotificationWrapper<UserLoggedIn> wrapper)
   {
@@ -456,4 +466,24 @@
   .mud-split-panel-first {
     max-width: 500px !important;
   }
+   :root {
+        --file-explorer-search-box-height: 3rem;
+    }
+
+    .file-explorer-folders-list {
+        display:flex;
+        flex-direction:column;
+        flex: 1;
+        height: calc(100% - var(--file-explorer-search-box-height));
+    }
+        /* box-shadow: inset h-offset v-offset blur-radius spread-radius color; */
+        .element-class {
+            @* box-shadow: inset 6px 6px 10px 0 rgba(0, 0, 0, 0.2),
+                inset -6px -6px 10px 0 rgba(255, 255, 255, 0.5); *@
+            box-shadow: var(--inner-shadow);
+        }
+
+        .file-explorer-folders-list .mud-list-item {
+            cursor: pointer;
+        }
 </style>

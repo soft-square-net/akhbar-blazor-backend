@@ -2,7 +2,7 @@
 using FSH.Framework.Core.Storage.Bucket.Features;
 using MediatR;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.ListFiles.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.ListFiles.v1;
 
 
 public class ListBucketFilesRequest : PaginationFilter, IRequest<PagedList<SingleBucketResponse>>

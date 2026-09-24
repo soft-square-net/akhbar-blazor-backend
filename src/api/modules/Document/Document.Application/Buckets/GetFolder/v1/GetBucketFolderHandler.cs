@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.GetFolder.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.GetFolder.v1;
 public sealed class GetBucketFolderHandler(
     ILogger<GetBucketFolderHandler> logger, IStorageServiceFactory serviceFactory, 
     [FromKeyedServices("document:buckets")] IRepository<Bucket> repository

@@ -152,6 +152,7 @@
     Toast.Add($"Simulated download: {f.Name}", Severity.Info);
   }
 
+
   async Task DeleteFile(FileModel f)
   {
     bool? result = await DialogService.ShowMessageBoxAsync(

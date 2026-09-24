@@ -1,6 +1,6 @@
 ﻿using FSH.Framework.Infrastructure.Auth.Policy;
-using FSH.Starter.WebApi.Document.Appication.Buckets.Create.v1;
-using FSH.Starter.WebApi.Document.Appication.Buckets.UpdateFile.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.Create.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.UpdateFile.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

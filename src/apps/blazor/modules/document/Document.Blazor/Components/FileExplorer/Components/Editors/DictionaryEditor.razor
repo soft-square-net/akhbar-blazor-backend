@@ -1,0 +1,158 @@
+﻿ <MudDataGrid @ref="_dataGrid"
+                T="KeyValuePair<string, string>"
+                     Items="@Elements"
+                     ReadOnly="false"
+                     EditMode="DataGridEditMode.Cell"
+                     EditTrigger="DataGridEditTrigger.Manual"
+                     CommittedItemChanges="@CommittedItemChanges"
+                     Bordered="true"
+                     Dense="true"
+                     Hover="true">
+          <ToolBarContent>
+            <MudText Typo="Typo.h6">File MetaData</MudText>
+            <MudSpacer />
+            <MudButton StartIcon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Outlined" OnClick="AddMetaDataItem">Add</MudButton>
+          </ToolBarContent>
+          <Columns>
+            @* Non-editable column - always shows plain text *@
+
+    <TemplateColumn Title="Setting Name">
+      <CellTemplate>@context.Item.Key</CellTemplate>
+      <EditTemplate>
+        <MudTextField T="string" 
+                      Value="@context.Item.Key" 
+                      ValueChanged="@(newValue => UpdateDictionaryKey(context.Item.Key, newValue))" />
+      </EditTemplate>
+    </TemplateColumn>
+
+    <TemplateColumn Title="Setting Value">
+      <CellTemplate>
+        @context.Item.Value
+      </CellTemplate>
+      <EditTemplate>
+        <MudTextField T="string"
+                      Value="@context.Item.Value"
+                      ValueChanged="@(newValue => UpdateDictionaryValue(context.Item.Key, newValue))" />
+      </EditTemplate>
+    </TemplateColumn>
+
+             
+            <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
+              <CellTemplate>
+
+              </CellTemplate>
+              <EditTemplate>
+                
+                  <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                 Color="Color.Default"
+                                 Size="Size.Small"
+                                 OnClick="@(() => DeleteItem(context))" />
+
+              </EditTemplate>
+            </TemplateColumn>
+
+          </Columns>
+        </MudDataGrid>
+
+@code {
+  private MudDataGrid<KeyValuePair<string, string>> _dataGrid = default!;
+  [Parameter, EditorRequired]
+  public Dictionary<string, string> Elements { get; set; } = [];
+  private List<string> _events = [];
+  // private bool _isEditing;
+  private KeyValuePair<string, string>? _editingItem;
+
+
+
+  private void AddMetaDataItem()
+  {
+    // var newItem = new MetaTagItem();
+    Elements.Add("","");
+    // StartedEditingItem(newItem);
+  }
+  private void UpdateDictionaryKey(string key, string newKey)
+  {
+    var oldValue = Elements[key];
+
+    Elements.Remove(key);
+    Elements.Add(newKey, oldValue);
+  }
+  private void UpdateDictionaryValue(string key, string newValue)
+  {
+    Elements[key] = newValue;
+  }
+  // private void StartedEditingItem(MetaTagItem item)
+  // {
+  //   _editingItem = item;
+  //   _events.Insert(0, $"Started editing: {item.Key}");
+  //   _dataGrid.SetEditingItemAsync(item);
+  // }
+  private async Task StartEditAsync(CellContext<KeyValuePair<string, string>> context)
+  {
+    _editingItem = context.Item;
+    // Puts the row into edit mode programmatically via the grid reference
+    // await _dataGrid.SetEditingItemAsync(context.Item);
+  }
+  // private void CanceledEditingItem(MetaTagItem item)
+  // {
+  //   _editingItem = null;
+  //   // item.IsEditing = false;
+  //   _events.Insert(0, $"Canceled editing: {item?.Key}");
+  // }
+  private async Task CancelRowAsync()
+  {
+    if (_editingItem is not null)
+    {
+      // Cancels the current edit state and reverts changes
+      await _dataGrid.CancelEditingItemAsync();
+      _editingItem = null;
+    }
+  }
+  private async Task SaveRowAsync()
+  {
+    if (_editingItem is not null)
+    {
+      // Commits the ongoing edit session and fires CommittedItemChanges
+      await _dataGrid.CommittedItemChanges((KeyValuePair<string, string>)_editingItem);
+      _editingItem = null;
+    }
+  }
+
+  private Task<DataGridEditFormAction> CommittedItemChanges(KeyValuePair<string, string> item)
+  {
+    // Perform validation
+    if (string.IsNullOrWhiteSpace(item.Key))
+    {
+      _events.Insert(0, "Validation failed: Key is required");
+      return Task.FromResult(DataGridEditFormAction.KeepOpen);
+    }
+
+    if (string.IsNullOrWhiteSpace(item.Value))
+    {
+      _events.Insert(0, "Validation failed: Value is required");
+      return Task.FromResult(DataGridEditFormAction.KeepOpen);
+    }
+
+    // if (item.Molar < 0)
+    // {
+    //   _events.Insert(0, "Validation failed: Molar mass must be non-negative");
+    //   return Task.FromResult(DataGridEditFormAction.KeepOpen);
+    // }
+
+    _editingItem = null;
+    _events.Insert(0, $"Saved: {item.Key} (Value={item.Value})");
+    return Task.FromResult(DataGridEditFormAction.Close);
+  }
+
+  private void DeleteItem(CellContext<KeyValuePair<string, string>> context)
+  {
+    Elements.Remove(context.Item.Key);
+    _events.Insert(0, $"Deleted: {context.Item.Key}");
+  }
+
+  // public class MetaTagItem
+  // {
+  //   public string Key { get; set; }
+  //   public string Value { get; set; }
+  // }
+}

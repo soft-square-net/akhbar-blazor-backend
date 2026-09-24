@@ -2,7 +2,7 @@
 using FSH.Starter.WebApi.Document.Domain;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Appication.AccessRules.GetUserAccessRules.v1;
+namespace FSH.Starter.WebApi.Document.Application.AccessRules.GetUserAccessRules.v1;
 
 internal class AccessRuleByUserIdSpec : Specification<AccessRule>
 {

@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.CreateFolder.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.CreateFolder.v1;
 public sealed class CreateBucketFolderHandler(
         ILogger<CreateBucketFolderHandler> logger,
         IStorageServiceFactory serviceFactory,

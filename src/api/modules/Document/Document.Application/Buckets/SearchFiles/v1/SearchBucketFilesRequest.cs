@@ -1,10 +1,9 @@
 using FSH.Framework.Core.Paging;
-using FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
 using MediatR;
 
 namespace FSH.Starter.WebApi.Document.Application.Buckets.SearchFiles.v1;
 
-public class SearchBucketFilesRequest : PaginationFilter, IRequest<PagedList<GetBucketFileResponse>>
+public class SearchBucketFilesRequest : PaginationFilter, IRequest<PagedList<SearchBucketFileResponse>>
 {
     public Guid? BucketId { get; set; }
     public string? Name { get; set; }

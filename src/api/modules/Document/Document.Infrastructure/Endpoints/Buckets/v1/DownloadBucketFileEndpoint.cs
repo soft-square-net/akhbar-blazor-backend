@@ -1,5 +1,5 @@
 ﻿using FSH.Framework.Infrastructure.Auth.Policy;
-using FSH.Starter.WebApi.Document.Appication.Buckets.DownloadFile.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.DownloadFile.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -20,8 +20,8 @@ public static class DownloadBucketFileEndpoint
                 return Results.Ok(response);
             })
             .WithName(nameof(DownloadBucketFileEndpoint))
-            .WithSummary("Get bucket File by Id")
-            .WithDescription("Get bucket File by Id")
+            .WithSummary("Download bucket File by Id")
+            .WithDescription("Download bucket File by Id")
             .Produces<DownloadBucketFileResponse>()
             .RequirePermission("Permissions.Files.View")
             .MapToApiVersion(1);

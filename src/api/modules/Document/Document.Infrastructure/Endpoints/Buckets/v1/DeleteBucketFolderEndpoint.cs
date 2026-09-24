@@ -1,5 +1,5 @@
 ﻿using FSH.Framework.Infrastructure.Auth.Policy;
-using FSH.Starter.WebApi.Document.Appication.Buckets.DeleteFolder.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.DeleteFolder.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

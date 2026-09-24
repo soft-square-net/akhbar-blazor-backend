@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>FSH.Starter.WebApi.Document.Appication</RootNamespace>
-    <AssemblyName>FSH.Starter.WebApi.Document.Appication</AssemblyName>
+    <RootNamespace>FSH.Starter.WebApi.Document.Application</RootNamespace>
+    <AssemblyName>FSH.Starter.WebApi.Document.Application</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />

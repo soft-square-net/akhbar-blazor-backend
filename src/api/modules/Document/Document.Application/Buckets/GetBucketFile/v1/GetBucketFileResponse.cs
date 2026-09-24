@@ -1,8 +1,9 @@
 ﻿using FSH.Starter.WebApi.Document.Domain;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
-public sealed record GetBucketFileResponse(Guid BucketId,
+namespace FSH.Starter.WebApi.Document.Application.Buckets.GetBucketFile.v1;
+public record GetBucketFileResponse(
+    Guid BucketId,
     Guid FileId,
     Folder Folder,
     string Key,
@@ -11,6 +12,8 @@ public sealed record GetBucketFileResponse(Guid BucketId,
     string Extension,
     string Etag,
     string Url,
+    DateTimeOffset Created,
+    DateTimeOffset LastModified,
     FileType FileType = FileType.Other,
     long? Size = 0,
     bool IsPublic = true);

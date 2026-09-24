@@ -31,6 +31,9 @@
     <Content Remove="launchSettings.json" />
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Components\FileExplorer\Components\FileExplorerFoldersListZZZComponent.razor.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Mapster" />

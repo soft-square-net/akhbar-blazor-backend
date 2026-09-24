@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http.Headers;
 using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer;
+using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Dialogs;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Helpers;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 using FSH.Starter.BlazorShared;
@@ -47,6 +48,7 @@ public partial class List : MobulePageBase
         return DialogService.ShowAsync<FileExplorerDialog>("File Explorer Dialog", options);
     }
 
+
     private async Task TriggerUpload()
     {
         //_fileUpload.Files?.OpenReadStream();
@@ -64,8 +66,8 @@ public partial class List : MobulePageBase
         if (streamContent != null)
         {
             FolderModel folderModel = new FolderModel(new Guid("9d4bdbef-0df8-4e41-bd38-4082734e71ae"), "Trash", new Guid("7703de7b-e583-4feb-a753-5556a9061d13"));
-            folderModel.Path = "/Trash";
-            await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, new CancellationToken());
+           
+            await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, "Uploaded file", new Dictionary<string, string>(), new CancellationToken());
         }
     }
 }

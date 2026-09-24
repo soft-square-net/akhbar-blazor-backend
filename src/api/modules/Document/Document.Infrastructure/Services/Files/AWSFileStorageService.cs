@@ -161,23 +161,27 @@ public class AWSFileStorageService : IFileStorageService
     /// <param name="cancellationToken"></param>
     /// <returns> string Key of uploaded file</returns>
     /// <exception cref="FileNotFoundException"></exception>
-    public async Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    public async Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, Dictionary<string,string> metadata, CancellationToken cancellationToken = default)
     {
         _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {bucketName} does not exist.");
         prefix = "/test/";
+        
         var request = new PutObjectRequest()
         {
             BucketName = bucketName,
             Key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimStart('/').TrimEnd('/')}/{fileName}",
             InputStream = fileStream,
-
             // Disable strict AWS validation mechanisms for MinIO compatibility
             DisablePayloadSigning = false,
             DisableDefaultChecksumValidation = true
         };
         request.Metadata.Add("Content-Type", contentType);
+        foreach (var item in metadata)
+        {
+            request.Metadata.Add(item.Key, item.Value);
+        }
         PutObjectResponse res = await _s3Client.PutObjectAsync(request, cancellationToken);
         var eTag = res.ETag;
         var expires = res.Expiration;

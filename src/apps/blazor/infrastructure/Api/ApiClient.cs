@@ -142,7 +142,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body);
+        System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -153,7 +153,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// creates a brand
@@ -289,7 +289,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, FileParameter file);
+        System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, string description, string extension, string metaTags, FileParameter file);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -300,7 +300,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, FileParameter file, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, string description, string extension, string metaTags, FileParameter file, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// creates a bucket Folder
@@ -408,27 +408,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         System.Threading.Tasks.Task DeleteBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
-        /// Get bucket File by Id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket File by Id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get bucket File by Id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket File by Id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken);
-
-        /// <summary>
         /// Update a bucket file
         /// </summary>
         /// <remarks>
@@ -513,10 +492,10 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         System.Threading.Tasks.Task<UpdateBucketFolderResponse> UpdateBucketFolderEndpointAsync(UpdateBucketFolderCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </summary>
         /// <remarks>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -524,10 +503,10 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </summary>
         /// <remarks>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -541,7 +520,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid);
+        System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -552,7 +531,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets a list of bucket items with paging support
@@ -625,7 +604,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body);
+        System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -636,7 +615,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// creates a bucket
@@ -646,7 +625,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body);
+        System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -657,7 +636,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Search bucket files with paging support
@@ -700,6 +679,27 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketFolderEndpointAsync(SearchBucketFolderRequest body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Get bucket File by Id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket File by Id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get bucket File by Id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket File by Id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// creates a document
@@ -793,7 +793,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body);
+        System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -804,7 +804,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// creates a product
@@ -1129,7 +1129,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body);
+        System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -1140,7 +1140,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// creates a tenant
@@ -2267,7 +2267,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body)
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body)
         {
             return SearchAccessRulesEndpointAsync(body, System.Threading.CancellationToken.None);
         }
@@ -2281,7 +2281,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfAccessRuleResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchAccessRulesEndpointAsync(SearchAccessRulesCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -2329,7 +2329,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfAccessRuleResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -2938,9 +2938,9 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, FileParameter file)
+        public virtual System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, string description, string extension, string metaTags, FileParameter file)
         {
-            return CreateBucketFileEndpointAsync(bucketId, parentFolderId, fileType, file, System.Threading.CancellationToken.None);
+            return CreateBucketFileEndpointAsync(bucketId, parentFolderId, fileType, description, extension, metaTags, file, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2952,7 +2952,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, FileParameter file, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<CreateBucketFileResponse> CreateBucketFileEndpointAsync(System.Guid bucketId, System.Guid parentFolderId, FileType fileType, string description, string extension, string metaTags, FileParameter file, System.Threading.CancellationToken cancellationToken)
         {
             if (bucketId == null)
                 throw new System.ArgumentNullException("bucketId");
@@ -2962,6 +2962,15 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
             if (fileType == null)
                 throw new System.ArgumentNullException("fileType");
+
+            if (description == null)
+                throw new System.ArgumentNullException("description");
+
+            if (extension == null)
+                throw new System.ArgumentNullException("extension");
+
+            if (metaTags == null)
+                throw new System.ArgumentNullException("metaTags");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2997,6 +3006,9 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                     urlBuilder_.Append("/CreateFile");
                     urlBuilder_.Append('?');
                     urlBuilder_.Append(System.Uri.EscapeDataString("fileType")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(fileType, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    urlBuilder_.Append(System.Uri.EscapeDataString("description")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(description, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    urlBuilder_.Append(System.Uri.EscapeDataString("extension")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(extension, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    urlBuilder_.Append(System.Uri.EscapeDataString("metaTags")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(metaTags, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -3540,110 +3552,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         }
 
         /// <summary>
-        /// Get bucket File by Id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket File by Id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid)
-        {
-            return GetBucketFileEndpointAsync(id, folderid, fileid, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get bucket File by Id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket File by Id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (folderid == null)
-                throw new System.ArgumentNullException("folderid");
-
-            if (fileid == null)
-                throw new System.ArgumentNullException("fileid");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}/File/{fileid}"
-                    urlBuilder_.Append("api/v1/Document/buckets/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/Folder/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/File/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(fileid, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<GetBucketFileResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
         /// Update a bucket file
         /// </summary>
         /// <remarks>
@@ -4033,10 +3941,10 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         }
 
         /// <summary>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </summary>
         /// <remarks>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -4047,10 +3955,10 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </summary>
         /// <remarks>
-        /// Get bucket File by Id
+        /// Download bucket File by Id
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -4139,9 +4047,9 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid)
+        public virtual System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid)
         {
-            return UploadBucketFileEndpointAsync(id, folderid, fileid, System.Threading.CancellationToken.None);
+            return GetBucketFileEndpointAsync(id, folderid, fileid, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4153,7 +4061,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4170,20 +4078,18 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}/File{fileid}/UploadFile"
-                    urlBuilder_.Append("api/v1/Document/buckets/");
+                    // Operation Path: "api/v1/Document/buckets/GetFile/{id}/Folder/{folderid}/File/{fileid}"
+                    urlBuilder_.Append("api/v1/Document/buckets/GetFile/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append("/Folder/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/File");
+                    urlBuilder_.Append("/File/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(fileid, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/UploadFile");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -4210,7 +4116,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<UploadBucketFileResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<GetBucketFileResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4540,7 +4446,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body)
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body)
         {
             return ListRegionsEndpointAsync(body, System.Threading.CancellationToken.None);
         }
@@ -4554,7 +4460,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -4602,7 +4508,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfRegionResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4637,7 +4543,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body)
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body)
         {
             return SearchBucketsEndpointAsync(body, System.Threading.CancellationToken.None);
         }
@@ -4651,7 +4557,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfBucketResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchBucketsEndpointAsync(SearchBucketsRequest body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -4699,7 +4605,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfBucketResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4898,6 +4804,112 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfSingleBucketResponseAndCoreAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Get bucket File by Id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket File by Id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid)
+        {
+            return UploadBucketFileEndpointAsync(id, folderid, fileid, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get bucket File by Id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket File by Id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<UploadBucketFileResponse> UploadBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (folderid == null)
+                throw new System.ArgumentNullException("folderid");
+
+            if (fileid == null)
+                throw new System.ArgumentNullException("fileid");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}/File{fileid}/UploadFile"
+                    urlBuilder_.Append("api/v1/Document/buckets/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Folder/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/File");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(fileid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/UploadFile");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<UploadBucketFileResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -5312,7 +5324,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body)
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body)
         {
             return SearchDocumentsEndpointAsync(body, System.Threading.CancellationToken.None);
         }
@@ -5326,7 +5338,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfDocumentResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchDocumentsEndpointAsync(SearchDocumentsCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -5374,7 +5386,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfDocumentResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfDocumentResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6826,7 +6838,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body)
+        public virtual System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body)
         {
             return SearchStorageAccountsEndpointAsync(body, System.Threading.CancellationToken.None);
         }
@@ -6840,7 +6852,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedList_1OfOfStorageAccountResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> SearchStorageAccountsEndpointAsync(SearchStorageAccountsCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -6888,7 +6900,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfStorageAccountResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfStorageAccountResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10201,7 +10213,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PagedList_1OfOfAccessRuleResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    public partial class PagedList_1OfOfAccessRuleResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
@@ -10228,7 +10240,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PagedList_1OfOfBucketResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    public partial class PagedList_1OfOfBucketResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
@@ -10255,7 +10267,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PagedList_1OfOfRegionResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    public partial class PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
@@ -10282,7 +10294,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PagedList_1OfOfDocumentResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    public partial class PagedList_1OfOfDocumentResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
@@ -10309,7 +10321,7 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PagedList_1OfOfStorageAccountResponseAndAppicationAnd_0AndCulture_neutralAndPublicKeyToken_null
+    public partial class PagedList_1OfOfStorageAccountResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
@@ -10787,6 +10799,46 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class AccessRuleResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public string? ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
+        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
+        public bool IsEnabled { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("read")]
+        public bool Read { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("write")]
+        public bool Write { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("execute")]
+        public bool Execute { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
+        public Bucket Bucket { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class GetUserAccessRulesResponse
     {
 
@@ -10823,6 +10875,79 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
         public string? Description { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SearchAccessRulesCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("advancedSearch")]
+        public Search AdvancedSearch { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("keyword")]
+        public string? Keyword { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("advancedFilter")]
+        public Filter AdvancedFilter { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageNumber")]
+        public int PageNumber { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("pageSize")]
+        public int PageSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("orderBy")]
+        public System.Collections.Generic.ICollection<string>? OrderBy { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateAccessRuleCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
+        public System.Guid StorageAccountId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
+        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
+        public string? ResourceOwnerId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
+        public bool IsEnabled { get; set; } = true;
+
+        [System.Text.Json.Serialization.JsonPropertyName("read")]
+        public bool Read { get; set; } = true;
+
+        [System.Text.Json.Serialization.JsonPropertyName("write")]
+        public bool Write { get; set; } = false;
+
+        [System.Text.Json.Serialization.JsonPropertyName("execute")]
+        public bool Execute { get; set; } = false;
+
+        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
+        public string? RootPath { get; set; } = "";
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = "";
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateAccessRuleResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
 
     }
 
@@ -10939,6 +11064,39 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class BucketResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
+        public StorageAccount StorageAccount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("resourceName")]
+        public string? ResourceName { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("region")]
+        public string? Region { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("size")]
+        public long Size { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("maxSize")]
+        public long MaxSize { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class GetBucketFileResponse
     {
 
@@ -10968,6 +11126,12 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string? Url { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModified")]
+        public System.DateTime LastModified { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("fileType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<FileType>))]
@@ -11011,230 +11175,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("orderBy")]
         public System.Collections.Generic.ICollection<string>? OrderBy { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateBucketFileCommand
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
-        public System.Guid BucketId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("fileId")]
-        public System.Guid FileId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateBucketFileResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid? Id { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateBucketFolderCommand
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
-        public System.Guid BucketId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
-        public System.Guid FolderId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateBucketFolderResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid? Id { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UploadBucketFileResponse
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class CreateStorageAccountCommand
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageProvider")]
-        public StorageProvider StorageProvider { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("accountName")]
-        public string? AccountName { get; set; } = "Sample Bucket Name";
-
-        [System.Text.Json.Serialization.JsonPropertyName("accessKey")]
-        public string? AccessKey { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("secretKey")]
-        public string? SecretKey { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = "Descriptive Description";
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class CreateStorageAccountResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid? Id { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class AccessRuleResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid? Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
-        public StorageAccount StorageAccount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
-        public string? ResourceOwnerId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
-        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
-        public bool IsEnabled { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("read")]
-        public bool Read { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("write")]
-        public bool Write { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("execute")]
-        public bool Execute { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucket")]
-        public Bucket Bucket { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
-        public string? RootPath { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SearchAccessRulesCommand
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("advancedSearch")]
-        public Search AdvancedSearch { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("keyword")]
-        public string? Keyword { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("advancedFilter")]
-        public Filter AdvancedFilter { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pageNumber")]
-        public int PageNumber { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pageSize")]
-        public int PageSize { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("orderBy")]
-        public System.Collections.Generic.ICollection<string>? OrderBy { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateAccessRuleCommand
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccountId")]
-        public System.Guid StorageAccountId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerType")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ResourceOwnerType>))]
-        public ResourceOwnerType ResourceOwnerType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("resourceOwnerId")]
-        public string? ResourceOwnerId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
-        public System.Guid BucketId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isEnabled")]
-        public bool IsEnabled { get; set; } = true;
-
-        [System.Text.Json.Serialization.JsonPropertyName("read")]
-        public bool Read { get; set; } = true;
-
-        [System.Text.Json.Serialization.JsonPropertyName("write")]
-        public bool Write { get; set; } = false;
-
-        [System.Text.Json.Serialization.JsonPropertyName("execute")]
-        public bool Execute { get; set; } = false;
-
-        [System.Text.Json.Serialization.JsonPropertyName("rootPath")]
-        public string? RootPath { get; set; } = "";
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = "";
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateAccessRuleResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid? Id { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class BucketResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public System.Guid? Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageAccount")]
-        public StorageAccount StorageAccount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("resourceName")]
-        public string? ResourceName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("region")]
-        public string? Region { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("size")]
-        public long Size { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("maxSize")]
-        public long MaxSize { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("created")]
-        public System.DateTime Created { get; set; } = default!;
 
     }
 
@@ -11377,6 +11317,54 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateBucketFileCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileId")]
+        public System.Guid FileId { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateBucketFileResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateBucketFolderCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
+        public System.Guid FolderId { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateBucketFolderResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UploadBucketFileResponse
+    {
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateDocumentCommand
     {
 
@@ -11459,6 +11447,36 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UpdateDocumentResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public System.Guid? Id { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateStorageAccountCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("storageProvider")]
+        public StorageProvider StorageProvider { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("accountName")]
+        public string? AccountName { get; set; } = "Sample Bucket Name";
+
+        [System.Text.Json.Serialization.JsonPropertyName("accessKey")]
+        public string? AccessKey { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("secretKey")]
+        public string? SecretKey { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string? Description { get; set; } = "Descriptive Description";
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateStorageAccountResponse
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]

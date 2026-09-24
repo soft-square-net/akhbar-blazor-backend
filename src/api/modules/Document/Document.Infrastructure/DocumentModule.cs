@@ -53,10 +53,9 @@ public static class DocumentModule
             bucketsGroup.MapBucketDeleteEndpoint();
             bucketsGroup.MapBucketDeleteFileEndpoint();
             bucketsGroup.MapBucketDeleteFolderEndpoint();
+            bucketsGroup.MapDownloadBucketFileEndpoint();
             bucketsGroup.MapBucketGetEndpoint();
             bucketsGroup.MapBucketGetFileEndpoint();
-            bucketsGroup.MapDownloadBucketFileEndpoint();
-            bucketsGroup.MapUploadBucketFileEndpoint();
             bucketsGroup.MapBucketGetFolderEndpoint();
             bucketsGroup.MapBucketListEndpoint();
             bucketsGroup.MapBucketListFilesEndpoint();
@@ -68,6 +67,8 @@ public static class DocumentModule
             bucketsGroup.MapBucketUpdateEndpoint();
             bucketsGroup.MapBucketUpdateFileEndpoint();
             bucketsGroup.MapBucketUpdateFolderEndpoint();
+            bucketsGroup.MapUploadBucketFileEndpoint();
+
             // Mapping Storage Account endpoints
             var storageAccountGroup = app.MapGroup("storage-accounts").WithGroupName("documents").WithTags("storage-ccounts");
             storageAccountGroup.MapStorageAccountCreationEndpoint();

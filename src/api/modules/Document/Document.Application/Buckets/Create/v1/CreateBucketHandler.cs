@@ -2,13 +2,13 @@
 using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.Bucket;
 using FSH.Framework.Core.Storage.Bucket.Features;
-using FSH.Starter.WebApi.Document.Appication.Buckets.Specs;
+using FSH.Starter.WebApi.Document.Application.Buckets.Specs;
 using FSH.Starter.WebApi.Document.Domain;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.Create.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.Create.v1;
 
 public sealed class CreateBucketHandler( 
     ILogger<CreateBucketHandler> logger,

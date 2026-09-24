@@ -1,0 +1,105 @@
+﻿@using System.Net.Http.Headers
+@using System.Web
+@using FSH.Starter.Blazor.Infrastructure.Api
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.Editors
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Notifications
+
+@inject NavigationManager NavigationManager
+@inject IDocumentsStorageService DocumentsStorageService
+
+<MudDialog>
+  <TitleContent>
+    @UploadDialog.Title
+  </TitleContent>
+  <DialogContent>
+    <div class="d-flex flex-column py-1" style="min-width:400px;">
+      <MudForm>
+
+        <MudTextField T="string" Lines="3" MaxLines="3" @bind-Value="_description" Label="Description"></MudTextField>
+        <MudFileUpload T="IBrowserFile" @ref="_fileUpload"
+                       @bind-Files="_file"
+                       OnUploadSuccess="OnUploadSuccess"
+                       Accept=".png, .jpg, .tiff, .jpeg">
+          <CustomContent>
+            <MudButton OnClick="@context.OpenFilePickerAsync"
+                       StartIcon="@Icons.Material.Filled.CloudUpload">
+              Choose File
+            </MudButton>
+          </CustomContent>
+        </MudFileUpload>
+
+       @*  StartedEditingItem="@StartedEditingItem"
+        CanceledEditingItem="@CanceledEditingItem" *@
+        <DictionaryEditor Elements="_metadata"></DictionaryEditor>
+        <MudIconButton Icon="@Icons.Material.Filled.UploadFile" Color="Color.Primary" OnClick="TriggerUpload" />
+
+      </MudForm>
+      Folder Name: @CurrentFolder.Name
+    </div>
+  </DialogContent>
+  <DialogActions>
+    <MudButton Color="Color.Primary" OnClick="Upload">Upload</MudButton>
+    <MudButton Color="Color.Primary" OnClick="Cancel">Cancel</MudButton>
+  </DialogActions>
+</MudDialog>
+
+
+
+
+@code {
+  [CascadingParameter] IMudDialogInstance UploadDialog { get; set; } = default!;
+  [Parameter] public string CurrentName { get; set; } = string.Empty;
+  [Parameter] public FolderModel CurrentFolder { get; set; }
+  string NewName = string.Empty;
+
+  private MudFileUpload<IBrowserFile> _fileUpload;
+  // private IBrowserFile _file = new DummyBrowserFile("test1.jpg", DateTimeOffset.Now, 0, "image/jpeg", []);
+  private IBrowserFile _file;
+  private bool _uploading;
+  private int _progress;
+  private string _statusText = "Waiting for files.";
+  private string _description;
+  private Dictionary<string, string> _metadata = new() { { "AAAAA", "BBBBB" } };  
+
+  void Cancel() => UploadDialog.Cancel();
+
+  void Upload() => UploadDialog.Close(DialogResult.Ok(NewName.Trim()));
+
+
+
+  private async Task TriggerUpload()
+  {
+
+    using var fileStream = _file.OpenReadStream(5242880);
+    var fileParameter = new FileParameter(fileStream, _file.Name, _file.ContentType);
+
+    using var formData = new MultipartFormDataContent();
+    using var streamContent = new StreamContent(fileStream);
+    streamContent.Headers.ContentType = new MediaTypeHeaderValue(_file.ContentType);
+    formData.Add(streamContent, "file", _file.Name);
+    if (streamContent != null)
+    {
+      FolderModel folderModel = new FolderModel(new Guid("9d4bdbef-0df8-4e41-bd38-4082734e71ae"), "Trash", new Guid("7703de7b-e583-4feb-a753-5556a9061d13"));
+
+      Dictionary<string, string> metadata = new Dictionary<string, string>();
+      await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, _description, metadata, new CancellationToken());
+    }
+  }
+
+
+
+
+
+  //_fileUpload.Files?.OpenReadStream();
+  // using var stream = _file.OpenReadStream(5242880); // Limit to 5MB.
+  //using var memoryStream = new MemoryStream();
+  //await stream.CopyToAsync(memoryStream);
+  //var fileBytes = memoryStream.ToArray();
+
+
+}
+
+
+
+

@@ -5,13 +5,14 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shared.Enums;
+using File = FSH.Starter.WebApi.Document.Domain.File;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.GetBucketFile.v1;
 
 public sealed class GetBucketFileHandler(
     ILogger<GetBucketFileHandler> logger, IStorageServiceFactory serviceFactory,
     [FromKeyedServices("document:buckets")] IRepository<Bucket> repository,
-    [FromKeyedServices("document:files")] IReadRepository<Domain.File> fileRepo
+    [FromKeyedServices("document:files")] IReadRepository<File> fileRepo
     ) : IRequestHandler<GetBucketFileRequest, GetBucketFileResponse>
 {
 
@@ -24,6 +25,6 @@ public sealed class GetBucketFileHandler(
         // var service = serviceFactory.GetFileStorageService(StorageProvider.AmazonS3);
 
 
-        return new GetBucketFileResponse(request.BucketId, request.FileId, file.Folder,file.Key, file.Name,file.Description,file.Extension,file.Etag,file.Url,file.FileType,file.Size, file.IsPublic);
+        return new GetBucketFileResponse(request.BucketId, request.FileId, file.Folder,file.Key, file.Name,file.Description,file.Extension,file.Etag,file.Url, file.Created, file.LastModified,file.FileType,file.Size, file.IsPublic);
     }
 }

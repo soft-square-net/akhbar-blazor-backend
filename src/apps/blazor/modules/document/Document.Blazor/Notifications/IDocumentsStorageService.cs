@@ -8,7 +8,7 @@ public interface IDocumentsStorageService
 {
     Task<List<GetUserAccessRulesResponse>?> GetAccessRules();
     Task<FileStream> DownloadFile(FileModel model, string filePath, CancellationToken cancellationToken);
-    Task<FileModel> UploadFile(FileParameter fileParameter, string fileName, FolderModel folder, int fileSize, CancellationToken cancellationToken);
+    Task<FileModel> UploadFile(FileParameter fileParameter, string fileName, FolderModel folder, int fileSize, string description, Dictionary<string, string> metaTags, CancellationToken cancellationToken);
     Task<bool> Copy(List<BaseExplorerFactory> sources);
     Task<bool> Paste(FolderModel destination);
     Task<FolderModel> CreateFolder(string name);

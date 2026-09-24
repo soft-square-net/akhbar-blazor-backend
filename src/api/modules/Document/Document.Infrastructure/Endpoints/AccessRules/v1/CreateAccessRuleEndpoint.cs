@@ -1,5 +1,5 @@
 ﻿using FSH.Framework.Infrastructure.Auth.Policy;
-using FSH.Starter.WebApi.Document.Appication.AccessRules.Create.v1;
+using FSH.Starter.WebApi.Document.Application.AccessRules.Create.v1;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

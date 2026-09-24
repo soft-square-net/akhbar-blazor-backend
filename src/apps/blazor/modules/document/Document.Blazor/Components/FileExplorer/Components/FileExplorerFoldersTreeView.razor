@@ -109,9 +109,10 @@
     {
       DetatchActions();
       StateService.OnCurrentFolderChanged += HandleOnCurrentFolderChanged;
+      StateService.OnFolderSelectionChanged += HandleOnFolderSelectionChanged;
       StateService.OnFolderUpdated += HandleOnFolderUpdated;
       StateService.OnFolderCreated += HandleOnFolderCreated;
-      StateService.OnFolderSelectionChanged += HandleOnFolderSelectionChanged;
+
       _treeItems = MapFoldersToTreeItemData(Folders);
       // Optionally, select the first folder in the tree on initial render
       if (Folders.Any())

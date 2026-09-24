@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Ardalis.Specification;
 using FSH.Starter.WebApi.Document.Domain;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.Specs;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.Specs;
 public class GetBucketByIdSpec: SingleResultSpecification<Bucket>
 {
     public GetBucketByIdSpec(Guid id)

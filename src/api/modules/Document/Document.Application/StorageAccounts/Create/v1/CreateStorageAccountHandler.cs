@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Amazon.Runtime.Internal.Util;
 using Microsoft.Extensions.Logging;
 
-namespace FSH.Starter.WebApi.Document.Appication.StorageAccounts.Create.v1;
+namespace FSH.Starter.WebApi.Document.Application.StorageAccounts.Create.v1;
 
 public sealed class CreateStorageAccountHandler(
     ILogger<CreateStorageAccountHandler> logger,

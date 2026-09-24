@@ -2,7 +2,7 @@
 using FSH.Framework.Core.Persistence;
 using FSH.Framework.Core.Storage;
 using FSH.Framework.Core.Storage.Bucket.Features;
-using FSH.Starter.WebApi.Document.Appication.Buckets.ListFiles.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.ListFiles.v1;
 using FSH.Starter.WebApi.Document.Application.Buckets.ListFolder.v1;
 using FSH.Starter.WebApi.Document.Domain;
 using MediatR;

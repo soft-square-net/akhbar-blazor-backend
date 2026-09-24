@@ -4,7 +4,7 @@ using FSH.Starter.WebApi.Document.Domain;
 using MediatR;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Appication.AccessRules.Create.v1;
+namespace FSH.Starter.WebApi.Document.Application.AccessRules.Create.v1;
 
 public sealed record CreateAccessRuleCommand(
 

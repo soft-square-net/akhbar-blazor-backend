@@ -3,7 +3,7 @@ using System.ComponentModel;
 using FSH.Starter.WebApi.Document.Domain;
 using MediatR;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.Create.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.Create.v1;
 
 public sealed record CreateBucketCommand(
     Guid StorageAccountId,

@@ -2,7 +2,7 @@
 using MediatR;
 using Shared.Enums;
 
-namespace FSH.Starter.WebApi.Document.Appication.Buckets.UpdateFolder.v1;
+namespace FSH.Starter.WebApi.Document.Application.Buckets.UpdateFolder.v1;
 public sealed record UpdateBucketFolderCommand(
     Guid BucketId,
     Guid FolderId) : IRequest<UpdateBucketFolderResponse>;

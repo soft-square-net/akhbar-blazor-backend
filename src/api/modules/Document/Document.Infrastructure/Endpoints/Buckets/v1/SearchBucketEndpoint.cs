@@ -1,7 +1,7 @@
 ﻿using FSH.Framework.Core.Paging;
 using FSH.Framework.Core.Storage.Bucket.Features;
 using FSH.Framework.Infrastructure.Auth.Policy;
-using FSH.Starter.WebApi.Document.Appication.Buckets.Create.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.Create.v1;
 using FSH.Starter.WebApi.Document.Application.Buckets.Get.v1;
 using FSH.Starter.WebApi.Document.Application.Buckets.Search.v1;
 using MediatR;

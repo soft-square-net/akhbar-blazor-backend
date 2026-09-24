@@ -1,7 +1,7 @@
 ﻿using Ardalis.Specification;
 using FSH.Framework.Core.Paging;
 using FSH.Framework.Core.Specifications;
-using FSH.Starter.WebApi.Document.Appication.Buckets.GetFile.v1;
+using FSH.Starter.WebApi.Document.Application.Buckets.GetBucketFile.v1;
 using FSH.Starter.WebApi.Document.Domain;
 
 namespace FSH.Starter.WebApi.Document.Application.Buckets.SearchFiles.v1;

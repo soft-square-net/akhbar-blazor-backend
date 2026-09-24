@@ -85,10 +85,12 @@ public class MinIOFileStorageService : IFileStorageService
         };
     }
 
-    public async Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    public async Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, Dictionary<string,string> metadata, CancellationToken cancellationToken = default)
     {
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {bucketName} does not exist.");
+
+       
         var request = new PutObjectRequest()
         {
             BucketName = bucketName,
@@ -96,6 +98,10 @@ public class MinIOFileStorageService : IFileStorageService
             InputStream = fileStream
         };
         request.Metadata.Add("Content-Type", contentType);
+        foreach (var item in metadata)
+        {
+            request.Metadata.Add(item.Key, item.Value);
+        }
         await _s3Client.PutObjectAsync(request);
         return $"File {prefix}/{fileName} uploaded to S3 successfully!";
     }

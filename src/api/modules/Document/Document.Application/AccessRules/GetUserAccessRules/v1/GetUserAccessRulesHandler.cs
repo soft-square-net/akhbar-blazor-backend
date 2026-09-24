@@ -13,7 +13,7 @@ using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FSH.Starter.WebApi.Document.Appication.AccessRules.GetUserAccessRules.v1;
+namespace FSH.Starter.WebApi.Document.Application.AccessRules.GetUserAccessRules.v1;
 
 public sealed class GetUserAccessRulesHandler(
     ICurrentUser currentuser, 
