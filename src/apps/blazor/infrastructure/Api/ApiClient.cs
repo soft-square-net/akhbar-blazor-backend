@@ -450,27 +450,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         System.Threading.Tasks.Task DeleteBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
-        /// Get bucket folder by id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket folder by id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get bucket folder by id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket folder by id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, System.Threading.CancellationToken cancellationToken);
-
-        /// <summary>
         /// update bucket folder by id
         /// </summary>
         /// <remarks>
@@ -532,6 +511,27 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<GetBucketFileResponse> GetBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Get bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets a list of bucket items with paging support
@@ -3744,105 +3744,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         }
 
         /// <summary>
-        /// Get bucket folder by id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket folder by id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid)
-        {
-            return GetBucketFolderEndpointAsync(id, folderid, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get bucket folder by id
-        /// </summary>
-        /// <remarks>
-        /// Get bucket folder by id
-        /// </remarks>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (folderid == null)
-                throw new System.ArgumentNullException("folderid");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}"
-                    urlBuilder_.Append("api/v1/Document/buckets/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/Folder/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<GetBucketFolderResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
         /// update bucket folder by id
         /// </summary>
         /// <remarks>
@@ -4083,13 +3984,14 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/v1/Document/buckets/GetFile/{id}/Folder/{folderid}/File/{fileid}"
+                    // Operation Path: "api/v1/Document/buckets/GetFile/{id}/Folder/{folderid}/File/{fileid}/GetFile"
                     urlBuilder_.Append("api/v1/Document/buckets/GetFile/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append("/Folder/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append("/File/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(fileid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/GetFile");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -4117,6 +4019,106 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<GetBucketFileResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Get bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid)
+        {
+            return GetBucketFolderEndpointAsync(id, folderid, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// Get bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<GetBucketFolderResponse> GetBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (folderid == null)
+                throw new System.ArgumentNullException("folderid");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}/GetFolder"
+                    urlBuilder_.Append("api/v1/Document/buckets/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Folder/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/GetFolder");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<GetBucketFolderResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11151,6 +11153,39 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public System.Guid? Id { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string? Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folders")]
+        public System.Collections.Generic.ICollection<Folder>? Folders { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("files")]
+        public System.Collections.Generic.ICollection<File>? Files { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("size")]
+        public int Size { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("isRoot")]
+        public bool IsRoot { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("created")]
+        public System.DateTime Created { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastModefied")]
+        public System.DateTime LastModefied { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("allowRead")]
+        public bool AllowRead { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("allowWrite")]
+        public bool AllowWrite { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("allowDelete")]
+        public bool AllowDelete { get; set; } = default!;
 
     }
 

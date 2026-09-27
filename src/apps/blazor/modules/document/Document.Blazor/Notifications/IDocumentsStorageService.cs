@@ -6,7 +6,8 @@ namespace FSH.Starter.Blazor.Modules.Document.Blazor.Notifications;
 
 public interface IDocumentsStorageService
 {
-    Task<List<GetUserAccessRulesResponse>?> GetAccessRules();
+    // List<GetUserAccessRulesResponse>? GetAccessRules();
+    Task<List<GetUserAccessRulesResponse>?> GetAccessRulesAsync();
     Task<FileStream> DownloadFile(FileModel model, string filePath, CancellationToken cancellationToken);
     Task<FileModel> UploadFile(FileParameter fileParameter, string fileName, FolderModel folder, int fileSize, string description, Dictionary<string, string> metaTags, CancellationToken cancellationToken);
     Task<bool> Copy(List<BaseExplorerFactory> sources);

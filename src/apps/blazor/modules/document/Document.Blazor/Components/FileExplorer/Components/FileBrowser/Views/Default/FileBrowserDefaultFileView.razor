@@ -12,7 +12,7 @@
 <MudPaper class="default-explorer-file-view d-flex flex-wrap gap-4 justify-start" Elevation="0">
 
 
-@foreach (FolderModel folder in CurrentFolder.Folders)
+@foreach (FolderModel folder in CurrentFolder?.Folders)
 {
     <MudPaper @onclick="() => ToggleSelected(folder)" Width="100px" Class="@($" d-flex {GetSelectClass(folder)}")">
 

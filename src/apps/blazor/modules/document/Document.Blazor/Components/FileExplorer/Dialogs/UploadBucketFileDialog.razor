@@ -15,7 +15,7 @@
   <DialogContent>
     <div class="d-flex flex-column py-1" style="min-width:400px;">
       <MudForm>
-
+        <MudTextField  T="string" @bind-Value="_title" Label="Title" />
         <MudTextField T="string" Lines="3" MaxLines="3" @bind-Value="_description" Label="Description"></MudTextField>
         <MudFileUpload T="IBrowserFile" @ref="_fileUpload"
                        @bind-Files="_file"
@@ -59,12 +59,18 @@
   private bool _uploading;
   private int _progress;
   private string _statusText = "Waiting for files.";
+  private string _title;
   private string _description;
   private Dictionary<string, string> _metadata = new() { { "AAAAA", "BBBBB" } };  
 
   void Cancel() => UploadDialog.Cancel();
 
-  void Upload() => UploadDialog.Close(DialogResult.Ok(NewName.Trim()));
+  async Task Upload()  {
+    _uploading = true;
+    await TriggerUpload();
+    _uploading = false;
+    UploadDialog.Close(DialogResult.Ok(NewName.Trim()));
+  }
 
 
 
@@ -81,9 +87,8 @@
     if (streamContent != null)
     {
       FolderModel folderModel = new FolderModel(new Guid("9d4bdbef-0df8-4e41-bd38-4082734e71ae"), "Trash", new Guid("7703de7b-e583-4feb-a753-5556a9061d13"));
-
-      Dictionary<string, string> metadata = new Dictionary<string, string>();
-      await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, _description, metadata, new CancellationToken());
+      // Dictionary<string, string> metadata = new Dictionary<string, string>();
+      await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, _description, _metadata, new CancellationToken());
     }
   }
 

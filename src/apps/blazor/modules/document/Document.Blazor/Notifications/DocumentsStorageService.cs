@@ -46,9 +46,15 @@ public class DocumentsStorageService: IDocumentsStorageService
         await _localStorageService.RemoveItemAsync("accessRules");
     }
 
-    public async Task<List<GetUserAccessRulesResponse>?> GetAccessRules()
+    //public  List<GetUserAccessRulesResponse>? GetAccessRules()
+    //{
+    //    var result =  _localStorageService.GetItemAsync<List<GetUserAccessRulesResponse>>("accessRules").Result;
+    //    return result;
+    //}
+    public async Task<List<GetUserAccessRulesResponse>?> GetAccessRulesAsync()
     {
-        return await _localStorageService.GetItemAsync<List<GetUserAccessRulesResponse>>("accessRules");
+        var result = await _localStorageService.GetItemAsync<List<GetUserAccessRulesResponse>>("accessRules");
+        return result;
     }
 
     private async Task<bool> CanReadRule(BaseExplorerItemModel model) {  return false; }

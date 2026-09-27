@@ -10,7 +10,7 @@ public static class GetBucketFolderEndpoint
     public static RouteHandlerBuilder MapBucketGetFolderEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapGet("/{id:guid}/Folder/{folderid:guid}/", async (Guid id,Guid folderid , ISender mediator) =>
+            .MapGet("/{id:guid}/Folder/{folderid:guid?}/GetFolder", async (Guid id,Guid? folderid = null , ISender mediator = default) =>
             {
                 var response = await mediator.Send(new GetBucketFolderRequest(id, folderid));
                 return Results.Ok(response);

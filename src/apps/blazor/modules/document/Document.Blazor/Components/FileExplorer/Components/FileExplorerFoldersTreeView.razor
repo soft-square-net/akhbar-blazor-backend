@@ -126,7 +126,7 @@
   {
     // ensure the component re-renders on the UI thread
     // await SelectAsync(model);
-    if (TreeViewHelper<FolderModel>.GetByIdAndSelect(Folders, SelectedTreeItemData.Id, out var currentTreeFolder))
+    if (SelectedTreeItemData != null && TreeViewHelper<FolderModel>.GetByIdAndSelect(Folders, SelectedTreeItemData.Id, out var currentTreeFolder))
     {
       currentTreeFolder.Select();
     }
@@ -287,7 +287,7 @@
       Value = f,
       Text = f.Name,
       // Recursively maps all levels of your child sub-folders safely
-      Children = f.Folders != null ? MapFoldersToTreeItemData(f.Folders) : null
+      Children = f.Folders != null ? MapFoldersToTreeItemData(f.Folders) : new List<TreeItemData<FolderModel>>()
     }).ToList();
   }
 

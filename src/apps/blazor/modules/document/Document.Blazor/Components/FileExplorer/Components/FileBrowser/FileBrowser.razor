@@ -33,7 +33,7 @@
   }
 </ContextMenuGeneric>
 <div>
-  Current Folder Items: @CurrentFolder.Files.Count
+  Current Folder Items: @CurrentFolder?.Files?.Count 
 </div>
 @code {
   [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }

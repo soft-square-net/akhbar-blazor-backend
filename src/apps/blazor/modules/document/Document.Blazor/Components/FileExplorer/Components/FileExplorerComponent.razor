@@ -201,67 +201,13 @@
 
 
   #region Events
-  protected override void OnInitialized()
+  protected override async Task OnInitializedAsync()
   {
-    var bucket = new Bucket();
-    // Courier.SubscribeWeak<NotificationWrapper<UserLoggedIn>>(HandleUserLoggedIn);
-    var root = new FolderModel(Guid.NewGuid(), $"Root", bucket.Id, new[] {
-                    new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
-                    new FileModel(Guid.NewGuid(), $"door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"iceland.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"tractor-very-long-file-name-wraptext.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"castle.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"pilars.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"sweden.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"document_01.docx", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"document_02.doc", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"document_03.xlsx", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"document_04.xls", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"document_05.mdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"document_05.accdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
-                    new FileModel(Guid.NewGuid(), $"Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
-        },
-           new[] {
-                new FolderModel(Guid.NewGuid(), "Projects", bucket.Id, new[] {
-                            new FileModel(Guid.NewGuid(), "project1.png", 512_000, DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-10)),
-                            new FileModel(Guid.NewGuid(), "project2.png", 768_000, DateTime.Now.AddDays(-12), DateTime.Now.AddDays(-8))
-                        } ){ Path = $"{Constants._content}/img/projects", AllowedExtensions="mpeg" },
-                new FolderModel(Guid.NewGuid(), "Vacations", bucket.Id, new[]{
-                            new FileModel(Guid.NewGuid(), "beach.png", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
-                            new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
-                        }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="jpg" },
-                new FolderModel(Guid.NewGuid(), "Docs files", bucket.Id, new[]{
-                            new FileModel(Guid.NewGuid(), "Doc01.pdf", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
-                            new FileModel(Guid.NewGuid(), "doc02.docx", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
-                        }){Path = $"{Constants._content}/documents" , AllowedExtensions="pdf,docx" },
-                new FolderModel(Guid.NewGuid(), "Music files", bucket.Id, new[]{
-                            new FileModel(Guid.NewGuid(), "voice.wav", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
-                            new FileModel(Guid.NewGuid(), "video.mp4", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
-                        }){Path = $"{Constants._content}/music" , AllowedExtensions="mp3,mp4" }
-           }
-
-        )
-    { Path = $"{Constants._content}/img/" };
-
-    Folders.Add(root);
-
-    var shared = new FolderModel(Guid.NewGuid(), "Shared", bucket.Id, new[]
-    {
-            new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
-        })
-    { Path = $"{Constants._content}/Shared" };
-
-    Folders.Add(shared);
-    var archive = new FolderModel(Guid.NewGuid(), "Archive", bucket.Id) { Path = $"{Constants._content}/archive" };
-
-    Folders.Add(archive);
-
-
-    // _currentFolder = Folders.First();
-    CurrentFolder = Folders.First();
+    // GenerateFakeFolders();
+    await LoadUserBuckets();
   }
 
-  
+
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
@@ -274,7 +220,7 @@
         StateService.OnFileExplorerClearSelection += ClearSelection;
         StateService.OnCurrentFolderChanged += HandleOnCurrentFolderChanged;
         StateService.OnToggleFileBrowserTree += ToggleFileBrowserTree;
-        // await StateService.NotifyCurrentFolderChanged(CurrentFolder);
+        //  
         _isSubscribed = true;
       }
 
@@ -403,6 +349,108 @@
     var user = wrapper.Notification.UserInfo;
 
   }
+
+  #region Helers
+
+  private async Task LoadUserBuckets()
+  {
+    CurrentFolder = new FolderModel(Guid.Empty, "Empty", Guid.Empty, []);
+    var rules = await documentsStorage.GetAccessRulesAsync();
+
+    foreach (var rule in rules)
+    {
+      // FolderModel folder = new FolderModel(Guid.NewGuid(), "FFFFFFFF", rule.Bucket.Id, []);
+      // new[] { new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)) },
+      // new[] { new FolderModel(Guid.NewGuid(), "Subfolder", rule.Bucket.Id, new FileModel[0], new FolderModel[0]) }
+      // );
+      var bucketRoot = await _client.GetBucketFolderEndpointAsync(rule.Bucket.Id, Guid.Empty);
+
+      
+      FolderModel[]? folders = [];  
+      // foreach (var fldr in bucketRoot.Folders)
+      // {
+      //   folders.Add(new FolderModel((Guid)fldr.Id, fldr.Name, fldr.BucketId, fldr.Files, fldr.Folders));
+      // }
+      FolderModel folder = new FolderModel((Guid)bucketRoot.Id, bucketRoot.Name, bucketRoot.BucketId, []);
+
+      // foreach (var file in bucketRoot.Files)
+      // {
+      //   folder.AddFile(new FileModel((Guid)file.Id, file.Name, 245_760, file.Created, file.LastModified));
+      // }
+      
+      // var current = bucketRoot.Adapt<FolderModel>();
+      // bucketRoot.Adapt(folder);
+      folder.Path = $"/{bucketRoot.Name}";
+folder.Size = 245_760;
+folder.Description = "Test Folder";
+      Folders.Add(folder);
+      CurrentFolder = Folders.First();
+      
+    // StateService.NotifyFoldersChanged(Folders);
+    StateService.NotifyCurrentFolderChanged(folder);
+    }
+  }
+  private void GenerateFakeFolders()
+  {
+    var bucket = new Bucket();
+    // Courier.SubscribeWeak<NotificationWrapper<UserLoggedIn>>(HandleUserLoggedIn);
+    var root = new FolderModel(Guid.NewGuid(), $"Root", bucket.Id, new[] {
+                    new FileModel(Guid.NewGuid(), $"Report.pdf", 245_760, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-2)),
+                    new FileModel(Guid.NewGuid(), $"door.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"iceland.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"tractor-very-long-file-name-wraptext.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"castle.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"pilars.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"sweden.jpg", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_01.docx", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_02.doc", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_03.xlsx", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_04.xls", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_05.mdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"document_05.accdb", 1_048_576, DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-10)),
+                    new FileModel(Guid.NewGuid(), $"Notes.txt", 1024, DateTime.Now.AddDays(-2), DateTime.Now.AddHours(-5))
+        },
+           new[] {
+                new FolderModel(Guid.NewGuid(), "Projects", bucket.Id, new[] {
+                            new FileModel(Guid.NewGuid(), "project1.png", 512_000, DateTime.Now.AddDays(-15), DateTime.Now.AddDays(-10)),
+                            new FileModel(Guid.NewGuid(), "project2.png", 768_000, DateTime.Now.AddDays(-12), DateTime.Now.AddDays(-8))
+                        } ){ Path = $"{Constants._content}/img/projects", AllowedExtensions="mpeg" },
+                new FolderModel(Guid.NewGuid(), "Vacations", bucket.Id, new[]{
+                            new FileModel(Guid.NewGuid(), "beach.png", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
+                            new FileModel(Guid.NewGuid(), "mountains.png", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
+                        }){Path = $"{Constants._content}/img/vacations" , AllowedExtensions="jpg" },
+                new FolderModel(Guid.NewGuid(), "Docs files", bucket.Id, new[]{
+                            new FileModel(Guid.NewGuid(), "Doc01.pdf", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
+                            new FileModel(Guid.NewGuid(), "doc02.docx", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
+                        }){Path = $"{Constants._content}/documents" , AllowedExtensions="pdf,docx" },
+                new FolderModel(Guid.NewGuid(), "Music files", bucket.Id, new[]{
+                            new FileModel(Guid.NewGuid(), "voice.wav", 1_024_000, DateTime.Now.AddDays(-30), DateTime.Now.AddDays(-25)),
+                            new FileModel(Guid.NewGuid(), "video.mp4", 1_536_000, DateTime.Now.AddDays(-28), DateTime.Now.AddDays(-20))
+                        }){Path = $"{Constants._content}/music" , AllowedExtensions="mp3,mp4" }
+           }
+
+        )
+    { Path = $"{Constants._content}/img/" };
+
+    Folders.Add(root);
+
+    var shared = new FolderModel(Guid.NewGuid(), "Shared", bucket.Id, new[]
+    {
+            new FileModel(Guid.NewGuid(), "Meeting.mp4", 50_000_000, DateTime.Now.AddDays(-20), DateTime.Now.AddDays(-20))
+        })
+    { Path = $"{Constants._content}/Shared" };
+
+    Folders.Add(shared);
+    var archive = new FolderModel(Guid.NewGuid(), "Archive", bucket.Id) { Path = $"{Constants._content}/archive" };
+
+    Folders.Add(archive);
+
+
+    // _currentFolder = Folders.First();
+    CurrentFolder = Folders.First();
+  }
+  
+#endregion
 }
 
 <style>
