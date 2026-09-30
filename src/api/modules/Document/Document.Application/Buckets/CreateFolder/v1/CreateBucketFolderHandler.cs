@@ -31,7 +31,7 @@ public sealed class CreateBucketFolderHandler(
         var parentPath = $"{folder.GetFullPath().TrimStart($"/{bucket.Name}".ToArray())}";
         parentPath = string.IsNullOrWhiteSpace(parentPath) ? "" : parentPath.EndsWith('/') ? parentPath : (parentPath + "/");
         var fldrKey = $"{parentPath}{request.FolderName}/";   
-        await service.CreateEmptyFolderAsync(bucket.Name, fldrKey, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
+        // await service.CreateEmptyFolderAsync(bucket.Name, fldrKey, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
 
         await repository.UpdateAsync(bucket);
         return new CreateBucketFolderResponse(folder.Id);
