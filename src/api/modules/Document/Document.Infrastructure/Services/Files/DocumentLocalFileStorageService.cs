@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Amazon.S3;
 using FSH.Framework.Core.Origin;
 using FSH.Framework.Core.Storage.Dtos;
 using FSH.Framework.Core.Storage.File;
@@ -240,72 +241,76 @@ public class DocumentLocalFileStorageService(IOptions<OriginOptions> originSetti
     {
         throw new NotImplementedException();
     }
+    public async Task RenameFolderAsync(string bucketName, string oldFolder, string newFolder, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    {
+
+    }
 }
 
 
-    //public async Task<Uri> UploadAsync<T>(FileUploadCommand? request, FileType supportedFileType, CancellationToken cancellationToken = default)
-    //    where T : class
-    //{
-    //    if (request == null || request.Data == null)
-    //    {
-    //        return null!;
-    //    }
+//public async Task<Uri> UploadAsync<T>(FileUploadCommand? request, FileType supportedFileType, CancellationToken cancellationToken = default)
+//    where T : class
+//{
+//    if (request == null || request.Data == null)
+//    {
+//        return null!;
+//    }
 
-    //    if (request.Extension is null || !supportedFileType.GetDescriptionList().Contains(request.Extension.ToLower(System.Globalization.CultureInfo.CurrentCulture)))
-    //        throw new InvalidOperationException("File Format Not Supported.");
-    //    if (request.Name is null)
-    //        throw new InvalidOperationException("Name is required.");
+//    if (request.Extension is null || !supportedFileType.GetDescriptionList().Contains(request.Extension.ToLower(System.Globalization.CultureInfo.CurrentCulture)))
+//        throw new InvalidOperationException("File Format Not Supported.");
+//    if (request.Name is null)
+//        throw new InvalidOperationException("Name is required.");
 
-    //    string base64Data = Regex.Match(request.Data, "data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+//    string base64Data = Regex.Match(request.Data, "data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
 
-    //    var streamData = new MemoryStream(Convert.FromBase64String(base64Data));
-    //    if (streamData.Length > 0)
-    //    {
-    //        string folder = typeof(T).Name;
-    //        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-    //        {
-    //            folder = folder.Replace(@"\", "/", StringComparison.Ordinal);
-    //        }
+//    var streamData = new MemoryStream(Convert.FromBase64String(base64Data));
+//    if (streamData.Length > 0)
+//    {
+//        string folder = typeof(T).Name;
+//        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+//        {
+//            folder = folder.Replace(@"\", "/", StringComparison.Ordinal);
+//        }
 
-    //        string folderName = supportedFileType switch
-    //        {
-    //            FileType.Image => Path.Combine("assets", "images", folder),
-    //            _ => Path.Combine("assets", "others", folder),
-    //        };
-    //        string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-    //        Directory.CreateDirectory(pathToSave);
+//        string folderName = supportedFileType switch
+//        {
+//            FileType.Image => Path.Combine("assets", "images", folder),
+//            _ => Path.Combine("assets", "others", folder),
+//        };
+//        string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+//        Directory.CreateDirectory(pathToSave);
 
-    //        string fileName = request.Name.Trim('"');
-    //        fileName = RemoveSpecialCharacters(fileName);
-    //        fileName = fileName.ReplaceWhitespace("-");
-    //        fileName += request.Extension.Trim();
-    //        string fullPath = Path.Combine(pathToSave, fileName);
-    //        string dbPath = Path.Combine(folderName, fileName);
-    //        if (File.Exists(dbPath))
-    //        {
-    //            dbPath = NextAvailableFilename(dbPath);
-    //            fullPath = NextAvailableFilename(fullPath);
-    //        }
+//        string fileName = request.Name.Trim('"');
+//        fileName = RemoveSpecialCharacters(fileName);
+//        fileName = fileName.ReplaceWhitespace("-");
+//        fileName += request.Extension.Trim();
+//        string fullPath = Path.Combine(pathToSave, fileName);
+//        string dbPath = Path.Combine(folderName, fileName);
+//        if (File.Exists(dbPath))
+//        {
+//            dbPath = NextAvailableFilename(dbPath);
+//            fullPath = NextAvailableFilename(fullPath);
+//        }
 
-    //        using var stream = new FileStream(fullPath, FileMode.Create);
-    //        await streamData.CopyToAsync(stream, cancellationToken);
-    //        var path = dbPath.Replace("\\", "/", StringComparison.Ordinal);
-    //        var imageUri = new Uri(originSettings.Value.OriginUrl!, path);
-    //        return imageUri;
-    //    }
-    //    else
-    //    {
-    //        return null!;
-    //    }
-    //}
+//        using var stream = new FileStream(fullPath, FileMode.Create);
+//        await streamData.CopyToAsync(stream, cancellationToken);
+//        var path = dbPath.Replace("\\", "/", StringComparison.Ordinal);
+//        var imageUri = new Uri(originSettings.Value.OriginUrl!, path);
+//        return imageUri;
+//    }
+//    else
+//    {
+//        return null!;
+//    }
+//}
 
 
 
-    //public void Remove(Uri? path)
-    //{
-    //    var pathString = path!.ToString();
-    //    if (File.Exists(pathString))
-    //    {
-    //        File.Delete(pathString);
-    //    }
-    //}
+//public void Remove(Uri? path)
+//{
+//    var pathString = path!.ToString();
+//    if (File.Exists(pathString))
+//    {
+//        File.Delete(pathString);
+//    }
+//}

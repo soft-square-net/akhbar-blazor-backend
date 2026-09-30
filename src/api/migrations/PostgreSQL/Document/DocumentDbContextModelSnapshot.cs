@@ -462,7 +462,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Folder", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Bucket");
 

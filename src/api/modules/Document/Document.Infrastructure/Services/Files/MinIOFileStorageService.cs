@@ -180,4 +180,9 @@ public class MinIOFileStorageService : IFileStorageService
     {
         throw new NotImplementedException();
     }
+    public async Task RenameFolderAsync(string bucketName, string oldFolder, string newFolder, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    {
+
+    }
+
 }

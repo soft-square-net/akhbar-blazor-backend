@@ -61,6 +61,8 @@ public static class DocumentModule
             bucketsGroup.MapBucketListFilesEndpoint();
             bucketsGroup.MapBucketListFolderEndpoint();
             bucketsGroup.MapRegionListEndpoint();
+            bucketsGroup.MapBucketRenameFileEndpoint();
+            bucketsGroup.MapBucketRenameFolderEndpoint();
             bucketsGroup.MapBucketSearchEndpoint();
             bucketsGroup.MapBucketSearchFilesEndpoint();
             bucketsGroup.MapBucketSearchFolderEndpoint();

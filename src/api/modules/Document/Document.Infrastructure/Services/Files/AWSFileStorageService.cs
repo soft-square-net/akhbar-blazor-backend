@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Shared.Enums;
 
 namespace FSH.Starter.WebApi.Document.Infrastructure.Services.Files;
+
 public class AWSFileStorageService : IFileStorageService
 {
     private readonly IAmazonS3 _s3Client;
@@ -25,6 +26,7 @@ public class AWSFileStorageService : IFileStorageService
         _refreshCeredintials = refreshCeredintials;
         var s3Config = new AmazonS3Config
         {
+            RegionEndpoint = region,
             ServiceURL = "http://localhost:9000",
             ForcePathStyle = true,
         };
@@ -34,13 +36,16 @@ public class AWSFileStorageService : IFileStorageService
 
     public async Task CreateEmptyFolderAsync(string bucketName, string folderName, string accessKey, string secretKey)
     {
+        _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
         var putObjectRequest = new PutObjectRequest
         {
             BucketName = bucketName,
             Key = folderName, // Key ending with a slash
-            ContentBody = string.Empty // Empty content for a zero-byte object
+            // ContentBody = string.Empty // Empty content for a zero-byte object
+            InputStream = new MemoryStream()
         };
-        await _s3Client.PutObjectAsync(putObjectRequest);
+        var result = await _s3Client.PutObjectAsync(putObjectRequest);
+        _refreshCeredintials.UpdateCredentials("", "");
     }
 
     public async Task DeleteFileAsync(string bucketName, string key, string accessKey, string secretKey, CancellationToken cancellationToken = default)
@@ -127,7 +132,7 @@ public class AWSFileStorageService : IFileStorageService
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new NotFoundException($"Bucket {bucketName} does not exist.");
 
-        
+
         var urlRequest = new GetPreSignedUrlRequest()
         {
             BucketName = bucketName,
@@ -145,7 +150,7 @@ public class AWSFileStorageService : IFileStorageService
         _secretKey = secretKey;
         return _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -161,13 +166,13 @@ public class AWSFileStorageService : IFileStorageService
     /// <param name="cancellationToken"></param>
     /// <returns> string Key of uploaded file</returns>
     /// <exception cref="FileNotFoundException"></exception>
-    public async Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, Dictionary<string,string> metadata, CancellationToken cancellationToken = default)
+    public async Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, Dictionary<string, string> metadata, CancellationToken cancellationToken = default)
     {
         _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {bucketName} does not exist.");
         prefix = "/test/";
-        
+
         var request = new PutObjectRequest()
         {
             BucketName = bucketName,
@@ -201,7 +206,7 @@ public class AWSFileStorageService : IFileStorageService
     /// <exception cref="FileNotFoundException"></exception>
     public async Task<Uri> UploadFileAsync<T>(FileUploadCommand? command, FileType supportedFileType, string accessKey, string secretKey, CancellationToken cancellationToken = default) where T : class
     {
-        
+
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, command.Bucket);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {command.Bucket} does not exist.");
 
@@ -249,4 +254,81 @@ public class AWSFileStorageService : IFileStorageService
         }
     }
 
+
+    public async Task RenameFolderAsync(string bucketName, string oldFolder, string newFolder, string accessKey, string secretKey, CancellationToken cancellationToken = default)
+    {
+        _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
+        // Ensure prefixes end with a trailing slash to avoid matching partial folder names
+        string sourcePrefix = oldFolder.EndsWith("/") ? oldFolder : oldFolder + "/";
+        string destinationPrefix = newFolder.EndsWith("/") ? newFolder : newFolder + "/";
+        string continuationToken = null;
+        var listRequest = new ListObjectsV2Request
+        {
+            BucketName = bucketName,
+            Prefix = sourcePrefix,
+            ContinuationToken = continuationToken
+        };
+
+        var keysToDelete = new List<string>();
+        ListObjectsV2Response listResponse;
+
+        do
+        {
+            // 1. List all objects within the directory
+            listResponse = await _s3Client.ListObjectsV2Async(listRequest);
+
+            if (listResponse.S3Objects.Count == 0)
+                break;
+
+            //var deleteRequest = new DeleteObjectsRequest
+            //{
+            //    BucketName = bucketName,
+            //    ChecksumAlgorithm = ChecksumAlgorithm.SHA256
+            //};
+           
+            foreach (var s3Object in listResponse.S3Objects)
+            {
+                if (!sourcePrefix.Equals(destinationPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Calculate the new key path
+                    string newKey = s3Object.Key.Replace(sourcePrefix, destinationPrefix);
+
+                    // 2. Copy object to the new key
+                    var copyRequest = new CopyObjectRequest
+                    {
+                        SourceBucket = bucketName,
+                        SourceKey = s3Object.Key,
+                        DestinationBucket = bucketName,
+                        DestinationKey = newKey
+                    };
+                    await _s3Client.CopyObjectAsync(copyRequest);
+
+                    // Queue the old object for batch deletion
+                    keysToDelete.Add(s3Object.Key);
+                }
+            }
+
+            // 3. Batch delete the original objects
+            if (keysToDelete.Count > 0)
+            {
+                foreach (var chunk in keysToDelete.Chunk(50))
+                {
+                    var deleteTasks = chunk.Select(key => _s3Client.DeleteObjectAsync(new DeleteObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = key
+                    }));
+
+                    // Execute this batch of single deletes concurrently
+                    await Task.WhenAll(deleteTasks);
+                }
+            }
+
+            // Handle pagination if the folder contains a large volume of files
+            listRequest.ContinuationToken = listResponse.NextContinuationToken;
+
+        } while ((bool)listResponse.IsTruncated);
+
+        _refreshCeredintials.UpdateCredentials("", "");
     }
+}

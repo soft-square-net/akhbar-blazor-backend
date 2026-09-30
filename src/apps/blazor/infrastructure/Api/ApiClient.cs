@@ -618,6 +618,48 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         System.Threading.Tasks.Task<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> ListRegionsEndpointAsync(ListRegionsRequest body, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// rename bucket File by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket File by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<RenameBucketFileResponse> RenameBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, RenameBucketFileCommand body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// rename bucket File by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket File by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<RenameBucketFileResponse> RenameBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, RenameBucketFileCommand body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// rename bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<RenameBucketFolderResponse> RenameBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, RenameBucketFolderCommand body);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// rename bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<RenameBucketFolderResponse> RenameBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, RenameBucketFolderCommand body, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// creates a bucket
         /// </summary>
         /// <remarks>
@@ -4511,6 +4553,225 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
                         if (status_ == 200)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<PagedList_1OfOfRegionResponseAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// rename bucket File by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket File by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<RenameBucketFileResponse> RenameBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, RenameBucketFileCommand body)
+        {
+            return RenameBucketFileEndpointAsync(id, folderid, fileid, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// rename bucket File by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket File by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RenameBucketFileResponse> RenameBucketFileEndpointAsync(System.Guid id, System.Guid folderid, System.Guid fileid, RenameBucketFileCommand body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (folderid == null)
+                throw new System.ArgumentNullException("folderid");
+
+            if (fileid == null)
+                throw new System.ArgumentNullException("fileid");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}/File/{fileid}/rename"
+                    urlBuilder_.Append("api/v1/Document/buckets/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Folder/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/File/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(fileid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/rename");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RenameBucketFileResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// rename bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<RenameBucketFolderResponse> RenameBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, RenameBucketFolderCommand body)
+        {
+            return RenameBucketFolderEndpointAsync(id, folderid, body, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// rename bucket folder by id
+        /// </summary>
+        /// <remarks>
+        /// rename bucket folder by id
+        /// </remarks>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RenameBucketFolderResponse> RenameBucketFolderEndpointAsync(System.Guid id, System.Guid folderid, RenameBucketFolderCommand body, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (folderid == null)
+                throw new System.ArgumentNullException("folderid");
+
+            if (body == null)
+                throw new System.ArgumentNullException("body");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "api/v1/Document/buckets/{id}/Folder/{folderid}/rename"
+                    urlBuilder_.Append("api/v1/Document/buckets/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Folder/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(folderid, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/rename");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RenameBucketFolderResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11259,6 +11520,72 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RenameBucketFileCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
+        public System.Guid FolderId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileId")]
+        public System.Guid FileId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("newFileName")]
+        public string? NewFileName { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RenameBucketFileResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
+        public System.Guid FolderId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fileId")]
+        public System.Guid FileId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("newFileName")]
+        public string? NewFileName { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RenameBucketFolderCommand
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
+        public System.Guid FolderId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("newFolderName")]
+        public string? NewFolderName { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RenameBucketFolderResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("bucketId")]
+        public System.Guid BucketId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("folderId")]
+        public System.Guid FolderId { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("newFolderName")]
+        public string? NewFolderName { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SearchBucketsRequest
     {
 
@@ -11750,7 +12077,9 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
         public System.Guid? DeletedBy { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.StringLength(255)]
+        public string Name { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("slug")]
         public string? Slug { get; set; } = default!;
@@ -11772,9 +12101,6 @@ namespace FSH.Starter.Blazor.Infrastructure.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("parentId")]
         public System.Guid? ParentId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("parent")]
-        public Folder Parent { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("children")]
         public System.Collections.Generic.ICollection<Folder>? Children { get; set; } = default!;

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
 {
     [DbContext(typeof(DocumentDbContext))]
-    [Migration("20260916193310_Add Document Schema")]
+    [Migration("20260929044405_Add Document Schema")]
     partial class AddDocumentSchema
     {
         /// <inheritdoc />
@@ -465,7 +465,7 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                     b.HasOne("FSH.Starter.WebApi.Document.Domain.Folder", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Bucket");
 

@@ -300,7 +300,7 @@
     var node = new TreeItemData<FolderModel>
     {
       // Value = new FolderModel(di.Name,di.GetFiles(),[])
-      Value = new FolderModel(Guid.NewGuid(), di.Name, CurrentFolder.BucketId, null, [])
+      Value = new FolderModel(Guid.NewGuid(), di.Name, CurrentFolder.BucketId, new FileModel[0])
     };
 
     try

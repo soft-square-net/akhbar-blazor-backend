@@ -1,4 +1,5 @@
 ﻿@using System.Text.RegularExpressions
+@using FSH.Starter.Blazor.Infrastructure.Api
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 
 @inject IJSRuntime JSRuntime
@@ -32,6 +33,7 @@ else
                 Validation="@(new Func<string, string>(ValidateFileName))" />
 }
 @code {
+  [Inject] protected IApiClient _client { get; set; } = default!;
   [Parameter, EditorRequired] public BaseExplorerItemModel Model { get; set; }
   private MudTextField<string> multilineReference;
 
@@ -101,10 +103,15 @@ else
       // Built-in MudBlazor method to remove focus from the input field
       if (multilineReference != null && multilineReference?.Value != null)
       {
+        if (Model.IsFolder)
+        {
+          await RenameFolderAsync(Model, multilineReference!.Value);
+        }
         Model.Name = multilineReference!.Value;
         // Drop focus immediately on enter
         await multilineReference.BlurAsync();
         Model.IsEditing = false;
+        
         await InvokeAsync(StateHasChanged);
       }
     }
@@ -128,6 +135,24 @@ else
     // }
   }
 
+  private async Task RenameFolderAsync(BaseExplorerItemModel model, string newName)
+  {
+    if (model is FolderModel folderModel)
+    {
+      // Call the RenameFolderAsync method from the service
+      RenameBucketFolderResponse? result = await _client.RenameBucketFolderEndpointAsync(folderModel.BucketId, folderModel.Id, new RenameBucketFolderCommand { BucketId = folderModel.BucketId, FolderId = folderModel.Id, NewFolderName = newName });
+      if (result is not null)
+      {
+        // Handle success (e.g., show a success message, update UI, etc.)
+        Console.WriteLine($"Folder \"{folderModel.Name}\" renamed successfully to \"{newName}\".");
+      }
+      else
+      {
+        // Handle failure (e.g., show an error message)
+        Console.WriteLine($"Failed to rename folder: \"{folderModel.Name}\"");
+      }
+    }
+  }
 
   private string ValidateFileName(string value)
   {

@@ -13,8 +13,8 @@ public class GetBucketByIdSpec: SingleResultSpecification<Bucket>
     {
         Query
             .Include(e => e.StorageAccount)
-            .Include(e => e.Folders)
-            .ThenInclude(e =>e.Files)
+            .Include(e => e.Folders).ThenInclude(f => f.Files)
+            .Include(b =>b.Folders).ThenInclude(f => f.Children)
             .Where(b => b.Id == id);
     }
 }

@@ -1,16 +1,20 @@
-﻿using FSH.Framework.Core.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using FSH.Framework.Core.Domain;
 using FSH.Framework.Core.Domain.Contracts;
 using FSH.Framework.Core.Storage.File;
 using FSH.Starter.WebApi.Document.Domain.Events;
 using Shared.Enums;
-using System.Text.Json.Serialization;
 
 namespace FSH.Starter.WebApi.Document.Domain;
-public class Folder : AuditableEntity, IAggregateRoot
+public class  Folder : AuditableEntity, IAggregateRoot
 {
     private readonly List<Folder> _Children  = new();
     private readonly List<File> _Files  = new();
 
+    [Required]
+    [StringLength(255)]
     public string Name { get; private set; } = string.Empty;
     public string Slug { get; private set; } = string.Empty;
     public string Icon { get; private set; } = string.Empty;
@@ -21,7 +25,11 @@ public class Folder : AuditableEntity, IAggregateRoot
     public Guid? ParentId { get; private set; }
 
     [JsonIgnore]
+    [ForeignKey(nameof(BucketId))]
     public Bucket Bucket { get; private set; }
+
+    [ForeignKey(nameof(ParentId))]
+    [JsonIgnore]
     public Folder? Parent { get; private set; }
     public IReadOnlyList<Folder> Children  =>  _Children.ToList();
     public IReadOnlyList<File> Files => _Files.ToList();
@@ -37,23 +45,32 @@ public class Folder : AuditableEntity, IAggregateRoot
         Description = description;
         ParentId = parent?.Id;
         IsRoot = parent == null;
+        if(parent == null) {
+            FullPath = $"/{Name}/";
+        } else {
+            Parent = parent;
+            FullPath = $"{parent.FullPath}/{name}/";
+        }
         QueueDomainEvent(new FolderCreated { Folder = this });
     }
 
     internal static Folder Create(Bucket bucket)
     {
         return new Folder(
-            Guid.NewGuid(), 
-            bucket, 
-            "/", 
-            "", 
+            Guid.NewGuid(),
+            bucket,
+            "/",
+            "",
             $"Root folder for the {bucket.Name}"
-        );
+        )
+        { IsRoot = true };
     }
 
-    internal void AddChildFolder(string name, string? icon, string? description)
+    internal Folder AddChildFolder(string name, string? icon, string? description)
     {
-        _Children.Add( new Folder(Guid.NewGuid(),this.Bucket, name, icon, description, this));
+        var child = new Folder(Guid.NewGuid(), this.Bucket, name, icon, description, this);
+        _Children.Add(child);
+        return child;
     }
     internal Folder UpdateChildFolder(Folder child)
     {
@@ -140,7 +157,7 @@ public class Folder : AuditableEntity, IAggregateRoot
         {
             return Name;
         }
-        return $"{Parent.GetFullPath()}/{Name}";
+        return $"{Parent.GetFullPath().TrimEnd('/')}/{Name}/";
     }
 
     internal Folder SetFullPath(string fullPath="")
@@ -165,7 +182,7 @@ public class Folder : AuditableEntity, IAggregateRoot
         }
         return this;
     }
-    internal Folder ReName(string name)
+    public Folder ReName(string name)
     {
         bool isUpdated = false;
         if (string.IsNullOrWhiteSpace(name))

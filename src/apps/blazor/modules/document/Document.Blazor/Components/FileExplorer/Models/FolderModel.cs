@@ -1,7 +1,10 @@
 
+using FSH.Starter.Blazor.Infrastructure.Api;
 using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Interfaces;
 using MudBlazor;
 using Nextended.Core.Extensions;
+using File = FSH.Starter.Blazor.Infrastructure.Api.File;
+using Folder = FSH.Starter.Blazor.Infrastructure.Api.Folder;
 
 namespace FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
@@ -21,6 +24,21 @@ public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
             AddFolders(children);
         }
     }
+    public FolderModel(Guid id, string name, Guid bucketId, IEnumerable<File>? files = null, IEnumerable<Folder>? children = null)
+    {
+        Id = id;
+        Name = name;
+        BucketId = bucketId;
+        SetAsFolder();
+        if (files is not null)
+        {
+            AddFiles(ToFileModel(this, files).ToArray());
+        }
+        if (children is not null)
+        {
+            AddFolders(ToFolderModel(children).ToArray());
+        }
+    }
     public Guid BucketId { get; private set; }
     public new List<FolderModel> Children => _folders;
     private List<FileModel> _files { get; init; } = new();
@@ -32,6 +50,30 @@ public class FolderModel: BaseExplorerItemModel //, IExplorerFolder
     public string AllowedExtensions { get; set; } = string.Empty;
     public bool IsExpanded { get; set; }
 
+    public static FileModel ToFileModel(FolderModel parent,File file) {
+        return new FileModel(file.Id, file.Name, (long)file.Size, file.Created, file.LastModified) { Folder = parent };
+    }
+    public static List<FileModel> ToFileModel(FolderModel parent, IEnumerable<File> files)
+    {
+        List<FileModel> result = new List<FileModel>();
+        foreach (var file in files)
+        {
+            result.Add(ToFileModel(parent, file));
+        }
+        return result;
+    }
+    public FolderModel ToFolderModel(FolderModel parent,Folder folder) {
+        return new FolderModel(folder.Id, folder.Name, folder.BucketId, ToFileModel(parent, folder.Files).ToArray(), ToFolderModel(folder.Children).ToArray());
+    }
+    public List<FolderModel> ToFolderModel(IEnumerable<Folder> folders)
+    {
+        List<FolderModel> result = new List<FolderModel>();
+        foreach (var folder in folders)
+        {
+            result.Add(ToFolderModel(this,folder));
+        }
+        return result;
+    }
     public void AddFolder(FolderModel folder)
     {
         folder.Folder = this;

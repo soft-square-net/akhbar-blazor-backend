@@ -116,6 +116,15 @@ public class Bucket : AuditableEntity, IAggregateRoot
         UpdateSize(Size + size, MaxSize);
         return result;
     }
+
+    public Folder AddFolder(Guid ParentfolderId, string folderName, string? description = null)
+    {
+        // File file = new File(Guid.NewGuid(), folderId, key, name, extension, fileUrl, fileType, size, isPublic, description);
+        // File file = File.Create(Guid.NewGuid(), folderId, key, name, extension, fileUrl, fileType, size, isPublic, description);
+        var result = Folders.SingleOrDefault(f => f.Id == ParentfolderId)?
+            .AddChildFolder(folderName, null, description);
+        return result;
+    }
     //public void AddFile(Folder folder,File file)
     //{
     //    Folders.SingleOrDefault(f => f.Id == folder.Id)?.Files?.Add(file);

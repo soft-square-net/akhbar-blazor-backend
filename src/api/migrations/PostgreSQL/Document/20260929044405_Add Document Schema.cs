@@ -170,7 +170,8 @@ namespace FSH.Starter.WebApi.Migrations.PostgreSQL.Document
                         column: x => x.ParentId,
                         principalSchema: "document",
                         principalTable: "Folder",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

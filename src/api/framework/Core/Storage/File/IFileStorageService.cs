@@ -17,6 +17,8 @@ public interface IFileStorageService
     where T : class;
     Task<string> UploadFileAsync(Stream fileStream, string bucketName, string fileName, string contentType, FileType fileType, string fileExtention, string? prefix, string accessKey, string secretKey, Dictionary<string,string> metadata, CancellationToken cancellationToken = default);
     Task UploadFileToFolderAsync(string bucketName, string fileKeyInS3, string localFilePath, string accessKey, string secretKey);
+    Task RenameFolderAsync( string bucketName, string oldFolder, string newFolder, string accessKey, string secretKey, CancellationToken cancellationToken = default);
+
 }
 
 /// <param name="fullPath">Blob metadata</param>

@@ -23,7 +23,7 @@ internal class FolderConfiguration : IEntityTypeConfiguration<Folder>
         builder.HasOne(m => m.Parent)
             .WithMany(t => t.Children)
             .HasForeignKey(m => m.ParentId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(m => m.Files)
             .WithOne(t => t.Folder)
