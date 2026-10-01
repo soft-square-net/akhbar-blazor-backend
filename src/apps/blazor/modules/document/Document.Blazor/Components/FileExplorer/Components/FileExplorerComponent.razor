@@ -247,7 +247,7 @@
     {
       newFolderName = newFolderName.Substring(0, newFolderName.Length - 1);
     }
-    var fldr = new FolderModel(Guid.NewGuid(), newFolderName, Guid.Empty, new FileModel[0]);
+    var fldr = new FolderModel(Guid.NewGuid(), newFolderName, CurrentFolder.BucketId, new FileModel[0]);
     var createCmd = new CreateBucketFolderCommand()
     {
         BucketId = CurrentFolder.BucketId,
@@ -257,8 +257,8 @@
     var newFolder = await  _client.CreatePucketFolderEndpointAsync(CurrentFolder.BucketId, CurrentFolder.Id, createCmd);
     fldr.IsNeedsFocus = true; fldr.IsEditing = true;
     fldr.Path = $"{CurrentFolder.Path}/{newFolderName}";
-    StateService.NotifyFolderCreated(InstanceId, fldr);
-    StateService.NotifyFolderSelectionChanged(fldr);
+    await StateService.NotifyFolderCreated(InstanceId, fldr);
+    await StateService.NotifyFolderSelectionChanged(fldr);
   }
   #endregion
   private void ToggleFileBrowserTree(bool opened)
@@ -338,7 +338,7 @@
     // parent?.AddFolder(newFolderModel);
     CurrentFolder = folder; //newFolderModel;
     // parent?.RemoveFolder(temp);
-    StateHasChanged();
+    // StateHasChanged();
     
     // StateService.NotifyCurrentFolderChanged(folder);
     // Ensure current folder reference is updated
@@ -419,7 +419,7 @@
       CurrentFolder = Folders.First();
       
     // StateService.NotifyFoldersChanged(Folders);
-    StateService.NotifyCurrentFolderChanged(folder);
+        StateService.NotifyCurrentFolderChanged(folder);
     }
   }
   // private void GenerateFakeFolders()

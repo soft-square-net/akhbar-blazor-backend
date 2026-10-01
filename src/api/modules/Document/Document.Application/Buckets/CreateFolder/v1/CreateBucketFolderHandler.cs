@@ -27,13 +27,16 @@ public sealed class CreateBucketFolderHandler(
     {
         var bucket = await repository.FirstOrDefaultAsync(new GetBucketByIdSpec(request.BucketId));
         Folder folder = bucket.AddFolder(request.ParentFolderId, request.FolderName, request.Description);
-        var service = serviceFactory.GetFileStorageService(bucket.StorageAccount.Provider);
-        var parentPath = $"{folder.GetFullPath().TrimStart($"/{bucket.Name}".ToArray())}";
-        parentPath = string.IsNullOrWhiteSpace(parentPath) ? "" : parentPath.EndsWith('/') ? parentPath : (parentPath + "/");
-        var fldrKey = $"{parentPath}{request.FolderName}/";   
-        // await service.CreateEmptyFolderAsync(bucket.Name, fldrKey, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
+        if (folder is not null)
+        {
+            var service = serviceFactory.GetFileStorageService(bucket.StorageAccount.Provider);
+            var parentPath = $"{folder.GetFullPath().TrimStart($"/{bucket.Name}".ToArray())}";
+            parentPath = string.IsNullOrWhiteSpace(parentPath) ? "" : parentPath.EndsWith('/') ? parentPath : (parentPath + "/");
+            var fldrKey = $"{parentPath}{request.FolderName}/";
+            // await service.CreateEmptyFolderAsync(bucket.Name, fldrKey, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
 
-        await repository.UpdateAsync(bucket);
-        return new CreateBucketFolderResponse(folder.Id);
+            await repository.UpdateAsync(bucket);
+        }
+        return new CreateBucketFolderResponse(folder is null?Guid.Empty:folder.Id);
     }
 }

@@ -1,6 +1,7 @@
 ﻿@using System.Text.RegularExpressions
 @using FSH.Starter.Blazor.Infrastructure.Api
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces;
 
 @inject IJSRuntime JSRuntime
 
@@ -33,6 +34,8 @@ else
                 Validation="@(new Func<string, string>(ValidateFileName))" />
 }
 @code {
+    
+  [Inject] protected IFileExplorerStateService StateService { get; set; } = default!;
   [Inject] protected IApiClient _client { get; set; } = default!;
   [Parameter, EditorRequired] public BaseExplorerItemModel Model { get; set; }
   private MudTextField<string> multilineReference;
@@ -113,6 +116,7 @@ else
         Model.IsEditing = false;
         
         await InvokeAsync(StateHasChanged);
+        StateService.NotifyCurrentFolderChanged(Model.Folder);
       }
     }
     else if (e.Key == "Escape")
@@ -140,7 +144,7 @@ else
     if (model is FolderModel folderModel)
     {
       // Call the RenameFolderAsync method from the service
-      RenameBucketFolderResponse? result = await _client.RenameBucketFolderEndpointAsync(folderModel.BucketId, folderModel.Id, new RenameBucketFolderCommand { BucketId = folderModel.BucketId, FolderId = folderModel.Id, NewFolderName = newName });
+      RenameBucketFolderResponse? result = await _client.RenameBucketFolderEndpointAsync(folderModel.BucketId, model.Id, new RenameBucketFolderCommand { BucketId = folderModel.BucketId, FolderId = model.Id, NewFolderName = newName });
       if (result is not null)
       {
         // Handle success (e.g., show a success message, update UI, etc.)

@@ -26,18 +26,21 @@ public sealed class RenameBucketFolderHandler(
     public async Task<RenameBucketFolderResponse> Handle(RenameBucketFolderCommand request, CancellationToken cancellationToken)
     {
         var bucket = await repository.FirstOrDefaultAsync(new GetBucketByIdSpec(request.BucketId));
-        Folder folder = bucket.Folders.FirstOrDefault(f => f.Id == request.FolderId) ?? throw new Exception($"Folder with id {request.FolderId} not found in bucket {bucket.Name}") ;
-        var service = serviceFactory.GetFileStorageService(bucket.StorageAccount.Provider);
+        Folder folder = bucket.Folders.FirstOrDefault(f => f.Id == request.FolderId);  //?? throw new Exception($"Folder with id {request.FolderId} not found in bucket {bucket.Name}") ;
+        if (folder is not null)
+        {
+            var service = serviceFactory.GetFileStorageService(bucket.StorageAccount.Provider);
 
-        var parentFolder = bucket.Folders.FirstOrDefault(f => f.Id == folder.ParentId);
-        var prefix = (parentFolder?.GetFullPath() ?? "").TrimStart('/');
-        var oldFolderPath = $"{prefix.TrimEnd('/')}/{folder.Name}/";
-        var newFolderPath = $"{prefix.TrimEnd('/')}/{request.NewFolderName}/";
-        // var fldrKey = $"{folder.GetFullPath().TrimStart($"/{bucket.Name}".ToArray())}/{request.NewFolderName}/.";   
-        // await service.CreateEmptyFolderAsync(bucket.Name, fldrKey, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
-        await service.RenameFolderAsync(bucket.Name, oldFolderPath, newFolderPath, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
-        folder.ReName(request.NewFolderName);
-        await repository.UpdateAsync(bucket);
-        return new RenameBucketFolderResponse(bucket.Id, folder.Id, request.NewFolderName);
+            var parentFolder = bucket.Folders.FirstOrDefault(f => f.Id == folder.ParentId);
+            var prefix = (parentFolder?.GetFullPath() ?? "").TrimStart('/');
+            var oldFolderPath = $"{prefix.TrimEnd('/')}/{folder.Name}/";
+            var newFolderPath = $"{prefix.TrimEnd('/')}/{request.NewFolderName}/";
+            // var fldrKey = $"{folder.GetFullPath().TrimStart($"/{bucket.Name}".ToArray())}/{request.NewFolderName}/.";   
+            // await service.CreateEmptyFolderAsync(bucket.Name, fldrKey, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
+            await service.RenameFolderAsync(bucket.Name, oldFolderPath, newFolderPath, bucket.StorageAccount.AccessKey, bucket.StorageAccount.SecretKey);
+            folder.ReName(request.NewFolderName);
+            await repository.UpdateAsync(bucket);
+        }
+        return new RenameBucketFolderResponse(bucket.Id, request.FolderId, folder is null? "" :request.NewFolderName);
     }
 }

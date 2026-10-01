@@ -18,6 +18,7 @@ public sealed class GetBucketFolderHandler(
     public async Task<GetBucketFolderResponse?> Handle(GetBucketFolderRequest request, CancellationToken cancellationToken)
     {
         var bucket = await repository.FirstOrDefaultAsync(new GetBucketByIdSpec(request.BucketId), cancellationToken);
+        if (bucket is null) return null;
         GetBucketFolderResponse result;
         // var service = serviceFactory.GetFileStorageService(StorageProvider.AmazonS3);
         if (request.FolderId.HasValue && request.FolderId != Guid.Empty) 

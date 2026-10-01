@@ -277,7 +277,7 @@ public class AWSFileStorageService : IFileStorageService
             // 1. List all objects within the directory
             listResponse = await _s3Client.ListObjectsV2Async(listRequest);
 
-            if (listResponse.S3Objects.Count == 0)
+            if (listResponse?.S3Objects is null || listResponse.S3Objects.Count == 0)
                 break;
 
             //var deleteRequest = new DeleteObjectsRequest
