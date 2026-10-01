@@ -257,6 +257,7 @@
     var newFolder = await  _client.CreatePucketFolderEndpointAsync(CurrentFolder.BucketId, CurrentFolder.Id, createCmd);
     fldr.IsNeedsFocus = true; fldr.IsEditing = true;
     fldr.Path = $"{CurrentFolder.Path}/{newFolderName}";
+    fldr.Id = (Guid)(newFolder?.Id ?? Guid.Empty);
     await StateService.NotifyFolderCreated(InstanceId, fldr);
     await StateService.NotifyFolderSelectionChanged(fldr);
   }
