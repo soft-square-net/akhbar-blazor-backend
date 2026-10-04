@@ -15,6 +15,11 @@
 
 @code {
   [Parameter]
+  public float SiftX { get; set; } = 0;
+  [Parameter]
+  public float SiftY { get; set; } = 0;
+
+  [Parameter]
   public RenderFragment<TItem?> ChildContent { get; set; } = default!;
 
   private bool isVisible;
@@ -32,8 +37,8 @@
   {
     if (item is TItem)
     {
-      x = mouseX;
-      y = mouseY;
+      x = mouseX - SiftX;
+      y = mouseY - SiftY;
       selectedItem = item;
       isVisible = true;
       StateHasChanged();

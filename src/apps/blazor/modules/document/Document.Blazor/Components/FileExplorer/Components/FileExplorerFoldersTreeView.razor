@@ -180,7 +180,7 @@
     // selectNode.Selected = true;
     // newNode.Value.Select();
     // CurrentFolder.AddFolder(newNode?.Value);
-    CurrentFolder.AddFolder(folder);
+    CurrentFolder.AddFolders(new FolderModel[] { folder });
     // CurrentFolder = newNode?.Value ?? folder;
     CurrentFolder.IsExpanded = true;
 
@@ -274,7 +274,7 @@
     // Perform conditional action on expand
     if (isExpanded && (node.Value.Folders == null || !node.Value.Folders.Any()))
     {
-      await node.Value.LoadFolders(); // LoadChildDataAsync(node);
+      await node.Value.LoadFromDb(); // LoadChildDataAsync(node);
     }
   }
 
@@ -312,10 +312,12 @@
       }
 
       // 2. Populate Files
+      FileModel[] files = [];
       foreach (var file in di.GetFiles())
       {
-        node.Value.AddFile(new FileModel(Guid.NewGuid(), file.Name, file.Length, file.CreationTime, file.LastWriteTime));
+        files = files.Append(new FileModel(Guid.NewGuid(), file.Name, file.Length, file.CreationTime, file.LastWriteTime)).ToArray();
       }
+      node.Value.AddFiles(files);
     }
     catch (UnauthorizedAccessException)
     {

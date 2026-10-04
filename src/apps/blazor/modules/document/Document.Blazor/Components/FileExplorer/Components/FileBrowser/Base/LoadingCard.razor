@@ -10,7 +10,8 @@
   @if (!Loading)
   {
     @* <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
-    <div tabindex="0" class="file-explorer-loading-card" @onblur="@(() => HideContextMenu())"
+    @*<div tabindex="0" class="file-explorer-loading-card" @onblur="@(() => HideContextMenu())"  *@
+    <div tabindex="0" class="file-explorer-loading-card"
          @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
          @oncontextmenu:preventDefault @oncontextmenu:stopPropagation  
          @ondblclick="OnDblClick"

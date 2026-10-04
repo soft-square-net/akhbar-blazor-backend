@@ -32,6 +32,7 @@
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Components\FileExplorer\Components\FileBrowser\FileBrowser.razor.bak" />
     <Content Include="Components\FileExplorer\Components\FileExplorerFoldersListZZZComponent.razor.txt" />
   </ItemGroup>
 

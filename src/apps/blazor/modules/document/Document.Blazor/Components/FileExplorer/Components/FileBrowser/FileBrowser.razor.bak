@@ -1,0 +1,138 @@
+﻿@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components;
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Default
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Tabular
+@using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
+@using FSH.Starter.BlazorShared.Components.General
+@using FSH.Starter.BlazorShared.Services
+@using System.Text
+
+@inject ContextMenuService MenuService
+@inject IJSRuntime JSRuntime
+
+<div @onclick="() => HideGlobalMenu()" @onblur="() => HideGlobalMenu()">
+  @switch (ExplorerType)
+  {
+    case EnumExplorerType.DefaultExplorer:
+      <FileBrowserDefaultFileView />
+      break;
+    case EnumExplorerType.TabularExplorer:
+      <FileBrowserTabularFileView />
+      break;
+    default:
+      break;
+  }
+</div>
+@* Single instance definition with strongly-typed template content using generic ContextMenu *@
+<ContextMenuGeneric TItem="BaseExplorerItemModel" Context="ctx">
+  @if (ctx is BaseExplorerItemModel item)
+  {
+    <div @onblur="() => HideGlobalMenu()">
+      <MudPaper Elevation="1">
+        <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="() => EditItem(item)">Edit @item.Name</MudMenuItem>
+        <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteItem(item)">Delete</MudMenuItem>
+        <MudMenuItem Icon="@Icons.Material.Outlined.Download" OnClick="async () => await DownloadItem(item)">Download</MudMenuItem>
+        @if (!isFileReady)
+        {
+          <!-- STEP 1: Click to generate/prepare the file content in C# -->
+          <MudButton Variant="Variant.Filled"
+                     Color="Color.Primary"
+                     StartIcon="@Icons.Material.Filled.Construction"
+                     OnClick="PrepareFileAsync"
+                     Disabled="@isProcessing">
+            @((isProcessing) ? "Preparing File Content..." : "Generate File Data")
+          </MudButton>
+        }
+        else
+        {
+          <!-- STEP 2: The file is ready. Clicking this instantly triggers the JS Save Picker -->
+          <MudButton Variant="Variant.Filled"
+                     Color="Color.Success"
+                     StartIcon="@Icons.Material.Filled.Download"
+                     OnClick="TriggerSaveDialog">
+            Save File As...
+          </MudButton>
+        }
+      </MudPaper>
+    </div>
+  }
+</ContextMenuGeneric>
+<div>
+  Current Folder Items: @CurrentFolder?.Files?.Count
+</div>
+@code {
+
+  [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }
+
+  private void HideGlobalMenu() => MenuService.Hide();
+  private void EditItem(BaseExplorerItemModel item) {/* HideGlobalMenu();  Your Logic */ }
+  private void DeleteItem(BaseExplorerItemModel item) { HideGlobalMenu(); /* Your Logic */ }
+
+  private bool isProcessing = false;
+  private bool isFileReady = false;
+
+  // Temporary storage for your prepared data
+  private byte[] preparedFileBytes;
+
+  public async Task DownloadItem(BaseExplorerItemModel item)
+  {
+    // Yield execution to let the browser process the UI state cleanly
+    // await Task.Yield();
+    // 1. Generate or fetch your file data (e.g., text, PDF, Excel byte array)
+    var fileContent = "Hello from MudBlazor WebAssembly!";
+    var fileBytes = Encoding.UTF8.GetBytes(fileContent);
+
+    // 2. Wrap the data in a DotNetStreamReference
+    using var fileStream = new MemoryStream(fileBytes);
+    using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+    // 3. Define the file name
+    var fileName = "MudBlazorDownload.txt";
+
+    // 4. Call the JavaScript function to trigger the download
+    await JSRuntime.InvokeVoidAsync("window.helpers.downloadFileFromStream", fileName, streamRef);
+
+    // HideGlobalMenu();
+  }
+
+  [Parameter, EditorRequired]
+  public EnumExplorerType ExplorerType { get; set; } = EnumExplorerType.DefaultExplorer;
+
+
+  RenderFragment Render()
+  {
+    return new RenderFragment(builder =>
+    {
+      builder.AddContent(0, "my fragment");
+    });
+  }
+
+  // 1. Prepare your C# file content asynchronously
+  private async Task PrepareFileAsync()
+  {
+    isProcessing = true;
+
+    // Simulating your async C# preparation (API calls, data processing, etc.)
+    await Task.Delay(2000);
+
+    string sampleText = "This is the content prepared entirely in C#.";
+    preparedFileBytes = System.Text.Encoding.UTF8.GetBytes(sampleText);
+
+    isProcessing = false;
+    isFileReady = true; // Flips the button to the "Save" trigger
+  }
+
+  // 2. Trigger the JavaScript picker SYNCHRONOUSLY to satisfy browser security
+  private void TriggerSaveDialog()
+  {
+    // Pass the data down to JS using a stream reference
+    var stream = new MemoryStream(preparedFileBytes);
+    var streamRef = new DotNetStreamReference(stream);
+
+    // DO NOT use "await" before this line. Keeping it synchronous preserves the user gesture!
+    _ = JSRuntime.InvokeVoidAsync("helpers.downloadFileFromStream", "suggestedFileNmae.txt", streamRef);
+
+    // Reset the UI state back to the beginning
+    isFileReady = false;
+    preparedFileBytes = null;
+  }
+}

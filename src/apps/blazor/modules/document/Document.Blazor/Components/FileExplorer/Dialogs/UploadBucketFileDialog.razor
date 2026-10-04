@@ -14,11 +14,11 @@
   </TitleContent>
   <DialogContent>
     <div class="d-flex flex-column py-1" style="min-width:400px;">
+      <MudTextField T="string" Label="Path" Disabled="true" Value="CurrentFolder.GetFullPath()" Variant="Variant.Outlined" />
       <MudForm>
-        <MudTextField  T="string" @bind-Value="_title" Label="Title" />
-        <MudTextField T="string" Lines="3" MaxLines="3" @bind-Value="_description" Label="Description"></MudTextField>
-        <MudFileUpload T="IBrowserFile" @ref="_fileUpload"
+           <MudFileUpload T="IBrowserFile" @ref="_fileUpload"
                        @bind-Files="_file"
+                       OnFilesChanged="OnFileChanged"
                        OnUploadSuccess="OnUploadSuccess"
                        Accept=".png, .jpg, .tiff, .jpeg">
           <CustomContent>
@@ -28,19 +28,23 @@
             </MudButton>
           </CustomContent>
         </MudFileUpload>
+        @if (_file is not null && !string.IsNullOrWhiteSpace(_file?.Name))
+        {
+          <MudTextField  T="string" @bind-Value="_title" Label="Title" />
+          <MudTextField T="string" Lines="3" MaxLines="3" @bind-Value="_description" Label="Description"></MudTextField>
 
-       @*  StartedEditingItem="@StartedEditingItem"
+
+          @*  StartedEditingItem="@StartedEditingItem"
         CanceledEditingItem="@CanceledEditingItem" *@
-        <DictionaryEditor Elements="_metadata"></DictionaryEditor>
-        <MudIconButton Icon="@Icons.Material.Filled.UploadFile" Color="Color.Primary" OnClick="TriggerUpload" />
-
+          <DictionaryEditor Elements="_metadata"></DictionaryEditor>
+        }
       </MudForm>
-      Folder Name: @CurrentFolder.Name
+     
     </div>
   </DialogContent>
   <DialogActions>
-    <MudButton Color="Color.Primary" OnClick="Upload">Upload</MudButton>
-    <MudButton Color="Color.Primary" OnClick="Cancel">Cancel</MudButton>
+    <MudButton Color="Color.Primary" OnClick="Upload" Disabled="@(_file is null || string.IsNullOrWhiteSpace(_file?.Name))">Upload</MudButton>
+    <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
   </DialogActions>
 </MudDialog>
 
@@ -61,7 +65,7 @@
   private string _statusText = "Waiting for files.";
   private string _title;
   private string _description;
-  private Dictionary<string, string> _metadata = new() { { "AAAAA", "BBBBB" } };  
+  private Dictionary<string, string> _metadata = new() { };  
 
   void Cancel() => UploadDialog.Cancel();
 
@@ -72,7 +76,18 @@
     UploadDialog.Close(DialogResult.Ok(NewName.Trim()));
   }
 
-
+  private void OnFileChanged()
+  {
+    bool metaHsExtensionKey = _metadata.ContainsKey("Extension");
+    if(_file is not null && !string.IsNullOrWhiteSpace(_file.Name))
+    {
+      _metadata["Extension"] = System.IO.Path.GetExtension(_file.Name);
+    }
+    else
+    {
+      _metadata.Remove("Extension");
+    }
+  }
 
   private async Task TriggerUpload()
   {
@@ -86,9 +101,9 @@
     formData.Add(streamContent, "file", _file.Name);
     if (streamContent != null)
     {
-      FolderModel folderModel = new FolderModel(new Guid("9d4bdbef-0df8-4e41-bd38-4082734e71ae"), "Trash", new Guid("7703de7b-e583-4feb-a753-5556a9061d13"), new FileModel[0]);
+      // FolderModel folderModel = new FolderModel(new Guid("9d4bdbef-0df8-4e41-bd38-4082734e71ae"), "Trash", new Guid("7703de7b-e583-4feb-a753-5556a9061d13"), new FileModel[0]);
       // Dictionary<string, string> metadata = new Dictionary<string, string>();
-      await DocumentsStorageService.UploadFile(fileParameter, _file.Name, folderModel, (int)_file.Size, _description, _metadata, new CancellationToken());
+      await DocumentsStorageService.UploadFile(fileParameter, _file.Name, CurrentFolder, (int)_file.Size, _description, _metadata, new CancellationToken());
     }
   }
 
@@ -102,7 +117,7 @@
   //await stream.CopyToAsync(memoryStream);
   //var fileBytes = memoryStream.ToArray();
 
-
+  
 }
 
 

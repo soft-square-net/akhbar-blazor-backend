@@ -303,7 +303,7 @@
     foreach (var browserFile in e.GetMultipleFiles())
     {
       var model = new FileModel(Guid.NewGuid(), browserFile.Name, browserFile.Size, DateTime.Now, DateTime.Now);
-      CurrentFolder.AddFile(model);
+      CurrentFolder.AddFiles(new FileModel[] { model });
     }
     Toast.Add($"Uploaded {e.GetMultipleFiles().Count} file(s).", Severity.Success);
   }
@@ -332,7 +332,8 @@
     // {
     //   folder.AddFile(fl);
     // }
-
+    folder.Path = folder.Folder != null ? $"{folder.Folder.Path}/{folder.Name}" : $"/{folder.Name}";
+    folder.Path = folder.GetFullPath();
     // var newFolderModel = new FolderModel((Guid)newFolder.Id, newFolder.Name, newFolder.BucketId, newFolder.Files, newFolder.Folders);
     // var parent = CurrentFolder.Folder != null ?Folders.FirstOrDefault(f => f.Id == CurrentFolder.Folder.Id) : null;
     // var temp = CurrentFolder;

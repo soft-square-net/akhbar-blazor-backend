@@ -1,0 +1,14 @@
+﻿@using FSH.Starter.BlazorShared.interfaces;
+@using Microsoft.Extensions.Localization;
+@implements IModuleMenu;
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor;
+
+@inject IStringLocalizer<MudBlazorBlocksResources> Loc
+
+<MudNavGroup Title="@Loc["Modules.MudBlazorBlocks.Title"]" Icon="@Icons.Material.Filled.DocumentScanner">
+  <MudNavGroup Title="Document" Icon="@Icons.Material.Filled.DocumentScanner">
+    <MudNavLink Href="/document/list" Icon="@Icons.Material.Filled.FolderOpen" Class="fsh-nav-child">Blocks</MudNavLink>
+  </MudNavGroup>
+</MudNavGroup>
+
+

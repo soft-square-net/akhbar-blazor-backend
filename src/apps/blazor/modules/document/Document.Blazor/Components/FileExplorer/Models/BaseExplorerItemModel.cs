@@ -25,33 +25,37 @@ public class BaseExplorerItemModel : IExplorerItemModel,IDisposable
     public bool IsNeedsFocus { get; set; }
     public bool IsSelected => _selected;
 
-    public void Select()
-    {
-        
-        _selected = true;
-        // StateService.NotifyFileSelectionChanged();
-        // StateService.NotifyStateChanged();
-    }
-    public void UnSelect()
-    {
-        _selected = false;
-    }
+    
 
     private bool _isFolder;
     public bool IsFolder => _isFolder;
 
     public ICollection<IExplorerItemModel> Children { get;}
 
+
+    public string GetFullPath()
+    {
+        if (Folder is null) return Name;
+        return $"{Folder.GetFullPath().TrimStart('/').TrimEnd('/')}/{Name}";
+    }
+
+
     protected void SetAsFolder()
     {
-
         _isFolder = true;
     }
     protected void SetAsFile()
     {
         _isFolder = false;
     }
-
+    public void Select()
+    {
+        _selected = true;
+    }
+    public void UnSelect()
+    {
+        _selected = false;
+    }
     public void Dispose()
     {
         

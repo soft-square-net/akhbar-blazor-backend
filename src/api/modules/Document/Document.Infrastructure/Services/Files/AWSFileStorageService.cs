@@ -171,7 +171,7 @@ public class AWSFileStorageService : IFileStorageService
         _refreshCeredintials.UpdateCredentials(accessKey, secretKey);
         var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
         if (!bucketExists) throw new FileNotFoundException($"Bucket {bucketName} does not exist.");
-        prefix = "/test/";
+        // prefix = "/test/";
 
         var request = new PutObjectRequest()
         {
