@@ -4,8 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor</RootNamespace>
-    <AssemblyName>FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor</AssemblyName>
+    <RootNamespace>FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor</RootNamespace>
+    <AssemblyName>FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Blazor.Shared\BlazorShared.csproj" />
+    <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" />
   </ItemGroup>
 
 </Project>

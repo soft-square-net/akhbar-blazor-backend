@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Layout;
 public partial class FSHeroLayout
 {
     [Parameter] public RenderFragment? ChildContent { get; set; } = null;

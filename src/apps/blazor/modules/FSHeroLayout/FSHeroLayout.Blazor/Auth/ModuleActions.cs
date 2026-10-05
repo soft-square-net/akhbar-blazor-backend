@@ -1,5 +1,5 @@
 ﻿
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Auth;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Auth;
 
 public static partial class ModuleActions
 {
