@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="Abstractions\Interfaces\" />
+    <Folder Include="Search\" />
   </ItemGroup>
 
 </Project>
