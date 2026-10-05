@@ -15,7 +15,7 @@ public partial class Todos
 
     private EntityTable<GetTodoResponse, Guid, TodoViewModel> _table = default!;
 
-    protected override void OnInitialized() =>
+    protected void OnInitialized() =>
         Context = new(
             entityName: "Todos",
             entityNamePlural: "Todos",

@@ -415,7 +415,7 @@
       // var current = bucketRoot.Adapt<FolderModel>();
       // bucketRoot.Adapt(folder);
       folder.Path = $"/{bucketRoot.Name}";
-      folder.Size = 245_760;
+      folder.Size = bucketRoot.Size;
       folder.Description = "Test Folder";
       Folders.Add(folder);
       CurrentFolder = Folders.First();

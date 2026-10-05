@@ -34,4 +34,9 @@
 	  <Folder Include="Components\" />
 	</ItemGroup>
 
+  <Target Name="BuildVitePackage" BeforeTargets="CoreCompile">
+    <Exec WorkingDirectory="node-app" Command="npm install" />
+    <Exec WorkingDirectory="node-app" Command="npm run build" />
+  </Target>
+
 </Project>

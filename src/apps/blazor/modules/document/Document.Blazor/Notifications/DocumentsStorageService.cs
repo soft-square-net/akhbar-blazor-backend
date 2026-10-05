@@ -9,6 +9,7 @@ using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models;
 using FSH.Starter.Shared.Authorization;
 using Mapster;
 using MediatR.Courier;
+using Nextended.Core.Extensions;
 using OneOf.Types;
 using static FSH.Starter.Blazor.Modules.Document.Blazor.FileExplorerIcons;
 
@@ -64,17 +65,17 @@ public class DocumentsStorageService: IDocumentsStorageService
 
     public async Task<FileStream> DownloadFile(FileModel model, string filePath, CancellationToken cancellationToken)
     {
-        //GetBucketFileResponse? fileData = await _apiClient.GetBucketFileEndpointAsync(model.Folder.BucketId, model.Folder.Id, model.Id, cancellationToken);
-        DownloadBucketFileResponse fileData = await _apiClient.DownloadBucketFileEndpointAsync(model.Folder.BucketId, model.Id);
-
-        // Create the FileStream and write the bytes to disk
-        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-        {
-            if (fileData?.Stream != null)
-            {
-                await fs.WriteAsync(fileData.Stream.AsMemory(0, fileData.Stream.Length), cancellationToken);
-            }
-        }
+        // GetBucketFileResponse? fileData = await _apiClient.GetBucketFileEndpointAsync(model.Folder.BucketId, model.Folder.Id, model.Id, cancellationToken);
+        FileResponse fileData = await _apiClient.DownloadBucketFileEndpointAsync(model.Folder.BucketId, model.Id, cancellationToken);
+        
+         // Create the FileStream and write the bytes to disk
+         using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+         {
+             if (fileData?.Stream != null)
+             {
+                 await fs.WriteAsync(fileData.Stream.ToByteArray().AsMemory(0, (int)fileData.Stream.Length), cancellationToken);
+             }
+         }
         return new FileStream(filePath, FileMode.Open, FileAccess.Read);
     }
 

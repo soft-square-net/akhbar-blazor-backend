@@ -11,7 +11,7 @@
 
 <EntityTable @ref="_table" TEntity="StorageAccountResponse" TId="Guid" TRequest="StorageAccountVM" Context="@Context">
 
-  <ExtraActions>
+  <ExtraActions Context="context">
     <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
     @if (@* _canViewRoles *@ true)
     {
@@ -34,7 +34,7 @@
         <MudSlider T="decimal" @bind-value="SearchMaximumRate" Min="0" Max="9999" Step="100">Maximum Rate: @_searchMaximumRate.ToString()</MudSlider>
     </AdvancedSearchContent>
 
-    <EditFormContent>
+    <EditFormContent Context="context">
         @{
             // bool IsCreate = Context.AddEditModal.IsCreate;
             bool IsCreate = context.Id == Guid.Empty;

@@ -1,4 +1,5 @@
 ﻿@using System.Text
+@using FSH.Starter.Blazor.Infrastructure.Api
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components;
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Default
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Components.FileBrowser.Views.Tabular
@@ -6,6 +7,7 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Notifications
 @using FSH.Starter.BlazorShared.Components.General
 @using FSH.Starter.BlazorShared.Services
+@using Nextended.Core.Extensions
 
 
 
@@ -30,12 +32,15 @@
       <MudPaper Elevation="1">
         <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="() => EditItem(item)">Edit @item.Name</MudMenuItem>
         <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteItem(item)">Delete</MudMenuItem>
-        <MudMenuItem Icon="@Icons.Material.Outlined.Download" 
-                   Variant="Variant.Text"
-                   Color="Color.Primary"
-                   OnClick="() => OpenPickerImmediately(item)">
-          Download File
-        </MudMenuItem>
+      @if (item is FileModel )
+      {
+          <MudMenuItem Icon="@Icons.Material.Outlined.Download"
+                       Variant="Variant.Text"
+                       Color="Color.Primary"
+                       OnClick="() => OpenPickerImmediately(item)">
+              Download File
+          </MudMenuItem>
+      }
       </MudPaper>
     </div>
   }
@@ -51,6 +56,7 @@
 
   [Inject] private ContextMenuService MenuService { get; set; }
   [Inject] private IDocumentsStorageService documentStorageService { get; set; }
+  [Inject] private IApiClient _apiClient { get; set; } = default;
   [Inject] private IJSRuntime JS { get; set; }
 
   private static Func<Guid,Guid,Task<byte[]>> _generateDataDelegate;
@@ -77,20 +83,37 @@
   {
     // Zero awaits here! Preserves user gesture.
     var dotNetRef = DotNetObjectReference.Create(this);
-    _ = JS.InvokeVoidAsync("helpers.showPickerThenFetch", dotNetRef, item.Name, item.Id, item.Folder.BucketId);
+    _ = JS.InvokeVoidAsync("helpers.showPickerThenFetch", dotNetRef, item.Name, item.Folder.BucketId, item.Id);
   }
 
   [JSInvokable]
-  public async Task<string> GetPreparedDataJson(Guid itemId, Guid itemBucketId)
+  public async Task<string> GetPreparedDataJson(Guid bucketId,Guid itemId)
   {
     // This runs WHILE the file picker is saving/writing
-    byte[] data = await GenerateCsharpDataAsync(itemId, itemBucketId);
+    byte[] data = await GenerateCsharpDataAsync(bucketId, itemId);
     return Convert.ToBase64String(data);
   }
 
-  private async Task<byte[]> GenerateCsharpDataAsync(Guid itemId, Guid itemBucketId)
+  private async Task<byte[]> GenerateCsharpDataAsync(Guid bucketId, Guid itemId)
   {
     await Task.Delay(2000); // Your async preparation code
-    return System.Text.Encoding.UTF8.GetBytes($"Data generated after picker opened. /n/r With ID: {itemId} , /n/r and BucketID: {itemBucketId} .");
+    FileResponse file = await _apiClient.DownloadBucketFileEndpointAsync( bucketId, itemId);
+    
+    
+    string text;
+    using (MemoryStream stream = new MemoryStream())
+    {
+        await file.Stream.CopyToAsync(stream);
+        stream.Position = 0;
+        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+        {
+            text = reader.ReadToEnd();
+        }
+    }
+    
+    // return System.Text.Encoding.UTF8.GetBytes($"Data generated after picker opened. /n/r With ID: {itemId} , /n/r and BucketID: {itemBucketId} .");
+    // return Encoding.UTF8.GetBytes(text);
+    return file.Stream.ToByteArray();
+
   }
 }

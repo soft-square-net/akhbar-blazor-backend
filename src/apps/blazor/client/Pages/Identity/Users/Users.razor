@@ -3,7 +3,7 @@
 <PageHeader Title="Users" Header="Users" SubHeader="Manage Users." />
 
 <EntityTable TEntity="UserDetail" TId="Guid" TRequest="RegisterUserCommand" Context="@Context">
-    <ExtraActions>
+    <ExtraActions Context="context">
         <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
         @if (_canViewRoles)
         {
@@ -15,7 +15,7 @@
         }
     </ExtraActions>
 
-    <EditFormContent>
+    <EditFormContent Context="context">
         <MudItem xs="12" md="6">
             <MudTextField For="@(() => context.UserName)" @bind-Value="context.UserName" Label="User Name" />
         </MudItem>

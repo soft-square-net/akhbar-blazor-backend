@@ -6,7 +6,7 @@
 
 <EntityTable @ref="EntityTable" TEntity="TenantViewModel" TId="Guid" TRequest="CreateTenantCommand" Context="@Context"
     @bind-SearchString="_searchString">
-    <EditFormContent>
+    <EditFormContent Context="context">
         <MudItem xs="12" md="6">
             <MudTextField T="string" For="@(() => context.Id)" @bind-Value="context.Id" Label="Key" />
         </MudItem>
@@ -22,7 +22,7 @@
                 Label="Admin Email" />
         </MudItem>
     </EditFormContent>
-    <ExtraActions>
+    <ExtraActions Context="context">
         @if(_canUpgrade)
         {
             <MudMenuItem OnClick="@(() => ViewUpgradeSubscriptionModalAsync(context.Id))">Upgrade Subscription</MudMenuItem>
@@ -43,7 +43,7 @@
         }
     </ExtraActions>
 
-    <ChildRowContent>
+    <ChildRowContent Context="context">
         @if (context.ShowDetails)
         {
             <MudTr>

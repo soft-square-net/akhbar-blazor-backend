@@ -11,14 +11,14 @@ window.helpers.registerResizeCallback = (dotnetHelper) => {
     });
 };
 
-
-window.helpers.showPickerThenFetch = async function (dotNetRef, suggestedFileName, itemId, itemBucketId) {
+//  dotNetRef, item.Name, item.Id, item.Folder.BucketId)
+window.helpers.showPickerThenFetch = async function (dotNetRef, suggestedFileName, bucketId, itemId) {
         try {
             // 1. Open picker instantly (Valid user gesture)
             const handle = await window.showSaveFilePicker({ suggestedName: suggestedFileName });
             
             // 2. Go back to C# asynchronously to prepare and fetch the content
-            const base64Data = await dotNetRef.invokeMethodAsync('GetPreparedDataJson', itemId, itemBucketId);
+            const base64Data = await dotNetRef.invokeMethodAsync('GetPreparedDataJson', bucketId, itemId);
             const binaryString = atob(base64Data);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) {

@@ -1,0 +1,13 @@
+// abstracts
+@use "scss/abstracts";
+
+// JsLib/src/app.scss
+@use "tailwindcss";
+
+// Global custom SCSS variables/mixins can go below
+$primary-brand: #512bd4;
+
+body {
+  // @apply bg-slate-50 text-slate-900;
+  font-size: abstracts.$font-size;
+}

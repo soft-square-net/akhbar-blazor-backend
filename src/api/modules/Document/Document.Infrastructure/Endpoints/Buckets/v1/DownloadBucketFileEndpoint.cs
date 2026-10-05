@@ -11,18 +11,39 @@ public static class DownloadBucketFileEndpoint
 {
     public static RouteHandlerBuilder MapDownloadBucketFileEndpoint(this IEndpointRouteBuilder endpoints)
     {
+        string ContentType = "application/octet-stream";
         return endpoints
-            .MapGet("/{id:guid}/File/{fileid:guid}/", async (Guid id, Guid fileid,ISender mediator) =>
+            .MapGet("/{id:guid}/File/{fileid:guid}/DownloadFile", async (Guid id, Guid fileid, ISender mediator, HttpContext context) =>
             {
                 var response = await mediator.Send(new DownloadBucketFileRequest(id, fileid));
-                // byte[] fileBytes = System.IO.File.ReadAllBytes("path/to/your/file.pdf");
-                // return Results.File(fileBytes, "application/pdf", "document.pdf");
-                return Results.Ok(response);
+                response.downloadedStream.Position = 0;
+                ContentType = response.contentType;
+                // if (!string.IsNullOrWhiteSpace(response.contentLanguage))
+                // {
+                //     context.Response.Headers["Content-Language"] = response.contentLanguage;
+                // }
+                //
+                // if (!string.IsNullOrWhiteSpace(response.contentDisposition))
+                // {
+                //     context.Response.Headers["Content-Disposition"] = response.contentDisposition;
+                // }
+                //
+                // if (!string.IsNullOrWhiteSpace(response.contentMD5))
+                // {
+                //     context.Response.Headers["Content-MD5"] = response.contentMD5;
+                // }
+                //
+                // if (response.expires.HasValue)
+                // {
+                //     context.Response.Headers["Expires"] = response.expires.Value.ToString("R");
+                // }
+
+                return Results.File(response.downloadedStream, response.contentType);
             })
             .WithName(nameof(DownloadBucketFileEndpoint))
             .WithSummary("Download bucket File by Id")
             .WithDescription("Download bucket File by Id")
-            .Produces<DownloadBucketFileResponse>()
+            .Produces<Stream>(StatusCodes.Status200OK, ContentType)
             .RequirePermission("Permissions.Files.View")
             .MapToApiVersion(1);
     }
