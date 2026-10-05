@@ -62,7 +62,7 @@
   private static Func<Guid,Guid,Task<byte[]>> _generateDataDelegate;
 
   private void HideGlobalMenu() => MenuService.Hide();
-  private void EditItem(BaseExplorerItemModel item) {/* HideGlobalMenu();  Your Logic */ }
+  private void EditItem(BaseExplorerItemModel item) {HideGlobalMenu();  /* Your Logic */ }
   private void DeleteItem(BaseExplorerItemModel item) { HideGlobalMenu(); /* Your Logic */ }
 
   RenderFragment Render()
@@ -98,21 +98,7 @@
   {
     await Task.Delay(2000); // Your async preparation code
     FileResponse file = await _apiClient.DownloadBucketFileEndpointAsync( bucketId, itemId);
-    
-    
-    string text;
-    using (MemoryStream stream = new MemoryStream())
-    {
-        await file.Stream.CopyToAsync(stream);
-        stream.Position = 0;
-        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-        {
-            text = reader.ReadToEnd();
-        }
-    }
-    
-    // return System.Text.Encoding.UTF8.GetBytes($"Data generated after picker opened. /n/r With ID: {itemId} , /n/r and BucketID: {itemBucketId} .");
-    // return Encoding.UTF8.GetBytes(text);
+    HideGlobalMenu(); 
     return file.Stream.ToByteArray();
 
   }

@@ -34,7 +34,17 @@ window.helpers.showPickerThenFetch = async function (dotNetRef, suggestedFileNam
         }
     };
 
+window.helpers.getElementPosition = async function(dialogId) {
+    // MudBlazor maps the ID directly to the element class or container
+    const element = document.getElementById(dialogId);
+    if (!element) return { x: 0, y: 0 };
 
+    const rect = element.getBoundingClientRect();
+    return {
+        x: Math.round(rect.left),
+        y: Math.round(rect.top)
+    };
+};
 //////////////////////////////////////////////////////////////////////////////////
 // window.downloadFileFromStream = async (fileName, contentStreamReference) => {
 //         const arrayBuffer = await contentStreamReference.arrayBuffer();

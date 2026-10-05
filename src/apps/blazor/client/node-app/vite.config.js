@@ -67,7 +67,7 @@ export default defineConfig({
                         // Fallback if not found in the dynamic map
                         // let originalName = assetInfo.name.replace('.razor.css', '.razor');
                         let originalName = assetInfo.name.replace('.razor.css', '');
-                        return `wwwroot/css/${originalName.replace(/^-+/, '')}.css`;
+                        return `wwwroot/css/${originalName.replace(/^-+/, '').replace(/^modules-+/, 'FSH.Starter.Blazor.Modules-').replace('-','.')}.css`;
                         // let originalName = assetInfo.name.replace('.razor.css', '.razor');
  
                         // if (originalName.includes('global_app')) {

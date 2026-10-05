@@ -2,6 +2,7 @@
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Models
 @using FSH.Starter.Blazor.Modules.Document.Blazor.Components.FileExplorer.Services.Interfaces
 @using FSH.Starter.BlazorShared.Services
+@using Nextended.Core.Extensions
 
 @inject ContextMenuService MenuService
 @inject IJSRuntime JS
@@ -12,7 +13,7 @@
     @* <div class="file-explorer-loading-card" @onblur="@(CloseContextMenu)" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation> *@
     @*<div tabindex="0" class="file-explorer-loading-card" @onblur="@(() => HideContextMenu())"  *@
     <div tabindex="0" class="file-explorer-loading-card"
-         @oncontextmenu="@((e) => ShowContextMenu(e, Model))"
+         @oncontextmenu="@((e) => ShowContextMenuAsync(e, Model))"
          @oncontextmenu:preventDefault @oncontextmenu:stopPropagation  
          @ondblclick="OnDblClick"
          @ref="_targetContainerRef" @onclick="HandleTargetClick">
@@ -31,7 +32,7 @@
 
 @code {
   [Inject] IFileExplorerStateService StateService { get; set; } = default!;
-
+  [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
   [Parameter] public bool Loading { get; set; }
   [Parameter] public EventCallback<bool> OnLoadingChanged { get; set; }
   [Parameter, EditorRequired] public BaseExplorerItemModel Model { get; set; }
@@ -52,11 +53,20 @@
       await JS.InvokeVoidAsync("helpers.simulateCtrlClickByRef", _targetContainerRef);
     }
   }
-
-  private void ShowContextMenu(MouseEventArgs e, BaseExplorerItemModel item)
+  
+  record Point2D(double x, double y);
+  private async Task ShowContextMenuAsync(MouseEventArgs e, BaseExplorerItemModel item)
   {
     // Pass mouse coordinates and the data model to the single instance
-    MenuService.Show(e.ClientX, e.ClientY, item);
+    Point2D pos = new Point2D(0D, 0D);
+    string dialogId = string.Empty;
+    if (MudDialog != null)
+    {
+        dialogId = $"_{MudDialog.Id.ToString().Replace("-","")}";
+        pos = await JS.InvokeAsync<Point2D>("helpers.getElementPosition", dialogId);
+
+    }
+    MenuService.Show(e.ClientX - pos.x, e.ClientY - pos.y, item);
   }
 
   private void HideContextMenu()
