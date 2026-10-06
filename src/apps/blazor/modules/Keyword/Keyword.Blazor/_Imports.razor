@@ -1,0 +1,25 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using FSH.Starter.Blazor.Infrastructure.Preferences
+@using FSH.Starter.Blazor.Modules.Keyword.Blazor
+@using Mapster;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using MudBlazor
+@using static FSH.Starter.Blazor.Modules.Keyword.Blazor.Constants;
+
+@attribute [Authorize]
+
+@inject NavigationManager Navigation
+@inject ISnackbar Toast
+@inject IDialogService DialogService
+@inject IConfiguration Config
+@inject IClientPreferenceManager ClientPreferences
+@inject IStringLocalizer<KeywordResources> Loc ;

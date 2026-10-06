@@ -1,0 +1,99 @@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Models
+@* PostBlockNode.razor *@
+
+<MudPaper Class="pa-4 my-2 outline-none" Elevation="@(Block.IsEditing ? 3 : 1)" Style="border-left: 4px solid var(--mud-palette-primary);">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.DragIndicator" Class="cursor-grab" Color="Color.Default" />
+            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                @Block.Type
+            </MudChip>
+            @if (!Block.IsEditing)
+            {
+                <MudText Typo="Typo.subtitle1" Style="font-weight: 600;">@Block.Title</MudText>
+            }
+        </MudStack>
+
+        <MudStack Row="true" Spacing="1">
+            <MudTooltip Text="@(Block.IsEditing ? "Switch to Preview" : "Switch to Editor")">
+                <MudIconButton Icon="@(Block.IsEditing ? Icons.Material.Filled.Visibility : Icons.Material.Filled.Edit)"
+                               Color="Color.Info"
+                               Size="Size.Small"
+                               OnClick="() => Block.IsEditing = !Block.IsEditing" />
+            </MudTooltip>
+            
+            <MudTooltip Text="Add Sub-Block">
+                <MudIconButton Icon="@Icons.Material.Filled.Add"
+                               Color="Color.Success"
+                               Size="Size.Small"
+                               OnClick="() => OnAddChild.InvokeAsync(Block.Id)" />
+            </MudTooltip>
+
+            <MudTooltip Text="Delete Block">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Color="Color.Error"
+                               Size="Size.Small"
+                               OnClick="() => OnDelete.InvokeAsync(Block)" />
+            </MudTooltip>
+        </MudStack>
+    </MudStack>
+
+    @if (Block.IsEditing)
+    {
+        <MudGrid Class="mb-2">
+            <MudItem xs="12" sm="8">
+                <MudTextField @bind-Value="Block.Title" Label="Block Title" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudSelect @bind-Value="Block.Type" Label="Block Type" Variant="Variant.Outlined" Margin="Margin.Dense" T="BlockType">
+                    @foreach (BlockType type in Enum.GetValues(typeof(BlockType)))
+                    {
+                        <MudSelectItem Value="@type">@type</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="Block.Content" Label="Content" Variant="Variant.Outlined" Lines="2" Margin="Margin.Dense" />
+            </MudItem>
+        </MudGrid>
+    }
+    else
+    {
+        <MudPaper Class="pa-3 mud-background-gray" Elevation="0">
+            <MudText Typo="Typo.body2">@Block.Content</MudText>
+        </MudPaper>
+    }
+
+    @* --- RECURSIVE SUB-DROPZONE FOR THIS NODE --- *@
+    <div class="ml-6 pl-2 mt-2" style="border-left: 2px dashed var(--mud-palette-lines-default); min-height: 20px;">
+        <MudDropZone T="PostBlock" Identifier="@Block.Id" Class="pa-1 min-h-50">
+            @foreach (var child in GetChildren(Block.Id))
+            {
+                <PostBlockNode Block="child"
+                               AllBlocks="AllBlocks"
+                               OnDelete="OnDelete"
+                               OnAddChild="OnAddChild" />
+            }
+        </MudDropZone>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public PostBlock Block { get; set; } = default!;
+    [Parameter, EditorRequired] public List<PostBlock> AllBlocks { get; set; } = new();
+    [Parameter] public EventCallback<PostBlock> OnDelete { get; set; }
+    [Parameter] public EventCallback<string> OnAddChild { get; set; }
+    // public int AddChildHelper(MudItemDropInfo<PostBlock> info, PostBlock block)
+    // {
+    //     block.AddChild(info.Item);
+    //     return info.IndexInZone;
+    // }
+    private IEnumerable<PostBlock> GetChildren(string parentId)
+    {
+        return AllBlocks.Where(b => b.ParentId == parentId).OrderBy(b => b.Order);
+    }
+}
+
+    
+
+

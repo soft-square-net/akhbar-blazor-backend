@@ -1,0 +1,14 @@
+﻿@using FSH.Starter.BlazorShared.interfaces;
+@using Microsoft.Extensions.Localization;
+@implements IModuleMenu;
+@using FSH.Starter.Blazor.Modules.Keyword.Blazor;
+
+@inject IStringLocalizer<KeywordResources> Loc
+
+<MudNavGroup Title="@Loc["Modules.Keyword.Title"]" Icon="@Icons.Material.Filled.DocumentScanner">
+  <MudNavGroup Title="Keywords" Icon="@Icons.Material.Filled.DocumentScanner">
+    <MudNavLink Href="/Keywords/list" Icon="@Icons.Material.Filled.FolderOpen" Class="fsh-nav-child">Keywords</MudNavLink>
+  </MudNavGroup>
+</MudNavGroup>
+
+
