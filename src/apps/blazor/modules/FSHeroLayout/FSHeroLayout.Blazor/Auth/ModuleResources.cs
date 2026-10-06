@@ -1,6 +1,6 @@
 ﻿
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Auth;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Auth;
 public static partial class ModuleResources
 {
     public const string Documents = nameof(Documents);

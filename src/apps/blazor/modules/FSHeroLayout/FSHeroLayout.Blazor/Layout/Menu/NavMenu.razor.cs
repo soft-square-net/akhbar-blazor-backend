@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using FSH.Starter.Blazor.Infrastructure.Auth;
-using FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Auth;
+using FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Auth;
 using FSH.Starter.BlazorShared.interfaces;
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Layout.Menu;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout.Menu;
 public partial class NavMenu: IModuleMenu
 {
     [CascadingParameter]

@@ -1,28 +1,28 @@
-using static System.Net.WebRequestMethods;
+// /*using static System.Net.WebRequestMethods;*/
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddContainer("grafana", "grafana/grafana")
-       .WithBindMount("../../../compose/grafana/config", "/etc/grafana", isReadOnly: true)
-       .WithBindMount("../../../compose/grafana/dashboards", "/var/lib/grafana/dashboards", isReadOnly: true)
-       .WithHttpEndpoint(port: 3000, targetPort: 3000, name: "http");
+    .WithBindMount("../../../compose/grafana/config", "/etc/grafana", isReadOnly: true)
+    .WithBindMount("../../../compose/grafana/dashboards", "/var/lib/grafana/dashboards", isReadOnly: true)
+    .WithHttpEndpoint(port: 3000, targetPort: 3000, name: "http");
 
 builder.AddContainer("prometheus", "prom/prometheus")
-       .WithBindMount("../../../compose/prometheus", "/etc/prometheus", isReadOnly: true)
-       .WithHttpEndpoint(port: 9090, targetPort: 9090);
+    .WithBindMount("../../../compose/prometheus", "/etc/prometheus", isReadOnly: true)
+    .WithHttpEndpoint(port: 9090, targetPort: 9090);
 
 var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432)
-    .WithPgAdmin()  /******** * Uncomment to include pgAdmin for database management * ********/
+    .WithPgAdmin() /******** * Uncomment to include pgAdmin for database management * ********/
     .WithDataVolume()
-    .AddDatabase("akhbarblazor");  //.AddDatabase("fullstackhero");
+    .AddDatabase("akhbarblazor"); // /*.AddDatabase("fullstackhero");*/
 // Ahmed Galal
 // Note: Ensure that the database name matches the one used in the API project configuration.
-// var cache = builder.AddRedis("redis", port: 6379);
+// /*var cache = builder.AddRedis("redis", port: 6379);*/
 var cache = builder.AddGarnet("cache", port: 6379);
-// .WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");
+// /*.WithImage("ghcr.io/microsoft/garnet").WithImageTag("latest");*/
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,18 +30,18 @@ var cache = builder.AddGarnet("cache", port: 6379);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-//var elsaStudio = builder.AddProject<Projects.ElsaStudioBlazorWasm>("elsaStudio")
-//    .WithEndpoint(endpointName: "https", callback: static endpoint =>
-//    {
-//        endpoint.TargetPort = 7250;
-//        endpoint.Port = 7350;
-//    });
+/*
+  var elsaStudio = builder.AddProject<Projects.ElsaStudioBlazorWasm>("elsaStudio").WithEndpoint(endpointName: "https", callback: static endpoint =>{
+        endpoint.TargetPort = 7250;
+        endpoint.Port = 7350;
+    });
+*/
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ////                              MINIO / S3 COMPATIBLE OBJECT STORAGE
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //#region MINIO / S3 COMPATIBLE OBJECT STORAGE
-//// Object storage (MinIO, S3-compatible)
+// /*Object storage (MinIO, S3-compatible)*/
 //const string MinioBucket = "fsh-uploads";
 //var minioUser = builder.AddParameter("minio-user", "minioadmin");
 //var minioPassword = builder.AddParameter("minio-password", "minioadmin", secret: true);
@@ -55,7 +55,7 @@ var cache = builder.AddGarnet("cache", port: 6379);
 //    .WithVolume("fsh-minio-data", "/data")
 //    .WithLifetime(ContainerLifetime.Persistent);
 
-//var minioInitScript = $$"""
+// /* var minioInitScript = $$""" */
 //        until mc alias set local http://minio:9000 "$MC_USER" "$MC_PASS"; do
 //            echo "waiting for minio...";
 //            sleep 2;
@@ -77,7 +77,9 @@ var cache = builder.AddGarnet("cache", port: 6379);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //                              MINIO OLD / S3 COMPATIBLE OBJECT STORAGE
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #region MINIO OLD/ S3 COMPATIBLE OBJECT STORAGE
+
 // Object storage (MinIO, S3-compatible)
 const string MinioBucket = "fsh-uploads";
 var minioUser = builder.AddParameter("minio-user", "minioadmin");
@@ -90,20 +92,22 @@ var minio = builder.AddContainer("minio", "minio/minio", "RELEASE.2023-03-13T19-
     .WithEnvironment("MINIO_ROOT_USER", minioUser)
     .WithEnvironment("MINIO_ROOT_PASSWORD", minioPassword)
     .WithVolume("fsh-minio-data", "/data")
-    .WithLifetime(ContainerLifetime.Session); // .WithLifetime(ContainerLifetime.Persistent);
+    .WithLifetime(ContainerLifetime.Session);
+
+// /*.WithLifetime(ContainerLifetime.Persistent);*/
 
 var minioInitScript = $$"""
-        until mc alias set local http://minio:9000 "$MC_USER" "$MC_PASS";
-        do echo "waiting for minio..."; sleep 2; done;
-        mc mb --ignore-existing local/{{MinioBucket}};
-        mc anonymous set download local/{{MinioBucket}};
-        echo "Bucket {{MinioBucket}} created successfully!";
-        mc admin accesskey create local minioadmin --access-key wrZ1ifuJ9Fo8wbGv --secret-key unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2  --name "DEVELOPMENT_ACCESS_KEY" --description "The default development access key";
-        echo "Access Key created successfully!";
-        echo "MinIO setup completed!";
-    """;
+                            until mc alias set local http://minio:9000 "$MC_USER" "$MC_PASS";
+                            do echo "waiting for minio..."; sleep 2; done;
+                            mc mb --ignore-existing local/{{MinioBucket}};
+                            mc anonymous set download local/{{MinioBucket}};
+                            echo "Bucket {{MinioBucket}} created successfully!";
+                            mc admin accesskey create local minioadmin --access-key wrZ1ifuJ9Fo8wbGv --secret-key unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2  --name "DEVELOPMENT_ACCESS_KEY" --description "The default development access key";
+                            echo "Access Key created successfully!";
+                            echo "MinIO setup completed!";
+                        """;
 
-var minioInit = builder.AddContainer("minio-init", "minio/mc")
+builder.AddContainer("minio-init", "minio/mc")
     .WaitFor(minio)
     .WithEnvironment("MC_USER", minioUser)
     .WithEnvironment("MC_PASS", minioPassword)
@@ -113,17 +117,18 @@ var minioInit = builder.AddContainer("minio-init", "minio/mc")
     .WithArgs("-c", minioInitScript);
 
 var minioApiEndpoint = minio.GetEndpoint("minoioapi");
+
 #endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          TODO BLAZOR WASM HOST
+//                                          * BLAZOR WASM HOST
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #region Blazor WASM with ASP.NET Core Hosted Template
 
 var blazor = builder.AddProject<Projects.Client>("blazor")
     // .WithHttpEndpoint(port: 5100)
     // .WithHttpsEndpoint(port: 7100)
-
     .WithEndpoint(endpointName: "https", callback: static endpoint =>
     {
         // Sets the actual port the Blazor WASM app runs on
@@ -150,9 +155,9 @@ var api = builder.AddProject<Projects.Server>("webapi")
     .WithEnvironment("Storage__S3__AccessKey", minioUser)
     .WithEnvironment("Storage__S3__SecretKey", minioPassword)
     .WithEnvironment("Storage__S3__ForcePathStyle", "true")
-    .WithEnvironment("Storage__S3__PublicBaseUrl", ReferenceExpression.Create($"{minioApiEndpoint}/{MinioBucket}")); ;
+    .WithEnvironment("Storage__S3__PublicBaseUrl", ReferenceExpression.Create($"{minioApiEndpoint}/{MinioBucket}"));
 
-blazor.WaitFor(api)
+    blazor.WaitFor(api)
     .WithReference(api);
 
 #endregion
@@ -160,7 +165,6 @@ blazor.WaitFor(api)
 using var app = builder.Build();
 
 await app.RunAsync();
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

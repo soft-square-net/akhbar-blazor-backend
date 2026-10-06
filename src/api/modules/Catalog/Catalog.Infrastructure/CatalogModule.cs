@@ -10,11 +10,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.Starter.WebApi.Catalog.Infrastructure;
+
 public static class CatalogModule
 {
     public class Endpoints : CarterModule
     {
         public Endpoints() : base("catalog") { }
+
         public override void AddRoutes(IEndpointRouteBuilder app)
         {
             var productGroup = app.MapGroup("products").WithGroupName("catalog").WithTags("products");
@@ -32,6 +34,7 @@ public static class CatalogModule
             brandGroup.MapBrandDeleteEndpoint();
         }
     }
+
     public static WebApplicationBuilder RegisterCatalogServices(this WebApplicationBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -43,6 +46,7 @@ public static class CatalogModule
         builder.Services.AddKeyedScoped<IReadRepository<Brand>, CatalogRepository<Brand>>("catalog:brands");
         return builder;
     }
+
     public static WebApplication UseCatalogModule(this WebApplication app)
     {
         return app;

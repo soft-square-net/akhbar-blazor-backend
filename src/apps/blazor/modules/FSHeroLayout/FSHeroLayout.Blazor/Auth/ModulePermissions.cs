@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using FSH.Starter.Shared.Authorization;
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Auth;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Auth;
 internal class ModulePermissions
 {
     private static readonly FshPermission[] Permissions =

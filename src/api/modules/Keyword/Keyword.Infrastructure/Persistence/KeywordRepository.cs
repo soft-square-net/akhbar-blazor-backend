@@ -5,6 +5,7 @@ using FSH.Framework.Core.Persistence;
 using Mapster;
 
 namespace FSH.Starter.WebApi.Keyword.Infrastructure.Persistence;
+
 internal sealed class KeywordRepository<T> : RepositoryBase<T>, IReadRepository<T>, IRepository<T>
     where T : class, IAggregateRoot
 {

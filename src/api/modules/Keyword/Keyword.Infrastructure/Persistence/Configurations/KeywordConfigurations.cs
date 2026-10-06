@@ -1,5 +1,4 @@
-﻿
-using Finbuckle.MultiTenant;
+﻿using Finbuckle.MultiTenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,11 +14,10 @@ internal class KeywordConfigurations : IEntityTypeConfiguration<Domain.Keyword>
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Value).IsRequired().HasMaxLength(100);
 
-            // Unique index to prevent duplicate keywords
-            builder.HasIndex(e => e.Value).IsUnique();
+        // Unique index to prevent duplicate keywords
+        builder.HasIndex(e => e.Value).IsUnique();
 
-            // Index for fast faceted filtering by Part of Speech or Entity Type
-            builder.HasIndex(e => new { e.PartOfSpeech, e.EntityType });
-
+        // Index for fast faceted filtering by Part of Speech or Entity Type
+        builder.HasIndex(e => new { e.PartOfSpeech, e.EntityType });
     }
 }

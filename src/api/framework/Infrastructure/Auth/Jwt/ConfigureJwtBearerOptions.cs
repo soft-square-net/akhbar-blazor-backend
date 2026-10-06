@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FSH.Framework.Infrastructure.Auth.Jwt;
+
 public class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
 {
     private readonly JwtOptions _options;
@@ -62,7 +63,8 @@ public class ConfigureJwtBearerOptions : IConfigureNamedOptions<JwtBearerOptions
                 var accessToken = context.Request.Query["access_token"];
 
                 if (!string.IsNullOrEmpty(accessToken) &&
-                    context.HttpContext.Request.Path.StartsWithSegments("/notifications", StringComparison.OrdinalIgnoreCase))
+                    context.HttpContext.Request.Path.StartsWithSegments("/notifications",
+                        StringComparison.OrdinalIgnoreCase))
                 {
                     // Read the token out of the query string
                     context.Token = accessToken;

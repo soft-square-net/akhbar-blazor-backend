@@ -58,5 +58,14 @@ namespace FSH.Starter.Blazor.Modules.Keyword.Blazor.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to الكلمات الدالة.
+        /// </summary>
+        internal static string Modules_Keyword_Title {
+            get {
+                return ResourceManager.GetString("Modules.Keyword.Title", resourceCulture);
+            }
+        }
     }
 }

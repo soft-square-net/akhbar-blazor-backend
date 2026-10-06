@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using FSH.Framework.Core.Domain;
+using FSH.Framework.Core.Domain.Contracts;
 
 namespace FSH.Starter.WebApi.Keyword.Domain;
 
-public class DocumentKeyword
+public class DocumentKeyword: AuditableEntity<int>, IAggregateRoot
 {
     public int DocumentId { get; set; }
     public Document Document { get; set; }

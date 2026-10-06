@@ -6,6 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\framework\Core\Core.csproj" />
     <ProjectReference Include="..\Keyword.Domain\Keyword.Domain.csproj" />
+    <ProjectReference Include="..\Keyword.TextAnalysis\Keyword.TextAnalysis.csproj" />
   </ItemGroup>
 
 </Project>

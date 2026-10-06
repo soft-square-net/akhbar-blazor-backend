@@ -50,6 +50,7 @@
     <ProjectReference Include="..\document\Document.Blazor\Document.Blazor.csproj" />
     <ProjectReference Include="..\ElsaWorkflow\ElsaWorkflow.Blazor\ElsaWorkflow.Blazor.csproj" />
     <ProjectReference Include="..\FSHeroLayout\FSHeroLayout.Blazor\FSHeroLayout.Blazor.csproj" />
+    <ProjectReference Include="..\Keyword\Keyword.Blazor\Keyword.Blazor.csproj" />
     <ProjectReference Include="..\MudBlazorBlocks\MudBlazorBlocks.Blazor\MudBlazorBlocks.Blazor.csproj" />
   </ItemGroup>
 

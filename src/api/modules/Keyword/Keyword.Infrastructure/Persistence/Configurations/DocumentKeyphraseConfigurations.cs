@@ -1,5 +1,4 @@
-﻿
-using Finbuckle.MultiTenant;
+﻿using Finbuckle.MultiTenant;
 using FSH.Starter.WebApi.Keyword.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -17,11 +16,11 @@ internal class DocumentKeyphraseConfigurations : IEntityTypeConfiguration<Docume
         builder.HasKey(dk => new { dk.DocumentId, dk.KeyphraseId });
 
         builder.HasOne(dk => dk.Document)
-                  .WithMany(d => d.DocumentKeyphrases)
-                  .HasForeignKey(dk => dk.DocumentId);
+            .WithMany(d => d.DocumentKeyphrases)
+            .HasForeignKey(dk => dk.DocumentId);
 
         builder.HasOne(dk => dk.Keyphrase)
-                  .WithMany(k => k.DocumentKeyphrases)
-                  .HasForeignKey(dk => dk.KeyphraseId);
+            .WithMany(k => k.DocumentKeyphrases)
+            .HasForeignKey(dk => dk.KeyphraseId);
     }
 }

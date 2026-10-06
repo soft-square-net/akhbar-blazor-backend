@@ -1,8 +1,8 @@
 ﻿
 using System.Diagnostics.CodeAnalysis;
-using FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Auth;
-using FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Layout;
-using FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Layout.Menu;
+using FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Auth;
+using FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
+using FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout.Menu;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.BlazorShared.interfaces;
 using FSH.Starter.Shared.Authorization;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor;
 public sealed class FSHeroLayoutModule : BlazorModuleBase
 {
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(FSHeroLayoutModule))]

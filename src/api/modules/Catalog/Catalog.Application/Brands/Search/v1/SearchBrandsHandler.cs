@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.Starter.WebApi.Catalog.Application.Brands.Search.v1;
+
 public sealed class SearchBrandsHandler(
     [FromKeyedServices("catalog:brands")] IReadRepository<Brand> repository)
     : IRequestHandler<SearchBrandsCommand, PagedList<BrandResponse>>

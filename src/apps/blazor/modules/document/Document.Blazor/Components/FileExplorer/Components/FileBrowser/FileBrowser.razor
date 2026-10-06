@@ -12,94 +12,103 @@
 
 
 <div @onclick="() => HideGlobalMenu()" @onblur="() => HideGlobalMenu()">
-  @switch (ExplorerType)
-  {
-    case EnumExplorerType.DefaultExplorer:
-      <FileBrowserDefaultFileView />
-      break;
-    case EnumExplorerType.TabularExplorer:
-      <FileBrowserTabularFileView />
-      break;
-    default:
-      break;
-  }
+    @switch (ExplorerType)
+    {
+        case EnumExplorerType.DefaultExplorer:
+            <FileBrowserDefaultFileView/>
+            break;
+        case EnumExplorerType.TabularExplorer:
+            <FileBrowserTabularFileView/>
+            break;
+        default:
+            break;
+    }
 </div>
 @* Single instance definition with strongly-typed template content using generic ContextMenu *@
 <ContextMenuGeneric TItem="BaseExplorerItemModel" Context="ctx">
-  @if (ctx is BaseExplorerItemModel item)
-  {
-    <div @onblur="() => HideGlobalMenu()">
-      <MudPaper Elevation="1">
-        <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="() => EditItem(item)">Edit @item.Name</MudMenuItem>
-        <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteItem(item)">Delete</MudMenuItem>
-      @if (item is FileModel )
-      {
-          <MudMenuItem Icon="@Icons.Material.Outlined.Download"
-                       Variant="Variant.Text"
-                       Color="Color.Primary"
-                       OnClick="() => OpenPickerImmediately(item)">
-              Download File
-          </MudMenuItem>
-      }
-      </MudPaper>
-    </div>
-  }
+    @if (ctx is BaseExplorerItemModel item)
+    {
+        <div @onblur="() => HideGlobalMenu()">
+            <MudPaper Elevation="1">
+                <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="() => EditItem(item)">
+                    Edit @item.Name</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Outlined.Delete" OnClick="() => DeleteItem(item)">Delete
+                </MudMenuItem>
+                @if (item is FileModel)
+                {
+                    <MudMenuItem Icon="@Icons.Material.Outlined.Download"
+                                 Variant="Variant.Text"
+                                 Color="Color.Primary"
+                                 OnClick="() => OpenPickerImmediately(item)">
+                        Download File
+                    </MudMenuItem>
+                }
+            </MudPaper>
+        </div>
+    }
 </ContextMenuGeneric>
 <div>
-  Current Folder Items: @CurrentFolder?.Files?.Count
+    Current Folder Items: @CurrentFolder?.Files?.Count
 </div>
+
 @code {
 
-  [Parameter, EditorRequired]
-  public EnumExplorerType ExplorerType { get; set; } = EnumExplorerType.DefaultExplorer;
-  [CascadingParameter(Name = "CurrentFolder")] FolderModel CurrentFolder { get; set; }
+    [Parameter, EditorRequired] public EnumExplorerType ExplorerType { get; set; } = EnumExplorerType.DefaultExplorer;
 
-  [Inject] private ContextMenuService MenuService { get; set; }
-  [Inject] private IDocumentsStorageService documentStorageService { get; set; }
-  [Inject] private IApiClient _apiClient { get; set; } = default;
-  [Inject] private IJSRuntime JS { get; set; }
+    [CascadingParameter(Name = "CurrentFolder")]
+    FolderModel CurrentFolder { get; set; }
 
-  private static Func<Guid,Guid,Task<byte[]>> _generateDataDelegate;
+    [Inject] private ContextMenuService MenuService { get; set; }
+    [Inject] private IDocumentsStorageService documentStorageService { get; set; }
+    [Inject] private IApiClient _apiClient { get; set; } = default;
+    [Inject] private IJSRuntime JS { get; set; }
 
-  private void HideGlobalMenu() => MenuService.Hide();
-  private void EditItem(BaseExplorerItemModel item) {HideGlobalMenu();  /* Your Logic */ }
-  private void DeleteItem(BaseExplorerItemModel item) { HideGlobalMenu(); /* Your Logic */ }
+    private static Func<Guid, Guid, Task<byte[]>> _generateDataDelegate;
 
-  RenderFragment Render()
-  {
-    return new RenderFragment(builder =>
+    private void HideGlobalMenu() => MenuService.Hide();
+
+    private void EditItem(BaseExplorerItemModel item)
     {
-      builder.AddContent(0, "my fragment");
-    });
-  }
+        HideGlobalMenu(); /* Your Logic */
+    }
 
-  protected override void OnInitialized()
-  {
-    // Allow JS to call our data generator
-    _generateDataDelegate = GenerateCsharpDataAsync;
-  }
+    private void DeleteItem(BaseExplorerItemModel item)
+    {
+        HideGlobalMenu(); /* Your Logic */
+    }
 
-  private void OpenPickerImmediately(BaseExplorerItemModel item)
-  {
-    // Zero awaits here! Preserves user gesture.
-    var dotNetRef = DotNetObjectReference.Create(this);
-    _ = JS.InvokeVoidAsync("helpers.showPickerThenFetch", dotNetRef, item.Name, item.Folder.BucketId, item.Id);
-  }
+    RenderFragment Render()
+    {
+        return new RenderFragment(builder => { builder.AddContent(0, "my fragment"); });
+    }
 
-  [JSInvokable]
-  public async Task<string> GetPreparedDataJson(Guid bucketId,Guid itemId)
-  {
-    // This runs WHILE the file picker is saving/writing
-    byte[] data = await GenerateCsharpDataAsync(bucketId, itemId);
-    return Convert.ToBase64String(data);
-  }
+    protected override void OnInitialized()
+    {
+        // Allow JS to call our data generator
+        _generateDataDelegate = GenerateCsharpDataAsync;
+    }
 
-  private async Task<byte[]> GenerateCsharpDataAsync(Guid bucketId, Guid itemId)
-  {
-    await Task.Delay(2000); // Your async preparation code
-    FileResponse file = await _apiClient.DownloadBucketFileEndpointAsync( bucketId, itemId);
-    HideGlobalMenu(); 
-    return file.Stream.ToByteArray();
+    private void OpenPickerImmediately(BaseExplorerItemModel item)
+    {
+        // Zero awaits here! Preserves user gesture.
+        var dotNetRef = DotNetObjectReference.Create(this);
+        _ = JS.InvokeVoidAsync("helpers.showPickerThenFetch", dotNetRef, item.Name, item.Folder.BucketId, item.Id);
+    }
 
-  }
+    [JSInvokable]
+    public async Task<string> GetPreparedDataJson(Guid bucketId, Guid itemId)
+    {
+        // This runs WHILE the file picker is saving/writing
+        byte[] data = await GenerateCsharpDataAsync(bucketId, itemId);
+        return Convert.ToBase64String(data);
+    }
+
+    private async Task<byte[]> GenerateCsharpDataAsync(Guid bucketId, Guid itemId)
+    {
+        await Task.Delay(2000); // Your async preparation code
+        FileResponse file = await _apiClient.DownloadBucketFileEndpointAsync(bucketId, itemId);
+        HideGlobalMenu();
+        return file.Stream.ToByteArray();
+    }
+
 }

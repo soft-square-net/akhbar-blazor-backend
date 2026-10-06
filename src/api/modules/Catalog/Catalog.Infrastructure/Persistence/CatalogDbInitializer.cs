@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace FSH.Starter.WebApi.Catalog.Infrastructure.Persistence;
+
 internal sealed class CatalogDbInitializer(
     ILogger<CatalogDbInitializer> logger,
     CatalogDbContext context) : IDbInitializer
@@ -13,7 +14,8 @@ internal sealed class CatalogDbInitializer(
         if ((await context.Database.GetPendingMigrationsAsync(cancellationToken)).Any())
         {
             await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
-            logger.LogInformation("[{Tenant}] applied database migrations for catalog module", context.TenantInfo!.Identifier);
+            logger.LogInformation("[{Tenant}] applied database migrations for catalog module",
+                context.TenantInfo!.Identifier);
         }
     }
 
@@ -23,7 +25,8 @@ internal sealed class CatalogDbInitializer(
         const string Description = "A full-size layout QMK/VIA custom mechanical keyboard";
         const decimal Price = 79;
         Guid? BrandId = null;
-        if (await context.Products.FirstOrDefaultAsync(t => t.Name == Name, cancellationToken).ConfigureAwait(false) is null)
+        if (await context.Products.FirstOrDefaultAsync(t => t.Name == Name, cancellationToken)
+                .ConfigureAwait(false) is null)
         {
             var product = Product.Create(Name, Description, Price, BrandId);
             await context.Products.AddAsync(product, cancellationToken);

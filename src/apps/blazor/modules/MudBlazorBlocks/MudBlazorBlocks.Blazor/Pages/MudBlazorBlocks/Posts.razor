@@ -1,6 +1,8 @@
 @page "/Posts"
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Models
 <h3>Posts</h3>
-
+<PostBlockNode  />
 @code {
-    
+    PostBlock _block = new PostBlock();
 }

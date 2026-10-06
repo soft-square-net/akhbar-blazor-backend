@@ -3,7 +3,7 @@
  *  Constatnts exploded in all modules cs files
  */
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor;
 internal static class Constants
 {
     public const string ModuleName = "FSHeroLayout";

@@ -4,7 +4,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using Shared.Enums;
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Layout;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
 
 public partial class FSHMainLayout
 {

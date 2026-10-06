@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace FSH.Starter.Blazor.Modules.FSHeroLayout.FSHeroLayout.Blazor.Layout;
+namespace FSH.Starter.Blazor.Modules.FSHeroLayout.Blazor.Layout;
 public partial class FSHNavMenu
 {
     [CascadingParameter]

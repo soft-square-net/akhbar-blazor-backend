@@ -12,7 +12,8 @@ namespace FSH.Starter.WebApi.Catalog.Infrastructure.Persistence;
 
 public sealed class CatalogDbContext : FshDbContext
 {
-    public CatalogDbContext(IMultiTenantContextAccessor<FshTenantInfo> multiTenantContextAccessor, DbContextOptions<CatalogDbContext> options, IPublisher publisher, IOptions<DatabaseOptions> settings)
+    public CatalogDbContext(IMultiTenantContextAccessor<FshTenantInfo> multiTenantContextAccessor,
+        DbContextOptions<CatalogDbContext> options, IPublisher publisher, IOptions<DatabaseOptions> settings)
         : base(multiTenantContextAccessor, options, publisher, settings)
     {
     }

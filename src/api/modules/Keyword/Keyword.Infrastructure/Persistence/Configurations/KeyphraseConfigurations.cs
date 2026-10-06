@@ -1,5 +1,4 @@
-﻿
-using Finbuckle.MultiTenant;
+﻿using Finbuckle.MultiTenant;
 using FSH.Starter.WebApi.Keyword.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -17,6 +16,5 @@ internal class KeyphraseConfigurations : IEntityTypeConfiguration<Keyphrase>
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Value).IsRequired().HasMaxLength(255);
         builder.HasIndex(e => e.Value).IsUnique();
-
     }
 }
