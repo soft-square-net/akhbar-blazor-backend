@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Blazor.Shared\BlazorShared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Resources\KeywordResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

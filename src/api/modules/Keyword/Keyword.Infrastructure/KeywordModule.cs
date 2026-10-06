@@ -3,7 +3,6 @@ using FSH.Framework.Core.Persistence;
 using FSH.Framework.Infrastructure.Persistence;
 using FSH.Starter.WebApi.Keyword.Application.Documents.Abstractions;
 using FSH.Starter.WebApi.Keyword.Domain;
-using FSH.Starter.WebApi.Keyword.Infrastructure.Endpoints.Documents.v1;
 using FSH.Starter.WebApi.Keyword.Infrastructure.Persistence;
 using FSH.Starter.WebApi.Keyword.Infrastructure.Search;
 using FSH.Starter.WebApi.Keyword.TextAnalysis.Common.Models.SEO;
