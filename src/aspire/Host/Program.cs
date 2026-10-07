@@ -1,22 +1,26 @@
 // /*using static System.Net.WebRequestMethods;*/
+bool loadPgreAdmin = false;
+bool loadGrafana = false;
 
 var builder = DistributedApplication.CreateBuilder(args);
+if (loadGrafana)
+{
+    builder.AddContainer("grafana", "grafana/grafana")
+        .WithBindMount("../../../compose/grafana/config", "/etc/grafana", isReadOnly: true)
+        .WithBindMount("../../../compose/grafana/dashboards", "/var/lib/grafana/dashboards", isReadOnly: true)
+        .WithHttpEndpoint(port: 3000, targetPort: 3000, name: "http");
 
-builder.AddContainer("grafana", "grafana/grafana")
-    .WithBindMount("../../../compose/grafana/config", "/etc/grafana", isReadOnly: true)
-    .WithBindMount("../../../compose/grafana/dashboards", "/var/lib/grafana/dashboards", isReadOnly: true)
-    .WithHttpEndpoint(port: 3000, targetPort: 3000, name: "http");
-
-builder.AddContainer("prometheus", "prom/prometheus")
-    .WithBindMount("../../../compose/prometheus", "/etc/prometheus", isReadOnly: true)
-    .WithHttpEndpoint(port: 9090, targetPort: 9090);
+    builder.AddContainer("prometheus", "prom/prometheus")
+        .WithBindMount("../../../compose/prometheus", "/etc/prometheus", isReadOnly: true)
+        .WithHttpEndpoint(port: 9090, targetPort: 9090);
+}
 
 var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
-var database = builder.AddPostgres("db", username, password, port: 5432)
-    .WithPgAdmin() /******** * Uncomment to include pgAdmin for database management * ********/
-    .WithDataVolume()
+var database = builder.AddPostgres("db", username, password, port: 5432);
+    if(loadPgreAdmin) database.WithPgAdmin(); 
+    database.WithDataVolume()
     .AddDatabase("akhbarblazor"); // /*.AddDatabase("fullstackhero");*/
 // Ahmed Galal
 // Note: Ensure that the database name matches the one used in the API project configuration.

@@ -274,6 +274,16 @@
                                          ""TargetFieldId"": ""company_name"",
                                          ""Condition"": ""HasValue""
                                        }
+                                     },
+                                     {
+                                       ""Id"": ""payload_template"",
+                                       ""Label"": ""Request Body Payload (JSON)"",
+                                       ""Type"": ""json"",
+                                       ""Value"": ""{\n  \""event\"": \""user_signup\"",\n  \""retry_count\"": 3\n}"",
+                                       ""Validation"": {
+                                         ""IsRequired"": true,
+                                         ""RequiredMessage"": ""A valid JSON request payload template is required.""
+                                       }
                                      }
                                    ]
                                  }

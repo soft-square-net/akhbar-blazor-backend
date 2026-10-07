@@ -2,6 +2,7 @@ using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Inputs;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Inputs.Base;
+using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Inputs.Custome;
 
 namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Abstractions;
 
@@ -16,18 +17,16 @@ public static class InputRegistry
         { "number", typeof(NumberInput) },
         { "checkbox", typeof(CheckboxInput) },
         { "select", typeof(SelectInput) },
-        { "textarea", typeof(TextAreaInput) }
+        { "textarea", typeof(TextAreaInput) },
+        { "json", typeof(JsonEditorInput) },   // Custom complex field mapping
+        { "code", typeof(JsonEditorInput) }
     };
 
     public static Type GetInputComponent(string inputType)
     {
-        if (Registry.TryGetValue(inputType, out var componentType))
-        {
-            return componentType;
-        }
-
-        // Fallback component when type is unrecognized
-        return typeof(TextInput);
+        return Registry.TryGetValue(inputType, out var componentType) 
+            ? componentType 
+            : typeof(TextInput);
     }
 
     public static void RegisterComponent(string typeName, Type componentType)

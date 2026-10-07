@@ -32,6 +32,20 @@ public static class BlockNodeValidator
             input.ValidationErrors.Add(rules.RequiredMessage ?? $"{input.Label} is required.");
         }
 
+        // 2. JSON Structure Validation for "json" or "code" type inputs
+        if (input.Type.Equals("json", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(strVal))
+        {
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(strVal);
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                input.ValidationErrors.Add($"Invalid JSON syntax: {ex.Message}");
+                return false;
+            }
+        }
+        
         if (!isNullOrEmpty && (rules.Min.HasValue || rules.Max.HasValue))
         {
             if (double.TryParse(strVal, out double numVal))

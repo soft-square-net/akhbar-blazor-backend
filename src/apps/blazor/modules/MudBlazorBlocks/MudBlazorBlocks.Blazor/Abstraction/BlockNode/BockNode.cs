@@ -50,7 +50,7 @@ public class BlockNode
             ParentId = this.ParentId,
             Parent = this.Parent,
             CurrentJsonViews = this.CurrentJsonViews,
-            Children = this.Children?.Select(i => i.DeepClone())?.ToList(),
+            Children = this.Children?.Select(i => i.DeepClone())?.ToList() ?? new(),
             JsonViews = this.JsonViews.CloneDeep(),
         };
     }

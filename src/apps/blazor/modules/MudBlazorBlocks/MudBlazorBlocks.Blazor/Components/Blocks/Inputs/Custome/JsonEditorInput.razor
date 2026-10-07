@@ -1,0 +1,140 @@
+@* JsonEditorInput.razor *@
+@inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="mb-3">
+    <label class="form-label fw-bold d-flex align-items-center justify-content-between">
+        <span>
+            @Input.Label
+            @if (Input.Validation?.IsRequired == true)
+            {
+                <span class="text-danger">*</span>
+            }
+        </span>
+
+        <div class="d-flex align-items-center gap-2">
+            @if (Input.IsValidating)
+            {
+                <span class="text-muted small d-flex align-items-center gap-1">
+                    <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                    <span>Validating...</span>
+                </span>
+            }
+            <button type="button" 
+                    class="btn btn-sm btn-outline-secondary py-0" 
+                    @onclick="FormatJsonAsync" 
+                    disabled="@Input.IsValidating">
+                Format JSON
+            </button>
+        </div>
+    </label>
+
+    <!-- Container element bound to Monaco Editor JS -->
+    <div id="@editorElementId" 
+         class="border rounded @(Input.ValidationErrors.Any() ? "border-danger" : "")" 
+         style="height: 250px; width: 100%;">
+    </div>
+
+    <!-- Integrate standard Blazor Validation Message -->
+    <ValidationMessage For="@(() => Input.Value)" />
+</div>
+
+@code {
+    private string editorElementId = $"monaco_editor_{Guid.NewGuid():N}";
+    private IJSObjectReference? jsModule;
+    private IJSObjectReference? monacoInstance;
+    private DotNetObjectReference<JsonEditorInput>? dotnetRef;
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
+    {
+        // if (firstRender)
+        if (true)
+        {
+            dotnetRef = DotNetObjectReference.Create(this);
+
+            // Load JS Interop module it must be the min.js file the js code replce extension as follow
+            // * const basePath = cdnUrl.replace('/vs/loader.min.js', '/vs');
+            var cdnUrl = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js";
+            string customScriptText = @"
+                                   require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+                                   require(['vs/editor/editor.main'], function() {
+                                       console.log(""Monaco loaded globally."");
+                                   });
+                                   ";
+            jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./js/monacoEditor.js");
+
+            // Initialize Monaco
+            monacoInstance = await jsModule.InvokeAsync<IJSObjectReference>(
+                "initMonacoEditor", 
+                editorElementId, 
+                Input.Value?.ToString() ?? "{}", 
+                dotnetRef, 
+                Input.IsValidating,
+                cdnUrl );
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnJsEditorContentChanged(string newContent)
+    {
+        // 1. Update the underlying model value
+        Input.Value = newContent;
+
+        // 2. Notify parent form framework of changes
+        await InputChanged.InvokeAsync(Input);
+
+        // 3. Trigger EditContext field change notification for validation
+        if (EditContext != null)
+        {
+            var fieldIdentifier = new FieldIdentifier(Input, nameof(BlockNodeInput.Value));
+            EditContext.NotifyFieldChanged(fieldIdentifier);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task FormatJsonAsync()
+    {
+        try
+        {
+            var currentText = Input.Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(currentText))
+            {
+                using var jsonDoc = System.Text.Json.JsonDocument.Parse(currentText);
+                var formattedJson = System.Text.Json.JsonSerializer.Serialize(jsonDoc, new System.Text.Json.JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                Input.Value = formattedJson;
+
+                if (jsModule != null && monacoInstance != null)
+                {
+                    await jsModule.InvokeVoidAsync("updateMonacoContent", monacoInstance, formattedJson);
+                }
+
+                await OnJsEditorContentChanged(formattedJson);
+            }
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            // If invalid JSON, skip formatting and let validation catch it
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (jsModule != null && monacoInstance != null)
+        {
+            await jsModule.InvokeVoidAsync("disposeMonaco", monacoInstance);
+            await monacoInstance.DisposeAsync();
+            await jsModule.DisposeAsync();
+        }
+
+        dotnetRef?.Dispose();
+    }
+}

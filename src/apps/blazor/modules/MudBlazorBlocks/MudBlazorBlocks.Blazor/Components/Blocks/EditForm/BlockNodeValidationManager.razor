@@ -82,22 +82,20 @@
 
         if (!isSyncValid)
         {
+            input.IsValidating = false;
             ApplySyncErrors(input);
             CurrentEditContext?.NotifyValidationStateChanged();
             return;
         }
-
-        // 2. Run Async Validation if Sync Validation Passed
-
-               
-
         
-
         // 2. Run Async Validation
         if (input.Validation?.AsyncRule != null)
         {
-            Interlocked.Increment(ref activeValidationCount);
-            SetValidatingState(true);
+            // Set loading state for this specific field
+            input.IsValidating = true;
+            CurrentEditContext?.NotifyValidationStateChanged();
+            // Interlocked.Increment(ref activeValidationCount);
+            // SetValidatingState(true);
 
             try
             {
@@ -117,9 +115,14 @@
             catch (OperationCanceledException) { }
             finally
             {
-                if (Interlocked.Decrement(ref activeValidationCount) == 0)
+                // if (Interlocked.Decrement(ref activeValidationCount) == 0)
+                // {
+                //     SetValidatingState(false);
+                // }
+                if (!token.IsCancellationRequested)
                 {
-                    SetValidatingState(false);
+                    // Clear loading state when complete
+                    input.IsValidating = false;
                 }
             }
         }

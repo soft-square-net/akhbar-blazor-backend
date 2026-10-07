@@ -1,16 +1,36 @@
 @inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
 @using System.Timers
 
-<div class="mb-3">
-    <label class="form-label fw-bold">
-        @Input.Label
-        @if (Input.Validation?.IsRequired == true) { <span class="text-danger">*</span> }
+<div class="mb-3 position-relative">
+    <label class="form-label fw-bold d-flex align-items-center justify-content-between">
+        <span>
+            @Input.Label
+            @if (Input.Validation?.IsRequired == true) { <span class="text-danger">*</span> }
+        </span>
+
+        @if (Input.IsValidating)
+        {
+            <span class="text-muted small d-flex align-items-center gap-1">
+                <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                <span>Checking...</span>
+            </span>
+        }
     </label>
 
-    <input type="text" 
-           class="@FieldCssClass" 
-           value="@StringValue" 
-           @oninput="OnInputDebounced" />
+    <div class="input-group">
+        <input type="text" 
+               class="@FieldCssClass" 
+               value="@StringValue" 
+               disabled="@Input.IsValidating"
+               @onchange="OnTextChanged" />
+
+        @if (Input.IsValidating)
+        {
+            <span class="input-group-text bg-white">
+                <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+            </span>
+        }
+    </div>
 
     <ValidationMessage For="@(() => Input.Value)" />
 </div>
@@ -43,3 +63,4 @@
         debounceTimer?.Dispose();
     }
 }
+

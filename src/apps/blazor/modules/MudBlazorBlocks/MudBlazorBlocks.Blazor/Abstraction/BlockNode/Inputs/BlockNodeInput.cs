@@ -12,12 +12,9 @@ public class BlockNodeInput
     public string Type { get; set; } = "text"; // text, number, checkbox, select, textarea
 
     public object? Value { get; set; }
-    // public bool Required { get; set; } 
-    // public float Max { get; set; } = 0;
-    // public float Min { get; set; } = 0;
     
-    // public List<BlockNodeInputValidation> Validations { get; set; } = new();
-
+    [JsonIgnore]
+    public bool IsValidating { get; set; } // Tracks field-level async validation state
     // Added Validation Configuration
     public ValidationRules? Validation { get; set; }
     
