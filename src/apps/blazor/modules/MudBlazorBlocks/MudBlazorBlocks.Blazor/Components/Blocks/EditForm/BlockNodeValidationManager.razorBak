@@ -1,0 +1,71 @@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@* BlockNodeValidationManager.razor *@
+
+@code {
+    private ValidationMessageStore? messageStore;
+
+    [CascadingParameter]
+    private EditContext? CurrentEditContext { get; set; }
+
+    [Parameter, EditorRequired]
+    public BlockNode Node { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        if (CurrentEditContext == null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(BlockNodeValidationManager)} requires a cascading parameter " +
+                $"of type {nameof(EditContext)}. For example, use inside an {nameof(EditForm)}.");
+        }
+
+        messageStore = new ValidationMessageStore(CurrentEditContext);
+
+        // Subscribe to EditContext events
+        CurrentEditContext.OnValidationRequested += HandleValidationRequested;
+        CurrentEditContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Clear old messages for the modified field and re-validate node
+        messageStore?.Clear(e.FieldIdentifier);
+        ValidateAll();
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e)
+    {
+        messageStore?.Clear();
+        ValidateAll();
+    }
+
+    private void ValidateAll()
+    {
+        messageStore?.Clear();
+
+        // Run cross-field validation rules
+        BlockNodeValidator.ValidateNode(Node);
+
+        // Map errors from BlockNodeInput back to Blazor FieldIdentifiers
+        foreach (var input in Node.Inputs)
+        {
+            var fieldIdentifier = new FieldIdentifier(input, nameof(BlockNodeInput.Value));
+
+            foreach (var error in input.ValidationErrors)
+            {
+                messageStore?.Add(fieldIdentifier, error);
+            }
+        }
+
+        CurrentEditContext?.NotifyValidationStateChanged();
+    }
+
+    public void Dispose()
+    {
+        if (CurrentEditContext != null)
+        {
+            CurrentEditContext.OnValidationRequested -= HandleValidationRequested;
+            CurrentEditContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
+}

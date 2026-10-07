@@ -26,6 +26,7 @@
     <PackageVersion Include="Elsa.Studio.Workflows" Version="3.7.1" />
     <PackageVersion Include="Elsa.Studio.Workflows.Core" Version="3.7.1" />
     <PackageVersion Include="Elsa.Studio.Workflows.Designer" Version="3.7.1" />
+    <PackageVersion Include="Elsa.Workflows.Core" Version="3.7.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="9.0.15" />
     <PackageVersion Include="Aspire.StackExchange.Redis" Version="13.0.0" />
     <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />

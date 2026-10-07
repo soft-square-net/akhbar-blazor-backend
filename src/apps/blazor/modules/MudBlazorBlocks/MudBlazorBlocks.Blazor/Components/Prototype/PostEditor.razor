@@ -1,0 +1,165 @@
+@* PostEditor.razor *@
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Models
+@using MudBlazor.Utilities
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-4">
+        <MudText Typo="Typo.h4">Hierarchical Block Editor</MudText>
+        
+        <MudStack Row="true" Spacing="2">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="AddRootBlock">
+                Add Root Block
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Download"
+                       OnClick="ExportToJson">
+                Export JSON
+            </MudButton>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Upload"
+                       OnClick="ToggleImportBox">
+                Import JSON
+            </MudButton>
+        </MudStack>
+    </MudStack>
+
+    @if (showImportBox)
+    {
+        <MudPaper Class="pa-4 mb-4 mud-background-gray" Elevation="2">
+            <MudTextField @bind-Value="rawJsonInput"
+                          Label="Paste Post JSON Hierarchy"
+                          Lines="5"
+                          Variant="Variant.Outlined" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       Class="mt-2"
+                       OnClick="ImportFromJson">
+                Load Architecture
+            </MudButton>
+        </MudPaper>
+    }
+
+    @* --- TOP-LEVEL DRAG AND DROP ZONE --- *@
+    <MudDropContainer T="PostBlock"
+                      Items="RootBlocks"
+                      ItemsSelector="@((item, dropzone) => true)"
+                      ItemDropped="ItemDroppedAtRoot"
+                      Class="d-flex flex-column flex-grow-1">
+        <ChildContent>
+            <MudDropZone T="PostBlock" Identifier="root" Class="pa-2 rounded flex-grow-1 min-h-100">
+                @foreach (var block in RootBlocks)
+                {
+                    <PostBlockNode Block="block" OnDelete="RemoveRootBlock" />
+                }
+            </MudDropZone>
+        </ChildContent>
+        <ItemRenderer>
+            @* Rendered by child loops *@
+        </ItemRenderer>
+    </MudDropContainer>
+
+    @if (!string.IsNullOrEmpty(exportedJson))
+    {
+        <MudExpansionPanels Class="mt-6">
+            <MudExpansionPanel Text="Exported Data Output">
+                <pre style="max-height: 300px; overflow-y: auto;">@exportedJson</pre>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    }
+</MudContainer>
+
+@code {
+    private List<PostBlock> RootBlocks { get; set; } = new();
+    private bool showImportBox = false;
+    private string rawJsonInput = string.Empty;
+    private string exportedJson = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        // Sample initial structure
+        RootBlocks.Add(new PostBlock
+        {
+            Title = "Introduction Block",
+            Content = "Welcome to dynamic hierarchical Blazor WASM posts.",
+            Type = BlockType.Header,
+            IsEditing = false,
+            Children = new List<PostBlock>
+            {
+                new PostBlock
+                {
+                    Title = "Sub-point 1",
+                    Content = "Nested child content rendered dynamically.",
+                    Type = BlockType.Callout,
+                    IsEditing = false
+                }
+            }
+        });
+    }
+
+    private void AddRootBlock()
+    {
+        RootBlocks.Add(new PostBlock
+        {
+            Title = "New Root Section",
+            Content = "Enter content here...",
+            IsEditing = true
+        });
+    }
+
+    private void RemoveRootBlock(PostBlock block)
+    {
+        RootBlocks.Remove(block);
+    }
+
+    public int AddChildHelper(MudItemDropInfo<PostBlock> info, PostBlock block)
+    {
+        block.AddChild(info.Item);
+        return info.IndexInZone;
+    }
+    private void ItemDroppedAtRoot(MudItemDropInfo<PostBlock> dropInfo)
+    {
+        RootBlocks.UpdateOrder(dropInfo, (item) => AddChildHelper(dropInfo,item),0);
+    }
+
+    private void ExportToJson()
+    {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        exportedJson = JsonSerializer.Serialize(RootBlocks, options);
+        Snackbar.Add("Post exported to JSON successfully!", Severity.Success);
+    }
+
+    private void ToggleImportBox() => showImportBox = !showImportBox;
+
+    private void ImportFromJson()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(rawJsonInput)) return;
+
+            var imported = JsonSerializer.Deserialize<List<PostBlock>>(rawJsonInput);
+            if (imported != null)
+            {
+                RootBlocks = imported;
+                showImportBox = false;
+                rawJsonInput = string.Empty;
+                Snackbar.Add("Hierarchy loaded from JSON!", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Invalid JSON payload: {ex.Message}", Severity.Error);
+        }
+    }
+}

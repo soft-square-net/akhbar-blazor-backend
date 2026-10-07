@@ -1,8 +1,23 @@
-@page "/Posts"
+@page "/posts"
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Base
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Models
-<h3>Posts</h3>
-<PostBlockNode  />
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Prototype
+<h3>Posts NNN</h3>
+
+<BaseBlockNode>
+    <PostBlockNode Block="_block" />
+</BaseBlockNode>
+
 @code {
-    PostBlock _block = new PostBlock();
+    public PostBlock _block = new PostBlock() { Title = "Root Block", Type = BlockType.Header, Content = "First Root Block Container" };
+    public PostBlock _child = new PostBlock() { Title = "Sub Block", Type = BlockType.Header, Content = "Sub Root Block Container"};
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _block.AddChild(_child);
+    }
+
+    
 }

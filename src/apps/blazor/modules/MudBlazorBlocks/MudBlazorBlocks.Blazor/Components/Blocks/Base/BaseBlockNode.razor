@@ -1,0 +1,23 @@
+@* BaseBlockNode *@
+@* @typeparam T where T: FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.BlockNode *@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.Toolbar
+
+<BlockNodeContainer Items="Items">
+    @ChildContent
+</BlockNodeContainer>
+
+@code {
+    [Parameter] public List<ToolbarItem> Items { get; set; } = new();
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Items.Add(new ToolbarItem() { Icon = @Icons.Material.Filled.DragIndicator, Type = ToolbarItemType.IconButton, Tooltip = "Graph" });
+        Items.Add(new ToolbarItem() { Type = ToolbarItemType.Spacer});
+        Items.Add(new ToolbarItem() { Icon = Icons.Material.Outlined.MoreVert, Type = ToolbarItemType.IconButton, Tooltip = "MoreVert" });
+    Items.Add(new ToolbarItem() { Icon = Icons.Material.Outlined.Close, Type = ToolbarItemType.IconButton, Tooltip = "Close" });
+        
+    }
+
+}

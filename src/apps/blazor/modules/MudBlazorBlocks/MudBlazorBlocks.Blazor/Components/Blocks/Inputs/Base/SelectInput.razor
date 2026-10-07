@@ -1,0 +1,17 @@
+@inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
+
+<div class="mb-3">
+    <label class="form-label fw-bold">@Input.Label</label>
+    <select class="form-select" 
+            value="@StringValue" 
+            @onchange="OnTextChanged">
+        <option value="">-- Select Option --</option>
+        @if (Input.Options != null)
+        {
+            @foreach (var opt in Input.Options)
+            {
+                <option value="@opt">@opt</option>
+            }
+        }
+    </select>
+</div>

@@ -1,0 +1,12 @@
+@inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
+
+<div class="mb-3">
+    <div class="form-check form-switch">
+        <input class="form-check-input" 
+               type="checkbox" 
+               id="@Input.Id"
+               checked="@BoolValue" 
+               @onchange="OnBoolChanged" />
+        <label class="form-check-label fw-bold" for="@Input.Id">@Input.Label</label>
+    </div>
+</div>

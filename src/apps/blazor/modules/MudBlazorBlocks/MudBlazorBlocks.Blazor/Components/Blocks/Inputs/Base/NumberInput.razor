@@ -1,0 +1,15 @@
+@inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
+
+<div class="mb-3">
+    <label class="form-label fw-bold">
+        @Input.Label
+        @if (Input.Validation?.IsRequired == true) { <span class="text-danger">*</span> }
+    </label>
+
+    <input type="number" 
+           class="@FieldCssClass" 
+           value="@NumberValue" 
+           @onchange="OnNumberChanged" />
+
+    <ValidationMessage For="@(() => Input.Value)" />
+</div>

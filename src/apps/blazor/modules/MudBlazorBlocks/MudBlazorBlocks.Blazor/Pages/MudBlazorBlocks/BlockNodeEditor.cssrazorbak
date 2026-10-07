@@ -1,0 +1,207 @@
+@* BlockNodeEditor.razor *@
+@*  @page "/block-editor" *@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Fields
+
+<div class="container my-4">
+    <h2 class="mb-4">Block Node Dynamic Editor</h2>
+
+    <div class="row">
+        <!-- Form Generator Column -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Edit Node: @currentNode.Name</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Node Name</label>
+                        <input type="text" class="form-control" @bind="currentNode.Name" />
+                    </div>
+
+                    <hr />
+
+                    <h6 class="fw-bold mb-3">Dynamic Inputs</h6>
+                    @* BlockNodeEditor.razor *@
+
+                    <CascadingValue Value="currentNode">
+                        @foreach (var input in currentNode.Inputs)
+                        {
+                            <DynamicInputField Input="input" InputChanged="OnInputUpdated" />
+                        }
+                    </CascadingValue>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-success me-2" @onclick="ExportJson">
+                        Export JSON
+                    </button>
+                    <button class="btn btn-outline-secondary" @onclick="LoadSampleData">
+                        Reset to Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import / Export Column -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">JSON Import / Export</h5>
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control font-monospace" 
+                              rows="16" 
+                              @bind="jsonText"></textarea>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3" role="alert">
+                            @errorMessage
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <MudButton StartIcon="@Icons.Material.Filled.ImportContacts" Class="" OnClick="ImportJson">Import JSON to Form</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.ImportExport" Class="btn btn-primary mt-3" OnClick="SubmitForm">Submit / Validate Form</MudButton>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private BlockNode currentNode = new();
+    private string jsonText = string.Empty;
+    private string errorMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        LoadSampleData();
+    }
+
+    private void OnInputUpdated(BlockNodeInput input)
+    {
+        // Auto-update JSON live on form changes
+        // ExportJson();
+        
+        jsonText = JsonPayload;
+        ImportJson();
+    }
+
+    private void ExportJson()
+    {
+        jsonText = currentNode.ToJson();
+        errorMessage = string.Empty;
+    }
+
+    private void ImportJson()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(jsonText)) return;
+
+            var imported = BlockNode.FromJson(jsonText);
+            if (imported != null)
+            {
+                currentNode = imported;
+                errorMessage = string.Empty;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Invalid JSON payload: {ex.Message}";
+        }
+        StateHasChanged();
+    }
+
+    private void LoadSampleData()
+    {
+        currentNode = new BlockNode
+        {
+            Id = "node_101",
+            Name = "Email Action Node",
+            Inputs = new List<BlockNodeInput>
+            {
+                new() { Id = "in_1", Label = "Recipient Email", Type = "text", Value = "user@example.com" },
+                new() { Id = "in_2", Label = "Retry Count", Type = "number", Value = 3 },
+                new() { Id = "in_3", Label = "Priority Level", Type = "select", Value = "High", Options = new() { "Low", "Medium", "High" } },
+                new() { Id = "in_4", Label = "Is Active", Type = "checkbox", Value = true },
+                new() { Id = "in_5", Label = "Custom Payload", Type = "textarea", Value = "{\"key\": \"value\"}" }
+            }
+        };
+
+        ExportJson();
+    }
+    
+
+    private void SubmitForm()
+    {
+        bool isValid = BlockNodeValidator.ValidateNode(currentNode);
+
+        if (isValid)
+        {
+            // Proceed with form submission or export
+            ExportJson();
+        }
+        else
+        {
+            // Re-render components so they display updated error messages
+            StateHasChanged();
+        }
+    }
+
+    private string JsonPayload = @"
+                                 {
+                                   ""Id"": ""node_301"",
+                                   ""Name"": ""Order Process Block"",
+                                   ""Inputs"": [
+                                     {
+                                       ""Id"": ""is_physical_shipment"",
+                                       ""Label"": ""Is Physical Shipment?"",
+                                       ""Type"": ""checkbox"",
+                                       ""Value"": true
+                                     },
+                                     {
+                                       ""Id"": ""shipping_address"",
+                                       ""Label"": ""Shipping Address"",
+                                       ""Type"": ""textarea"",
+                                       ""Value"": """",
+                                       ""Validation"": {
+                                         ""DependentRules"": [
+                                           {
+                                             ""TargetFieldId"": ""is_physical_shipment"",
+                                             ""Condition"": ""Equals"",
+                                             ""ExpectedValue"": true,
+                                             ""Enforcement"": ""Required"",
+                                             ""Message"": ""Shipping Address is required when Physical Shipment is enabled.""
+                                           }
+                                         ]
+                                       }
+                                     },
+                                     {
+                                       ""Id"": ""min_retry"",
+                                       ""Label"": ""Minimum Retries"",
+                                       ""Type"": ""number"",
+                                       ""Value"": 5
+                                     },
+                                     {
+                                       ""Id"": ""max_retry"",
+                                       ""Label"": ""Maximum Retries"",
+                                       ""Type"": ""number"",
+                                       ""Value"": 2,
+                                       ""Validation"": {
+                                         ""DependentRules"": [
+                                           {
+                                             ""TargetFieldId"": ""min_retry"",
+                                             ""Condition"": ""HasValue"",
+                                             ""Enforcement"": ""GreaterThanTarget"",
+                                             ""Message"": ""Maximum retries must be greater than Minimum retries.""
+                                           }
+                                         ]
+                                       }
+                                     }
+                                   ]
+                                 }
+                                 ";
+
+}

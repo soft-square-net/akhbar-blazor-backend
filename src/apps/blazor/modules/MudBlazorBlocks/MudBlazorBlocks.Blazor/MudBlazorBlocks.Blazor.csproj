@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Elsa.Workflows.Core" />
     <PackageReference Include="Mapster" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
     <PackageReference Include="MudBlazor.Extensions" />
@@ -33,6 +34,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>MudBlazorBlocksResources.resx</DependentUpon>
     </Compile>
+    <None Include="Abstraction\BlockNode\Inputs\InputComponentBase2.csbak" />
+    <None Include="Abstraction\BlockNode\Inputs\InputComponentBase.csbak" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +43,20 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MudBlazorBlocksResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Abstraction\BlockNode\Studio\" />
+    <Folder Include="Components\Blocks\Dialogs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\MudBlazorBlocks\BlockNodeEditor.razorbak">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="Components\Blocks\EditForm\BlockNodeValidationManager.razorBak">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>

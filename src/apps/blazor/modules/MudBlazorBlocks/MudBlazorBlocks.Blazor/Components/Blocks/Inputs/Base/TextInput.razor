@@ -1,0 +1,45 @@
+@inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
+@using System.Timers
+
+<div class="mb-3">
+    <label class="form-label fw-bold">
+        @Input.Label
+        @if (Input.Validation?.IsRequired == true) { <span class="text-danger">*</span> }
+    </label>
+
+    <input type="text" 
+           class="@FieldCssClass" 
+           value="@StringValue" 
+           @oninput="OnInputDebounced" />
+
+    <ValidationMessage For="@(() => Input.Value)" />
+</div>
+
+@code {
+    private Timer? debounceTimer;
+
+    protected override void OnInitialized()
+    {
+        debounceTimer = new Timer(300); // 300ms delay after typing stops
+        debounceTimer.AutoReset = false;
+        debounceTimer.Elapsed += async (sender, e) =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await UpdateValueAsync(Input.Value);
+            });
+        };
+    }
+
+    private void OnInputDebounced(ChangeEventArgs e)
+    {
+        Input.Value = e.Value?.ToString();
+        debounceTimer?.Stop();
+        debounceTimer?.Start();
+    }
+
+    public void Dispose()
+    {
+        debounceTimer?.Dispose();
+    }
+}

@@ -1,0 +1,34 @@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.Visibility
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Abstractions
+@* DynamicInputField.razor *@
+
+@if (IsVisible)
+{
+    <DynamicComponent Type="@GetComponentType()" Parameters="@GetParameters()" />
+}
+@code {
+    [Parameter, EditorRequired]
+    public BlockNodeInput Input { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<BlockNodeInput> InputChanged { get; set; }
+
+    [CascadingParameter(Name = "CurrentNode")]
+    public BlockNode ParentNode { get; set; } = default!;
+
+    private bool IsVisible => ParentNode == null || BlockNodeVisibilityEvaluator.IsFieldVisible(Input, ParentNode);
+
+    private Type GetComponentType() => InputRegistry.GetInputComponent(Input.Type ?? "text");
+
+
+    private Dictionary<string, object> GetParameters()
+    {
+        return new Dictionary<string, object>
+        {
+            { nameof(InputComponentBase.Input), Input },
+            { nameof(InputComponentBase.InputChanged), InputChanged }
+        };
+    }
+}

@@ -5,7 +5,10 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Services;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Auth;
+using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Abstractions;
+using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Inputs.Custome;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Layout;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.Shared.Authorization;
@@ -48,13 +51,17 @@ public class MudBlazorBlocksModule : BlazorModuleBase
         /// Use MediatR on the Client Browser for MudBlazorBlocks Module
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(MudBlazorBlocksModule).Assembly));
 
-
+        // Register Custom InputsType, the base inputs are registered already
+        InputRegistry.RegisterComponent("date", typeof(DateInput));
+        services.AddScoped<IRemoteValidationService, RemoteValidationService>();
+        
+        
         return base.ConfigureModule(services, builder);
     }
 
     public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
-
+        
         return await base.UseModuleAsync(app);
     }
 }

@@ -1,0 +1,222 @@
+@* BlockNodeValidationManager.razor *@
+@using System.Threading
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Services
+
+@implements IDisposable
+@inject IRemoteValidationService RemoteValidationService
+
+@code {
+    private ValidationMessageStore? messageStore;
+    private CancellationTokenSource? cts;
+    private int activeValidationCount = 0;
+    
+    [CascadingParameter]
+    private EditContext? CurrentEditContext { get; set; }
+
+    [Parameter, EditorRequired]
+    public BlockNode Node { get; set; } = default!;
+    
+    // Expose validation state to parent component
+    [Parameter]
+    public bool IsValidating { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> IsValidatingChanged { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        if (CurrentEditContext == null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(BlockNodeValidationManager)} requires a cascading parameter of type {nameof(EditContext)}.");
+        }
+
+        messageStore = new ValidationMessageStore(CurrentEditContext);
+
+        CurrentEditContext.OnValidationRequested += HandleValidationRequested;
+        CurrentEditContext.OnFieldChanged += HandleFieldChanged;
+    }
+    
+    private void SetValidatingState(bool isValidating)
+    {
+        if (IsValidating != isValidating)
+        {
+            IsValidating = isValidating;
+            IsValidatingChanged.InvokeAsync(IsValidating);
+        }
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        // Cancel any pending async validation tasks from rapid typing
+        cts?.Cancel();
+        cts = new CancellationTokenSource();
+
+        _ = ValidateFieldAsync(e.FieldIdentifier, cts.Token);
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e)
+    {
+        cts?.Cancel();
+        cts = new CancellationTokenSource();
+
+        _ = ValidateAllAsync(cts.Token);
+    }
+
+    private async Task ValidateFieldAsync(FieldIdentifier fieldIdentifier, CancellationToken token)
+    {
+        // Clear previous messages for this specific field
+        messageStore?.Clear(fieldIdentifier);
+
+        // Find matching BlockNodeInput
+        var input = Node.Inputs.FirstOrDefault(
+            x => x.Id == fieldIdentifier.Model.GetType().GetProperty("Id")?.GetValue(fieldIdentifier.Model)?.ToString()
+                 || x == fieldIdentifier.Model);
+
+        if (input == null) return;
+
+        // 1. Run Synchronous + Dependent Rules First
+        bool isSyncValid = BlockNodeValidator.ValidateInput(input, Node);
+
+        if (!isSyncValid)
+        {
+            ApplySyncErrors(input);
+            CurrentEditContext?.NotifyValidationStateChanged();
+            return;
+        }
+
+        // 2. Run Async Validation if Sync Validation Passed
+
+               
+
+        
+
+        // 2. Run Async Validation
+        if (input.Validation?.AsyncRule != null)
+        {
+            Interlocked.Increment(ref activeValidationCount);
+            SetValidatingState(true);
+
+            try
+            {
+                var asyncRule = input.Validation.AsyncRule;
+                bool isRemoteValid = await RemoteValidationService.ValidateRemoteAsync(
+                    asyncRule.RuleName,
+                    asyncRule.EndpointUrl,
+                    input.Value,
+                    token);
+
+                if (!token.IsCancellationRequested && !isRemoteValid)
+                {
+                    var targetIdentifier = new FieldIdentifier(input, nameof(BlockNodeInput.Value));
+                    messageStore?.Add(targetIdentifier, asyncRule.Message);
+                }
+            }
+            catch (OperationCanceledException) { }
+            finally
+            {
+                if (Interlocked.Decrement(ref activeValidationCount) == 0)
+                {
+                    SetValidatingState(false);
+                }
+            }
+        }
+
+        if (!token.IsCancellationRequested)
+        {
+            CurrentEditContext?.NotifyValidationStateChanged();
+        }
+    }
+
+    private async Task ValidateAllAsync(CancellationToken token)
+    {
+        messageStore?.Clear();
+
+        BlockNodeValidator.ValidateNode(Node);
+
+        foreach (var input in Node.Inputs)
+        {
+            ApplySyncErrors(input);
+        }
+
+        CurrentEditContext?.NotifyValidationStateChanged();
+
+        var asyncInputs = Node.Inputs
+            .Where(i => i.IsValid && i.Validation?.AsyncRule != null)
+            .ToList();
+
+        if (asyncInputs.Count == 0) return;
+
+        Interlocked.Add(ref activeValidationCount, asyncInputs.Count);
+        SetValidatingState(true);
+
+        try
+        {
+            var asyncTasks = asyncInputs.Select(async input =>
+            {
+                var asyncRule = input.Validation!.AsyncRule!;
+                try
+                {
+                    bool isRemoteValid = await RemoteValidationService.ValidateRemoteAsync(
+                        asyncRule.RuleName,
+                        asyncRule.EndpointUrl,
+                        input.Value,
+                        token);
+
+                    if (!token.IsCancellationRequested && !isRemoteValid)
+                    {
+                        var fieldIdentifier = new FieldIdentifier(input, nameof(BlockNodeInput.Value));
+                        messageStore?.Add(fieldIdentifier, asyncRule.Message);
+                    }
+                }
+                catch (OperationCanceledException) { }
+                finally
+                {
+                    Interlocked.Decrement(ref activeValidationCount);
+                }
+            });
+
+            await Task.WhenAll(asyncTasks);
+        }
+        finally
+        {
+            if (activeValidationCount <= 0)
+            {
+                activeValidationCount = 0;
+                SetValidatingState(false);
+            }
+        }
+
+        if (!token.IsCancellationRequested)
+        {
+            CurrentEditContext?.NotifyValidationStateChanged();
+        }
+    }
+    
+    private void ApplySyncErrors(BlockNodeInput input)
+    {
+        var fieldIdentifier = new FieldIdentifier(input, nameof(BlockNodeInput.Value));
+        foreach (var error in input.ValidationErrors)
+        {
+            messageStore?.Add(fieldIdentifier, error);
+        }
+    }
+
+    public void Dispose()
+    {
+        // Cancel ongoing async validation requests
+        cts?.Cancel();
+        cts?.Dispose();
+
+        // Unbind message store and events from old EditContext
+        if (CurrentEditContext != null)
+        {
+            CurrentEditContext.OnValidationRequested -= HandleValidationRequested;
+            CurrentEditContext.OnFieldChanged -= HandleFieldChanged;
+        }
+
+        messageStore?.Clear();
+    }
+}

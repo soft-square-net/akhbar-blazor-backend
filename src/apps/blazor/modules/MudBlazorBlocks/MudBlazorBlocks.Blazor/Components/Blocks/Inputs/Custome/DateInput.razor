@@ -1,0 +1,9 @@
+@inherits FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.InputComponentBase
+
+<div class="mb-3">
+    <label class="form-label fw-bold">@Input.Label</label>
+    <input type="date" 
+           class="form-control" 
+           value="@StringValue" 
+           @onchange="OnTextChanged" />
+</div>

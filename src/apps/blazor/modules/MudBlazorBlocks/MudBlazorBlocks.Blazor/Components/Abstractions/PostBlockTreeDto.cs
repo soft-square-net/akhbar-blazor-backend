@@ -13,8 +13,8 @@ public class PostBlockTreeDto
     public List<PostBlockTreeDto> ExportTree(List<PostBlock> flatBlocks, string? parentId = null)
     {
         return flatBlocks
-            .Where(b => b.ParentId == parentId)
-            .OrderBy(b => b.Order)
+            // .Where(b => b.ParentId == parentId)
+            // .OrderBy(b => b.Order)
             .Select(b => new PostBlockTreeDto
             {
                 Id = b.Id,

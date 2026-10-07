@@ -1,0 +1,290 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Text.Json;
+
+namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
+
+public enum FilterOperator
+{
+    Equals,
+    NotEquals,
+    Contains,
+    StartsWith,
+    EndsWith,
+    GreaterThan,
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual
+}
+
+public class FilterRule
+{
+    public string PropertyName { get; set; } = string.Empty; // e.g., "Name" or "Value.Name"
+    public string Operator { get; set; } = "Contains"; // "Equals", "Contains", ">", etc.
+    public object? Value { get; set; }
+}
+
+public static class TreeNodeFilterBuilder<T> where T : class, new()
+{
+    /// <summary>
+    /// Builds an Expression filter for TreeNode<T> from property name, operator string, and target value.
+    /// </summary>
+    public static Expression<Func<TreeNode<T>, bool>> BuildFilter(string propertyName, string op, object? value)
+    {
+        var operatorEnum = ParseOperator(op);
+        return BuildFilter(propertyName, operatorEnum, value);
+    }
+
+    /// <summary>
+    /// Builds an Expression filter for TreeNode<T> from a single rule.
+    /// </summary>
+    public static Expression<Func<TreeNode<T>, bool>> BuildFilter(string propertyName, FilterOperator op, object? value)
+    {
+        var parameter = Expression.Parameter(typeof(TreeNode<T>), "node");
+
+        // Resolve property path starting from TreeNode<T> or T
+        Expression propertyAccess = ResolvePropertyPath(parameter, propertyName);
+
+        // Convert the input value to match the property's target type
+        Expression targetValue = FormatValueExpression(propertyAccess.Type, value);
+
+        // Build comparison logic
+        Expression comparison = BuildComparison(propertyAccess, op, targetValue);
+
+        return Expression.Lambda<Func<TreeNode<T>, bool>>(comparison, parameter);
+    }
+
+    /// <summary>
+    /// Parses a JSON string containing filter rule(s) and combines them into a single Expression filter.
+    /// </summary>
+    /// <param name="json">JSON array or object representing filter rules.</param>
+    /// <param name="combineWithAnd">True to join rules with AND, false to join with OR.</param>
+    public static Expression<Func<TreeNode<T>, bool>> ParseJsonFilter(string json, bool combineWithAnd = true)
+    {
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+        var rules = new List<FilterRule>();
+
+        if (root.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var element in root.EnumerateArray())
+            {
+                var rule = JsonSerializer.Deserialize<FilterRule>(element.GetRawText(), JsonOptions);
+                if (rule != null) rules.Add(rule);
+            }
+        }
+        else if (root.ValueKind == JsonValueKind.Object)
+        {
+            var rule = JsonSerializer.Deserialize<FilterRule>(json, JsonOptions);
+            if (rule != null) rules.Add(rule);
+        }
+
+        if (rules.Count == 0)
+        {
+            return node => true; // Neutral filter
+        }
+
+        Expression<Func<TreeNode<T>, bool>> combined =
+            BuildFilter(rules[0].PropertyName, rules[0].Operator, rules[0].Value);
+
+        for (int i = 1; i < rules.Count; i++)
+        {
+            var nextFilter = BuildFilter(rules[i].PropertyName, rules[i].Operator, rules[i].Value);
+            combined = combineWithAnd ? CombineAnd(combined, nextFilter) : CombineOr(combined, nextFilter);
+        }
+
+        return combined;
+    }
+
+    // --- Expression Helpers ---
+
+    private static Expression ResolvePropertyPath(Expression param, string propertyPath)
+    {
+        // Default to targeting T (Value property) if not prefixed with "Value."
+        if (!propertyPath.StartsWith("Value.", StringComparison.OrdinalIgnoreCase) &&
+            !propertyPath.Equals("Value", StringComparison.OrdinalIgnoreCase))
+        {
+            propertyPath = $"Value.{propertyPath}";
+        }
+
+        Expression current = param;
+        foreach (var member in propertyPath.Split('.'))
+        {
+            var propInfo = current.Type.GetProperty(member,
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (propInfo == null)
+            {
+                throw new ArgumentException($"Property '{member}' not found on type '{current.Type.Name}'.");
+            }
+
+            current = Expression.Property(current, propInfo);
+        }
+
+        return current;
+    }
+
+    private static Expression BuildComparison(Expression left, FilterOperator op, Expression right)
+    {
+        // Handle Nullable types for string method compatibility
+        if (left.Type == typeof(string))
+        {
+            var nullCheck = Expression.NotEqual(left, Expression.Constant(null, typeof(string)));
+
+            MethodInfo? method = op switch
+            {
+                FilterOperator.Contains => typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) }),
+                FilterOperator.StartsWith => typeof(string).GetMethod(nameof(string.StartsWith),
+                    new[] { typeof(string) }),
+                FilterOperator.EndsWith => typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string) }),
+                _ => null
+            };
+
+            if (method != null)
+            {
+                var body = Expression.Call(left, method, right);
+                return Expression.AndAlso(nullCheck, body);
+            }
+        }
+
+        return op switch
+        {
+            FilterOperator.Equals => Expression.Equal(left, right),
+            FilterOperator.NotEquals => Expression.NotEqual(left, right),
+            FilterOperator.GreaterThan => Expression.GreaterThan(left, right),
+            FilterOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(left, right),
+            FilterOperator.LessThan => Expression.LessThan(left, right),
+            FilterOperator.LessThanOrEqual => Expression.LessThanOrEqual(left, right),
+            _ => Expression.Equal(left, right)
+        };
+    }
+
+    private static Expression FormatValueExpression(Type targetType, object? value)
+    {
+        if (value == null)
+        {
+            return Expression.Constant(null, targetType);
+        }
+
+        if (value is JsonElement element)
+        {
+            value = element.ValueKind switch
+            {
+                JsonValueKind.String => element.GetString(),
+                JsonValueKind.Number => element.TryGetInt64(out long l) ? l : element.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                _ => element.GetRawText()
+            };
+        }
+
+        var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+        var convertedValue = Convert.ChangeType(value, underlyingType);
+
+        return Expression.Constant(convertedValue, targetType);
+    }
+
+    private static FilterOperator ParseOperator(string op) => op.ToLowerInvariant() switch
+    {
+        "eq" or "equals" or "==" or "=" => FilterOperator.Equals,
+        "neq" or "notequals" or "!=" => FilterOperator.NotEquals,
+        "contains" or "like" => FilterOperator.Contains,
+        "startswith" => FilterOperator.StartsWith,
+        "endswith" => FilterOperator.EndsWith,
+        "gt" or ">" or "greaterthan" => FilterOperator.GreaterThan,
+        "gte" or ">=" => FilterOperator.GreaterThanOrEqual,
+        "lt" or "<" or "lessthan" => FilterOperator.LessThan,
+        "lte" or "<=" => FilterOperator.LessThanOrEqual,
+        _ => FilterOperator.Contains
+    };
+
+    private static Expression<Func<TType, bool>> CombineAnd<TType>(
+        Expression<Func<TType, bool>> left,
+        Expression<Func<TType, bool>> right)
+    {
+        var parameter = Expression.Parameter(typeof(TType));
+        var body = Expression.AndAlso(
+            Expression.Invoke(left, parameter),
+            Expression.Invoke(right, parameter)
+        );
+        return Expression.Lambda<Func<TType, bool>>(body, parameter);
+    }
+
+    private static Expression<Func<TType, bool>> CombineOr<TType>(
+        Expression<Func<TType, bool>> left,
+        Expression<Func<TType, bool>> right)
+    {
+        var parameter = Expression.Parameter(typeof(TType));
+        var body = Expression.OrElse(
+            Expression.Invoke(left, parameter),
+            Expression.Invoke(right, parameter)
+        );
+        return Expression.Lambda<Func<TType, bool>>(body, parameter);
+    }
+
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+// Flatten tree using Breadth-First Search (BFS) - ideal for level-by-level rendering
+    public static IEnumerable<TreeNode<T>> TraverseBreadthFirst(TreeNode<T> root)
+    {
+        var queue = new Queue<TreeNode<T>>();
+        queue.Enqueue(root);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            yield return current;
+
+            foreach (var child in current.Children)
+                queue.Enqueue(child);
+        }
+    }
+
+    // Fast lookup for finding a node by a predicate
+    public static TreeNode<T>? FindNode(TreeNode<T> root, Func<TreeNode<T>, bool> predicate)
+    {
+        if (predicate(root)) return root;
+
+        foreach (var child in root.Children)
+        {
+            var result = FindNode(child, predicate);
+            if (result != null) return result;
+        }
+
+        return null;
+    }
+//                  Usage                      //
+// public class CategoryModel
+// {
+//     public string Name { get; set; } = string.Empty;
+//     public int ItemCount { get; set; }
+// }
+
+// * // Builds: node => node.Value.Name.Contains("Electronics")
+// ?     var nameFilter = TreeNodeFilterBuilder<CategoryModel>.BuildFilter("Name", "Contains", "Electronics");
+// ?
+// * // Builds: node => node.Value.ItemCount >= 10
+// ?     var countFilter = TreeNodeFilterBuilder<CategoryModel>.BuildFilter("ItemCount", ">=", 10);
+// ?
+// * // Apply to tree node using your TreeNodeUtility
+// ?     TreeNodeUtility<CategoryModel>.Filter(rootNode, nameFilter);
+
+
+//                 Usage  JSON                    //
+//  *  string jsonPayload = @"
+//    [
+//      { ""propertyName"": ""Name"", ""operator"": ""Contains"", ""value"": ""Tech"" },
+//      { ""propertyName"": ""ItemCount"", ""operator"": "">="", ""value"": 5 }
+//    ]";
+//
+//  *  // Parses rules and combines them with AND
+//  ?  var jsonFilter = TreeNodeFilterBuilder<CategoryModel>.ParseJsonFilter(jsonPayload, combineWithAnd: true);
+//
+//  *  // Add filter to tree node and evaluate
+//  ?  rootNode.Filters.Add(jsonFilter);
+//  ?  TreeNodeUtility<CategoryModel>.Filter(rootNode, jsonFilter);
+}
+
+

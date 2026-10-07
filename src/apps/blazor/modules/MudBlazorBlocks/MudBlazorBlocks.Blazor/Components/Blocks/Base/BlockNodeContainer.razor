@@ -1,0 +1,104 @@
+@* BlockNodeContainer *@
+@using System.Text.Json
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.Toolbar
+@using MudBlazor
+
+<div class="post-block-container">
+    <MudToolBar Class="editor-toolbar" Color="Color.Primary" Elevation="1">
+        @if (Items != null)
+        {
+            @foreach (var item in Items)
+            {
+                @if (item.Type == ToolbarItemType.Spacer)
+                {
+                    <MudSpacer />
+                }
+                else if (item.Type == ToolbarItemType.IconButton)
+                {
+                    @if (!string.IsNullOrEmpty(item.Tooltip))
+                    {
+                        <MudTooltip Text="@item.Tooltip">
+                            <MudIconButton Icon="@item.Icon" Color="Color.Inherit" />
+                        </MudTooltip>
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@item.Icon" Color="Color.Inherit" />
+                    }
+                }
+            }
+        }
+    </MudToolBar>
+    
+    <div>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<ToolbarItem> Items { get; set; } = new();
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    // Export the current toolbar configuration to a JSON string
+    public string ExportToJson()
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        return JsonSerializer.Serialize(Items, options);
+    }
+
+    // Load and populate the toolbar configuration from a JSON string
+    public void LoadFromJson(string jsonString)
+    {
+        try
+        {
+            var deserialized = JsonSerializer.Deserialize<List<ToolbarItem>>(jsonString);
+            if (deserialized != null)
+            {
+                Items = deserialized;
+                StateHasChanged(); // Force the component to re-render with new items
+            }
+        }
+        catch (JsonException ex)
+        {
+            // Handle parsing errors here depending on your logging structure
+            Console.WriteLine($"Error deserializing toolbar JSON: {ex.Message}");
+        }
+    }
+}
+
+
+
+<style>
+    .post-block-container {
+        position: relative;
+        min-height: 48px;
+    }
+
+    /* Triggers when the user hovers anywhere over the toolbar area */
+    .post-block-container:hover {
+        /*padding-top:48px;*/
+        
+    }
+    .post-block-container .editor-toolbar{
+        /* Completely hidden by default */
+        opacity: 0;
+        visibility: hidden;
+        /* Smooth 0.3-second transition when fading in or out */
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        position: absolute;
+        top: 0;
+        left:0;
+        right: unset;
+        width: 100%;
+    }
+    .post-block-container:hover .editor-toolbar{
+        z-index: 1000;
+        opacity: 1;
+        visibility: visible;
+        background: color-mix(in srgb, var(--mud-palette-secondary) 25%, transparent);
+    .RTL  .post-block-container .editor-toolbar{left: unset;right: 0;}
+
+</style>

@@ -1,0 +1,40 @@
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Components;
+
+namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode;
+public abstract class InputComponentBase : ComponentBase
+{
+    
+    [Parameter, EditorRequired]
+    public BlockNodeInput Input { get; set; } = default!;
+    [Parameter]
+    public EventCallback<BlockNodeInput> InputChanged { get; set; }
+    [CascadingParameter]
+    public BlockNode ParentNode { get; set; } = default!;
+
+    protected string StringValue => Input.Value?.ToString() ?? string.Empty;
+    protected double NumberValue => double.TryParse(Input.Value?.ToString(), out var result) ? result : 0;
+    protected bool BoolValue => bool.TryParse(Input.Value?.ToString(), out var result) && result;
+
+    // Helper CSS class for Bootstrap invalid feedback state
+    protected string CssClass => Input.IsValid ? "form-control" : "form-control is-invalid";
+    protected string SelectCssClass => Input.IsValid ? "form-select" : "form-select is-invalid";
+    protected string CheckCssClass => Input.IsValid ? "form-check-input" : "form-check-input is-invalid";
+    
+    protected async Task UpdateValueAsync(object? newValue)
+    {
+        Input.Value = newValue;
+
+        // Re-validate all inputs in the node to catch cross-field side effects
+        if (ParentNode != null)
+        {
+            BlockNodeValidator.ValidateNode(ParentNode);
+        }
+
+        await InputChanged.InvokeAsync(Input);
+    }
+    protected Task OnTextChanged(ChangeEventArgs e) => UpdateValueAsync(e.Value?.ToString());
+    protected Task OnNumberChanged(ChangeEventArgs e) => UpdateValueAsync(double.TryParse(e.Value?.ToString(), out var numVal) ? numVal : null);
+    protected Task OnBoolChanged(ChangeEventArgs e) => UpdateValueAsync(e.Value is bool b ? b : false);
+
+}

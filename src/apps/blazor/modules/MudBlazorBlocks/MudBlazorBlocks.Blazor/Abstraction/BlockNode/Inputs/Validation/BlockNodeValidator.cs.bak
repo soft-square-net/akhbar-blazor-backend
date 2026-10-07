@@ -1,0 +1,73 @@
+
+// BlockNodeValidator.cs
+namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode;
+
+using System.Text.RegularExpressions;
+
+public static class BlockNodeValidatorOld
+{
+    public static bool ValidateInput(BlockNodeInput input)
+    {
+        input.ValidationErrors.Clear();
+        var rules = input.Validation;
+
+        if (rules == null) return true;
+
+        var strVal = input.Value?.ToString();
+        var isNullOrEmpty = string.IsNullOrWhiteSpace(strVal);
+
+        // 1. Required Check
+        if (rules.IsRequired && isNullOrEmpty)
+        {
+            input.ValidationErrors.Add(
+                rules.RequiredMessage ?? $"{input.Label} is required.");
+        }
+
+        // 2. Numeric Range Check (Min / Max)
+        if (!isNullOrEmpty && (rules.Min.HasValue || rules.Max.HasValue))
+        {
+            if (double.TryParse(strVal, out double numVal))
+            {
+                if (rules.Min.HasValue && numVal < rules.Min.Value)
+                    input.ValidationErrors.Add(rules.RangeMessage ?? $"{input.Label} must be at least {rules.Min.Value}.");
+
+                if (rules.Max.HasValue && numVal > rules.Max.Value)
+                    input.ValidationErrors.Add(rules.RangeMessage ?? $"{input.Label} cannot exceed {rules.Max.Value}.");
+            }
+        }
+
+        // 3. String Length Check (MinLength / MaxLength)
+        if (!isNullOrEmpty)
+        {
+            if (rules.MinLength.HasValue && strVal!.Length < rules.MinLength.Value)
+                input.ValidationErrors.Add($"{input.Label} must be at least {rules.MinLength.Value} characters.");
+
+            if (rules.MaxLength.HasValue && strVal!.Length > rules.MaxLength.Value)
+                input.ValidationErrors.Add($"{input.Label} cannot exceed {rules.MaxLength.Value} characters.");
+        }
+
+        // 4. Regex Pattern Check
+        if (!isNullOrEmpty && !string.IsNullOrEmpty(rules.RegexPattern))
+        {
+            if (!Regex.IsMatch(strVal!, rules.RegexPattern))
+            {
+                input.ValidationErrors.Add(rules.RegexMessage ?? $"{input.Label} format is invalid.");
+            }
+        }
+
+        return input.IsValid;
+    }
+
+    public static bool ValidateNode(BlockNode node)
+    {
+        bool isValid = true;
+        foreach (var input in node.Inputs)
+        {
+            if (!ValidateInput(input))
+            {
+                isValid = false;
+            }
+        }
+        return isValid;
+    }
+}
