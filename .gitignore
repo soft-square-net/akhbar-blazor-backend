@@ -459,3 +459,8 @@ $RECYCLE.BIN/
 
 **/Internal/Generated
 /src/api/server/appsettings.local.json
+*.json
+/src/apps/blazor/client/wwwroot/css/FSH.Starter.Blazor.Modules.document-Document.Blazor-Components-FileExplorer-FileExplorerDialog.css
+/src/apps/blazor/client/wwwroot/css/FSH.Starter.Blazor.Modules.FSHeroLayout-FSHeroLayout.Blazor-Layout-FSHMainLayout.css
+*.js
+*.css
