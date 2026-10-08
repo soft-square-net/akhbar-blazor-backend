@@ -7,6 +7,9 @@ namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
 
 public static class TreeNodeUtility<T> where T : class, new()
 {
+    /// <summary>
+    /// Adds a collection of child items to the specified tree node.
+    /// </summary>
     public static void AddChildren(TreeNode<T> treeNode, IEnumerable<T> items)
     {
         ArgumentNullException.ThrowIfNull(treeNode);
@@ -19,15 +22,23 @@ public static class TreeNodeUtility<T> where T : class, new()
     }
 
     /// <summary>
-    /// Evaluates a filter delegate across the tree and retains nodes matching the predicate 
-    /// or having matching descendants.
+    /// Clears all children from the specified tree node.
+    /// </summary>
+    public static void ClearChildren(TreeNode<T> treeNode)
+    {
+        ArgumentNullException.ThrowIfNull(treeNode);
+        treeNode.Children.Clear();
+    }
+
+    /// <summary>
+    /// Evaluates a filter expression across the tree and retains nodes matching the predicate 
+    /// or having matching descendants in the filtered children collection.
     /// </summary>
     public static void Filter(TreeNode<T> rootNode, Expression<Func<TreeNode<T>, bool>> filterExpression)
     {
         ArgumentNullException.ThrowIfNull(rootNode);
         ArgumentNullException.ThrowIfNull(filterExpression);
 
-        // Compile expression ONCE outside recursion for optimal performance
         Func<TreeNode<T>, bool> predicate = filterExpression.Compile();
 
         rootNode.ClearFiltered();
@@ -39,7 +50,6 @@ public static class TreeNodeUtility<T> where T : class, new()
         bool selfMatches = predicate(currentNode);
         bool anyChildMatches = false;
 
-        // Process actual underlying children during filter evaluation
         foreach (var child in currentNode.Children)
         {
             bool childHasMatch = FilterRecursive(child, predicate);
@@ -50,7 +60,6 @@ public static class TreeNodeUtility<T> where T : class, new()
             }
         }
 
-        // Keep node if it matches directly OR if any descendant matches
         return selfMatches || anyChildMatches;
     }
 
@@ -69,8 +78,7 @@ public static class TreeNodeUtility<T> where T : class, new()
         return result;
     }
 
-    private static void WhereRecursive(TreeNode<T> currentNode, Func<TreeNode<T>, bool> predicate,
-        List<TreeNode<T>> result)
+    private static void WhereRecursive(TreeNode<T> currentNode, Func<TreeNode<T>, bool> predicate, List<TreeNode<T>> result)
     {
         if (predicate(currentNode))
         {
@@ -82,6 +90,10 @@ public static class TreeNodeUtility<T> where T : class, new()
             WhereRecursive(child, predicate, result);
         }
     }
+
+    /// <summary>
+    /// Traverses up from the given node and yields all ancestor values up to the root.
+    /// </summary>
     public static IEnumerable<T> GetAncestors(TreeNode<T> currentNode)
     {
         ArgumentNullException.ThrowIfNull(currentNode);
@@ -93,10 +105,14 @@ public static class TreeNodeUtility<T> where T : class, new()
             walker = walker.Parent;
         }
     }
-    
-    // Flatten tree using Breadth-First Search (BFS) - ideal for level-by-level rendering
+
+    /// <summary>
+    /// Flattens and traverses the tree using Breadth-First Search (BFS).
+    /// </summary>
     public static IEnumerable<TreeNode<T>> TraverseBreadthFirst(TreeNode<T> root)
     {
+        ArgumentNullException.ThrowIfNull(root);
+
         var queue = new Queue<TreeNode<T>>();
         queue.Enqueue(root);
 
@@ -106,13 +122,20 @@ public static class TreeNodeUtility<T> where T : class, new()
             yield return current;
 
             foreach (var child in current.Children)
+            {
                 queue.Enqueue(child);
+            }
         }
     }
 
-    // Fast lookup for finding a node by a predicate
+    /// <summary>
+    /// Finds the first node matching the specified predicate using Depth-First Search (DFS).
+    /// </summary>
     public static TreeNode<T>? FindNode(TreeNode<T> root, Func<TreeNode<T>, bool> predicate)
     {
+        ArgumentNullException.ThrowIfNull(root);
+        ArgumentNullException.ThrowIfNull(predicate);
+
         if (predicate(root)) return root;
 
         foreach (var child in root.Children)
@@ -123,26 +146,34 @@ public static class TreeNodeUtility<T> where T : class, new()
 
         return null;
     }
-    
+
+    /// <summary>
+    /// Recursively sorts node children in-place based on a key selector.
+    /// </summary>
     public static void SortRecursive<TKey>(TreeNode<T> node, Func<T, TKey> keySelector, bool descending = false)
     {
-        // Re-order internal child lists
-        if (descending)
-            node.Children.OrderByDescending(c => keySelector(c.Value));
-        else
-            node.Children.OrderBy(c => keySelector(c.Value));
+        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(keySelector);
 
-        foreach (var child in node.Children)
+        List<TreeNode<T>> sortedChildren = descending
+            ? node.Children.OrderByDescending(c => keySelector(c.Value)).ToList()
+            : node.Children.OrderBy(c => keySelector(c.Value)).ToList();
+
+        node.Children.Clear();
+        foreach (var child in sortedChildren)
         {
+            node.Children.Add(child);
             SortRecursive(child, keySelector, descending);
         }
     }
-    
+
     /// <summary>
-    /// Flattens the tree into a list containing only expanded nodes (suitable for virtualized lists).
+    /// Flattens the tree into a list containing only expanded nodes (ideal for virtualized lists).
     /// </summary>
     public static List<TreeNode<T>> ToVisibleFlatList(TreeNode<T> root)
     {
+        ArgumentNullException.ThrowIfNull(root);
+
         var result = new List<TreeNode<T>>();
         FlattenVisibleRecursive(root, result);
         return result;
@@ -160,9 +191,14 @@ public static class TreeNodeUtility<T> where T : class, new()
             }
         }
     }
-    
+
+    /// <summary>
+    /// Sets the check state for a node, optionally cascading down to children and recalculating parent state up the chain.
+    /// </summary>
     public static void SetCheckedState(TreeNode<T> node, bool isChecked, bool cascadeToChildren = true)
     {
+        ArgumentNullException.ThrowIfNull(node);
+
         node.IsChecked = isChecked;
 
         if (cascadeToChildren)
@@ -194,84 +230,3 @@ public static class TreeNodeUtility<T> where T : class, new()
         UpdateParentCheckState(parent.Parent);
     }
 }
-
-
-// using System.Linq.Expressions;
-// using System.Reflection;
-//
-// namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
-//
-// public static class TreeNodeUtility<T> where T : class, new()
-// {
-//     public static void AddChildren(TreeNode<T> treeNode, List<T> items)
-//     {
-//         foreach (var childNode in items) treeNode.AddChild(childNode);  
-//     }
-//     public static void ClearChildren(TreeNode<T> treeNode)
-//     {
-//         treeNode.Children.Clear(); 
-//     }
-//     
-//     public static List<TreeNode<T>> Where(TreeNode<T> treeNode, Expression<Func<TreeNode<T>,bool>> filter)
-//     {
-//         List<TreeNode<T>> searchResult = new();
-//         if (filter.Body is MemberExpression && ((MemberExpression)filter.Body).Member is PropertyInfo && filter.Compile().Invoke(treeNode))
-//         { 
-//             searchResult.Add(treeNode);
-//         }
-//
-//         foreach (var childNode in treeNode.Children)
-//         {
-//             searchResult.AddRange(Where(childNode, filter));
-//         }
-//         return searchResult;
-//     }
-//     /// <summary>
-//     ///  Filter CHildern and Add the node if one of it's children , grand children, grand grand children match the expression
-//     /// </summary>
-//     /// <param name="treeNode"> Is the node to apply chearch on</param>
-//     /// <param name="filter"> Expression (TreeNode node) => true</param>
-//     /// <param name="carrier"> the Parent node to add treeNode to</param>
-//     /// <returns></returns>
-//     public static void Filter(TreeNode<T> treeNode, Expression<Func<TreeNode<T>,bool>> filter, TreeNode<T> carrier = null)
-//     {
-//         bool treeNodeAdded = false;
-//         // if carrier is null create new  with the treeNode.Value carrier will be the root
-//         if (carrier is null)
-//         {
-//             // carrier = new TreeNode<T>(treeNode.Value);
-//             carrier = treeNode;
-//             treeNodeAdded = true;
-//         }
-//         else
-//         {
-//             if (filter.Body is MemberExpression && ((MemberExpression)filter.Body).Member is PropertyInfo && filter.Compile().Invoke(treeNode))
-//             { 
-//                 carrier.AddToFiltered(treeNode);
-//                 treeNodeAdded = true;
-//             }
-//         }
-//         
-//         // var temp = new TreeNode<T>(treeNode.Value);
-//         foreach (var childNode in treeNode.Children)
-//         {
-//             
-//             if ( !treeNodeAdded)
-//             {
-//                 if (filter.Compile().Invoke(childNode))
-//                 {
-//                     carrier.AddToFiltered(treeNode);
-//                     treeNodeAdded = true;
-//                     Filter(childNode, filter, treeNode);
-//                 } 
-//             }
-//             else
-//             {
-//                 Filter(childNode, filter, treeNode);
-//             }
-//             
-//         }
-//         // return carrier;
-//     }
-//     
-// }

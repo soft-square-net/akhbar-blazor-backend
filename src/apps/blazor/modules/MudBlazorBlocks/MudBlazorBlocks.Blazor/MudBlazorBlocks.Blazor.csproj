@@ -12,6 +12,12 @@
     <BlazorWebAssemblyDefaultCulture>ar</BlazorWebAssemblyDefaultCulture>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Abstraction\TreeNode\TreeNode.jpg" />
+    <None Remove="Abstraction\TreeNode\TreeNodeFilterBuilder.jpg" />
+    <None Remove="Abstraction\TreeNode\TreeNodeUtility.jpg" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />

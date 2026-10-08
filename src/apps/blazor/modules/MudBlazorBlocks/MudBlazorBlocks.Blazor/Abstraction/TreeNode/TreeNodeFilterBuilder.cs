@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
 
@@ -20,17 +21,61 @@ public enum FilterOperator
     LessThanOrEqual
 }
 
+/// <summary>
+/// Represents an atomic filter condition (e.g., PropertyName "Price" >= 100).
+/// </summary>
 public class FilterRule
 {
-    public string PropertyName { get; set; } = string.Empty; // e.g., "Name" or "Value.Name"
-    public string Operator { get; set; } = "Contains"; // "Equals", "Contains", ">", etc.
+    public string PropertyName { get; set; } = string.Empty; // e.g., "Name" or "Price"
+    public string Operator { get; set; } = "Contains";      // "Equals", "Contains", ">=", etc.
     public object? Value { get; set; }
+}
+
+public enum LogicalGroupOperator
+{
+    And,
+    Or
+}
+
+/// <summary>
+/// Composite structure capable of representing single rules or nested groups of rules.
+/// </summary>
+public class FilterGroup
+{
+    /// <summary>
+    /// Specifies how children/rules in this group are joined (AND / OR).
+    /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public LogicalGroupOperator GroupOperator { get; set; } = LogicalGroupOperator.And;
+
+    /// <summary>
+    /// Atomic rules inside this group.
+    /// </summary>
+    public List<FilterRule> Rules { get; set; } = new();
+
+    /// <summary>
+    /// Nested child groups inside this group.
+    /// </summary>
+    public List<FilterGroup> Groups { get; set; } = new();
 }
 
 public static class TreeNodeFilterBuilder<T> where T : class, new()
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    private static readonly MethodInfo StringContainsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+    private static readonly MethodInfo StringStartsWithMethod = typeof(string).GetMethod(nameof(string.StartsWith), new[] { typeof(string) })!;
+    private static readonly MethodInfo StringEndsWithMethod = typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string) })!;
+
+    #region Single Rule Building
+
     /// <summary>
-    /// Builds an Expression filter for TreeNode<T> from property name, operator string, and target value.
+    /// Builds an Expression filter for TreeNode<T> from property name, string operator, and target value.
     /// </summary>
     public static Expression<Func<TreeNode<T>, bool>> BuildFilter(string propertyName, string op, object? value)
     {
@@ -43,52 +88,61 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
     /// </summary>
     public static Expression<Func<TreeNode<T>, bool>> BuildFilter(string propertyName, FilterOperator op, object? value)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
         var parameter = Expression.Parameter(typeof(TreeNode<T>), "node");
-
-        // Resolve property path starting from TreeNode<T> or T
         Expression propertyAccess = ResolvePropertyPath(parameter, propertyName);
-
-        // Convert the input value to match the property's target type
         Expression targetValue = FormatValueExpression(propertyAccess.Type, value);
-
-        // Build comparison logic
         Expression comparison = BuildComparison(propertyAccess, op, targetValue);
 
         return Expression.Lambda<Func<TreeNode<T>, bool>>(comparison, parameter);
     }
 
+    #endregion
+
+    #region JSON Filter Parsing
+
     /// <summary>
-    /// Parses a JSON string containing filter rule(s) and combines them into a single Expression filter.
+    /// Parses a JSON payload (single FilterRule, list of FilterRules, or nested FilterGroup) 
+    /// and compiles it into a single Expression filter.
     /// </summary>
-    /// <param name="json">JSON array or object representing filter rules.</param>
-    /// <param name="combineWithAnd">True to join rules with AND, false to join with OR.</param>
     public static Expression<Func<TreeNode<T>, bool>> ParseJsonFilter(string json, bool combineWithAnd = true)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
-        var rules = new List<FilterRule>();
 
+        // 1. Handle composite FilterGroup JSON payload
+        if (root.ValueKind == JsonValueKind.Object && (root.TryGetProperty("Rules", out _) || root.TryGetProperty("Groups", out _)))
+        {
+            var group = root.Deserialize<FilterGroup>(JsonOptions);
+            return group != null ? BuildGroupFilter(group) : node => true;
+        }
+
+        // 2. Handle flat array of FilterRules JSON payload
+        var rules = new List<FilterRule>();
         if (root.ValueKind == JsonValueKind.Array)
         {
             foreach (var element in root.EnumerateArray())
             {
-                var rule = JsonSerializer.Deserialize<FilterRule>(element.GetRawText(), JsonOptions);
+                var rule = element.Deserialize<FilterRule>(JsonOptions);
                 if (rule != null) rules.Add(rule);
             }
         }
+        // 3. Handle single FilterRule JSON payload
         else if (root.ValueKind == JsonValueKind.Object)
         {
-            var rule = JsonSerializer.Deserialize<FilterRule>(json, JsonOptions);
+            var rule = root.Deserialize<FilterRule>(JsonOptions);
             if (rule != null) rules.Add(rule);
         }
 
         if (rules.Count == 0)
         {
-            return node => true; // Neutral filter
+            return node => true; // Neutral fallback filter
         }
 
-        Expression<Func<TreeNode<T>, bool>> combined =
-            BuildFilter(rules[0].PropertyName, rules[0].Operator, rules[0].Value);
+        Expression<Func<TreeNode<T>, bool>> combined = BuildFilter(rules[0].PropertyName, rules[0].Operator, rules[0].Value);
 
         for (int i = 1; i < rules.Count; i++)
         {
@@ -99,11 +153,69 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
         return combined;
     }
 
-    // --- Expression Helpers ---
+    #endregion
+
+    #region Complex Group Filter Building
+
+    /// <summary>
+    /// Converts a composite FilterGroup hierarchy into a single Expression filter.
+    /// </summary>
+    public static Expression<Func<TreeNode<T>, bool>> BuildGroupFilter(FilterGroup group)
+    {
+        ArgumentNullException.ThrowIfNull(group);
+
+        var parameter = Expression.Parameter(typeof(TreeNode<T>), "node");
+        var body = BuildGroupBody(group, parameter);
+
+        if (body == null)
+        {
+            return node => true;
+        }
+
+        return Expression.Lambda<Func<TreeNode<T>, bool>>(body, parameter);
+    }
+
+    private static Expression? BuildGroupBody(FilterGroup group, ParameterExpression parameter)
+    {
+        var expressions = new List<Expression>();
+
+        foreach (var rule in group.Rules)
+        {
+            var op = ParseOperator(rule.Operator);
+            Expression propertyAccess = ResolvePropertyPath(parameter, rule.PropertyName);
+            Expression targetValue = FormatValueExpression(propertyAccess.Type, rule.Value);
+            Expression comparison = BuildComparison(propertyAccess, op, targetValue);
+            expressions.Add(comparison);
+        }
+
+        foreach (var childGroup in group.Groups)
+        {
+            var childBody = BuildGroupBody(childGroup, parameter);
+            if (childBody != null)
+            {
+                expressions.Add(childBody);
+            }
+        }
+
+        if (expressions.Count == 0) return null;
+
+        Expression current = expressions[0];
+        for (int i = 1; i < expressions.Count; i++)
+        {
+            current = group.GroupOperator == LogicalGroupOperator.And
+                ? Expression.AndAlso(current, expressions[i])
+                : Expression.OrElse(current, expressions[i]);
+        }
+
+        return current;
+    }
+
+    #endregion
+
+    #region Helper Methods
 
     private static Expression ResolvePropertyPath(Expression param, string propertyPath)
     {
-        // Default to targeting T (Value property) if not prefixed with "Value."
         if (!propertyPath.StartsWith("Value.", StringComparison.OrdinalIgnoreCase) &&
             !propertyPath.Equals("Value", StringComparison.OrdinalIgnoreCase))
         {
@@ -113,8 +225,10 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
         Expression current = param;
         foreach (var member in propertyPath.Split('.'))
         {
-            var propInfo = current.Type.GetProperty(member,
+            var propInfo = current.Type.GetProperty(
+                member,
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
             if (propInfo == null)
             {
                 throw new ArgumentException($"Property '{member}' not found on type '{current.Type.Name}'.");
@@ -128,17 +242,15 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
 
     private static Expression BuildComparison(Expression left, FilterOperator op, Expression right)
     {
-        // Handle Nullable types for string method compatibility
         if (left.Type == typeof(string))
         {
             var nullCheck = Expression.NotEqual(left, Expression.Constant(null, typeof(string)));
 
             MethodInfo? method = op switch
             {
-                FilterOperator.Contains => typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) }),
-                FilterOperator.StartsWith => typeof(string).GetMethod(nameof(string.StartsWith),
-                    new[] { typeof(string) }),
-                FilterOperator.EndsWith => typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string) }),
+                FilterOperator.Contains => StringContainsMethod,
+                FilterOperator.StartsWith => StringStartsWithMethod,
+                FilterOperator.EndsWith => StringEndsWithMethod,
                 _ => null
             };
 
@@ -181,7 +293,16 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
         }
 
         var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
-        var convertedValue = Convert.ChangeType(value, underlyingType);
+
+        object? convertedValue;
+        if (underlyingType.IsEnum && value != null)
+        {
+            convertedValue = Enum.Parse(underlyingType, value.ToString()!, ignoreCase: true);
+        }
+        else
+        {
+            convertedValue = Convert.ChangeType(value, underlyingType);
+        }
 
         return Expression.Constant(convertedValue, targetType);
     }
@@ -205,10 +326,14 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
         Expression<Func<TType, bool>> right)
     {
         var parameter = Expression.Parameter(typeof(TType));
+        var leftVisitor = new ParameterVisitor(left.Parameters[0], parameter);
+        var rightVisitor = new ParameterVisitor(right.Parameters[0], parameter);
+
         var body = Expression.AndAlso(
-            Expression.Invoke(left, parameter),
-            Expression.Invoke(right, parameter)
+            leftVisitor.Visit(left.Body),
+            rightVisitor.Visit(right.Body)
         );
+
         return Expression.Lambda<Func<TType, bool>>(body, parameter);
     }
 
@@ -217,74 +342,115 @@ public static class TreeNodeFilterBuilder<T> where T : class, new()
         Expression<Func<TType, bool>> right)
     {
         var parameter = Expression.Parameter(typeof(TType));
+        var leftVisitor = new ParameterVisitor(left.Parameters[0], parameter);
+        var rightVisitor = new ParameterVisitor(right.Parameters[0], parameter);
+
         var body = Expression.OrElse(
-            Expression.Invoke(left, parameter),
-            Expression.Invoke(right, parameter)
+            leftVisitor.Visit(left.Body),
+            rightVisitor.Visit(right.Body)
         );
+
         return Expression.Lambda<Func<TType, bool>>(body, parameter);
     }
 
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
-
-// Flatten tree using Breadth-First Search (BFS) - ideal for level-by-level rendering
-    public static IEnumerable<TreeNode<T>> TraverseBreadthFirst(TreeNode<T> root)
+    private class ParameterVisitor : ExpressionVisitor
     {
-        var queue = new Queue<TreeNode<T>>();
-        queue.Enqueue(root);
+        private readonly ParameterExpression _oldParameter;
+        private readonly ParameterExpression _newParameter;
 
-        while (queue.Count > 0)
+        public ParameterVisitor(ParameterExpression oldParameter, ParameterExpression newParameter)
         {
-            var current = queue.Dequeue();
-            yield return current;
+            _oldParameter = oldParameter;
+            _newParameter = newParameter;
+        }
 
-            foreach (var child in current.Children)
-                queue.Enqueue(child);
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            return node == _oldParameter ? _newParameter : base.VisitParameter(node);
         }
     }
 
-    // Fast lookup for finding a node by a predicate
-    public static TreeNode<T>? FindNode(TreeNode<T> root, Func<TreeNode<T>, bool> predicate)
+    #endregion
+
+
+    #region JSON Export Serialization
+
+    /// <summary>
+    /// Serializes a TreeNode<T> hierarchy into a JSON string.
+    /// </summary>
+    public static string ExportToJson(TreeNode<T> node)
     {
-        if (predicate(root)) return root;
-
-        foreach (var child in root.Children)
-        {
-            var result = FindNode(child, predicate);
-            if (result != null) return result;
-        }
-
-        return null;
+        ArgumentNullException.ThrowIfNull(node);
+        return JsonSerializer.Serialize(node, JsonOptions);
     }
-//                  Usage                      //
-// public class CategoryModel
-// {
-//     public string Name { get; set; } = string.Empty;
-//     public int ItemCount { get; set; }
-// }
 
-// * // Builds: node => node.Value.Name.Contains("Electronics")
-// ?     var nameFilter = TreeNodeFilterBuilder<CategoryModel>.BuildFilter("Name", "Contains", "Electronics");
-// ?
-// * // Builds: node => node.Value.ItemCount >= 10
-// ?     var countFilter = TreeNodeFilterBuilder<CategoryModel>.BuildFilter("ItemCount", ">=", 10);
-// ?
-// * // Apply to tree node using your TreeNodeUtility
-// ?     TreeNodeUtility<CategoryModel>.Filter(rootNode, nameFilter);
+    /// <summary>
+    /// Serializes a collection of TreeNode<T> items into a JSON string.
+    /// </summary>
+    public static string ExportToJson(IEnumerable<TreeNode<T>> nodes)
+    {
+        ArgumentNullException.ThrowIfNull(nodes);
+        return JsonSerializer.Serialize(nodes, JsonOptions);
+    }
 
+    /// <summary>
+    /// Serializes a FilterGroup rule hierarchy into a JSON filter structure string.
+    /// </summary>
+    public static string ExportToJson(FilterGroup group)
+    {
+        ArgumentNullException.ThrowIfNull(group);
+        return JsonSerializer.Serialize(group, JsonOptions);
+    }
 
-//                 Usage  JSON                    //
-//  *  string jsonPayload = @"
-//    [
-//      { ""propertyName"": ""Name"", ""operator"": ""Contains"", ""value"": ""Tech"" },
-//      { ""propertyName"": ""ItemCount"", ""operator"": "">="", ""value"": 5 }
-//    ]";
-//
-//  *  // Parses rules and combines them with AND
-//  ?  var jsonFilter = TreeNodeFilterBuilder<CategoryModel>.ParseJsonFilter(jsonPayload, combineWithAnd: true);
-//
-//  *  // Add filter to tree node and evaluate
-//  ?  rootNode.Filters.Add(jsonFilter);
-//  ?  TreeNodeUtility<CategoryModel>.Filter(rootNode, jsonFilter);
+    /// <summary>
+    /// Serializes a single FilterRule or collection of rules into a JSON string.
+    /// </summary>
+    public static string ExportToJson(IEnumerable<FilterRule> rules)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+        return JsonSerializer.Serialize(rules, JsonOptions);
+    }
+
+    #endregion
+
+    #region JSON Import Deserialization
+
+    /// <summary>
+    /// Deserializes a JSON string into a single TreeNode<T> hierarchy.
+    /// </summary>
+    public static Expression<Func<TreeNode<T>, bool>>? ImportFromJson(string json)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+
+        return JsonSerializer.Deserialize<Expression<Func<TreeNode<T>, bool>>>(json, JsonOptions);
+    }
+
+    /// <summary>
+    /// Deserializes a JSON string into a collection of TreeNode<T> items.
+    /// </summary>
+    public static List<Expression<Func<TreeNode<T>, bool>>> ImportFromJsonList(string json)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+
+        return JsonSerializer.Deserialize<List<Expression<Func<TreeNode<T>, bool>>>>(json, JsonOptions) ?? new List<Expression<Func<TreeNode<T>, bool>>>();
+    }
+
+    /// <summary>
+    /// Tries to deserialize a JSON string into a single TreeNode<T>, returning false if parsing fails.
+    /// </summary>
+    public static bool TryImportFromJson(string json, out Expression<Func<TreeNode<T>, bool>>? result)
+    {
+        try
+        {
+            result = ImportFromJson(json);
+            return result != null;
+        }
+        catch
+        {
+            result = null;
+            return false;
+        }
+    }
+
+    #endregion
 }
-
-

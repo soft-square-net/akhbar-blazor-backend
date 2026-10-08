@@ -1,184 +1,269 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
 
-public class TreeNode<T> where T : class, new()
+/// <summary>
+/// Represents a generic hierarchical tree node for Blazor UI trees and virtualized components.
+/// </summary>
+/// <typeparam name="T">The type of payload data contained within the node.</typeparam>
+public class TreeNode<T> : INotifyPropertyChanged where T : class, new()
 {
-    public T Value { get; set; }
-    public TreeNode<T>? Parent { get; private set; }
+    private T _value;
+    private TreeNode<T>? _parent;
+    private bool _isExpanded;
+    private bool? _isChecked = false;
+    private bool _isVisible = true;
 
     private readonly List<TreeNode<T>> _children = new();
-    private readonly List<TreeNode<T>> _filtered = new();
+    private readonly List<TreeNode<T>> _filteredChildren = new();
 
-    /// <summary>
-    /// Indicates whether a filter has been actively applied to this node.
-    /// </summary>
-    public bool IsFiltered { get; private set; }
-// UI State Flags
-    public bool IsExpanded { get; set; }
-    public bool IsSelected { get; set; }
-    public bool? IsChecked { get; set; } // Nullable for tri-state checkboxes (Indeterminate)
-    public bool IsDisabled { get; set; }
-    
-    // Calculates visual depth (Root = 0)
-    public int Level => Parent == null ? 0 : Parent.Level + 1;
-    
-    // Check if the current node is a leaf
-    public bool IsLeaf => Children.Count == 0;
-    /// <summary>
-    /// Returns filtered children if a filter is active, otherwise returns all children.
-    /// </summary>
-    public IReadOnlyList<TreeNode<T>> Children => IsFiltered ? _filtered : _children;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    public List<Expression<Func<TreeNode<T>, bool>>> Filters { get; } = new();
+    #region Constructors
 
-    public TreeNode(T value)
+    public TreeNode()
     {
-        Value = value ?? throw new ArgumentNullException(nameof(value));
+        _value = new T();
     }
 
-    // --- Child Management ---
-
-    public TreeNode<T> AddChild(T value)
+    public TreeNode(T value, TreeNode<T>? parent = null)
     {
-        var childNode = new TreeNode<T>(value) { Parent = this };
+        _value = value ?? throw new ArgumentNullException(nameof(value));
+        if (parent != null)
+        {
+            parent.AddChildNode(this);
+        }
+    }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// The underlying data payload carried by this node.
+    /// </summary>
+    public T Value
+    {
+        get => _value;
+        set
+        {
+            if (!EqualityComparer<T>.Default.Equals(_value, value))
+            {
+                _value = value ?? throw new ArgumentNullException(nameof(value));
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reference to the parent node. Managing this automatically handles child list assignment.
+    /// </summary>
+    public TreeNode<T>? Parent
+    {
+        get => _parent;
+        internal set
+        {
+            if (_parent != value)
+            {
+                _parent = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Level));
+            }
+        }
+    }
+
+    /// <summary>
+    /// The complete list of child nodes under this node.
+    /// </summary>
+    public List<TreeNode<T>> Children => _children;
+
+    /// <summary>
+    /// Read-only view of filtered children used when tree filtering is active.
+    /// </summary>
+    public IReadOnlyList<TreeNode<T>> FilteredChildren => _filteredChildren;
+
+    /// <summary>
+    /// Indicates whether a filter is currently active on this node.
+    /// </summary>
+    public bool HasFilterActive => _filteredChildren.Count > 0;
+
+    /// <summary>
+    /// Gets the current child collection to render (returns FilteredChildren if filtered, otherwise Children).
+    /// </summary>
+    public IEnumerable<TreeNode<T>> RenderedChildren => HasFilterActive ? _filteredChildren : _children;
+
+    /// <summary>
+    /// Zero-based depth level of the node in the hierarchy (0 = Root).
+    /// </summary>
+    public int Level => Parent == null ? 0 : Parent.Level + 1;
+
+    /// <summary>
+    /// Indicates if this node has any underlying child nodes.
+    /// </summary>
+    public bool HasChildren => _children.Count > 0;
+
+    /// <summary>
+    /// Gets or sets whether this tree node is currently expanded in the UI.
+    /// </summary>
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set
+        {
+            if (_isExpanded != value)
+            {
+                _isExpanded = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the check state of this node (true = checked, false = unchecked, null = indeterminate).
+    /// </summary>
+    public bool? IsChecked
+    {
+        get => _isChecked;
+        set
+        {
+            if (_isChecked != value)
+            {
+                _isChecked = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets node visibility for custom UI filtering.
+    /// </summary>
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set
+        {
+            if (_isVisible != value)
+            {
+                _isVisible = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    #endregion
+
+    #region Child Management Methods
+
+    /// <summary>
+    /// Creates a new child node wrapping the item and appends it to this node.
+    /// </summary>
+    public TreeNode<T> AddChild(T item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
+        var childNode = new TreeNode<T>(item)
+        {
+            Parent = this
+        };
+
         _children.Add(childNode);
+        OnPropertyChanged(nameof(HasChildren));
         return childNode;
     }
 
-    public void AddChild(TreeNode<T> childNode)
+    /// <summary>
+    /// Adds an existing tree node as a child.
+    /// </summary>
+    public void AddChildNode(TreeNode<T> childNode)
     {
         ArgumentNullException.ThrowIfNull(childNode);
+
+        if (childNode.Parent != null && childNode.Parent != this)
+        {
+            childNode.Parent.RemoveChild(childNode);
+        }
+
         childNode.Parent = this;
-        _children.Add(childNode);
+        if (!_children.Contains(childNode))
+        {
+            _children.Add(childNode);
+            OnPropertyChanged(nameof(HasChildren));
+        }
     }
 
-    public bool RemoveChild(T value)
-    {
-        var childNode = _children.FirstOrDefault(c => EqualityComparer<T>.Default.Equals(c.Value, value));
-        if (childNode is null) return false;
-
-        childNode.Parent = null;
-        return _children.Remove(childNode);
-    }
-
+    /// <summary>
+    /// Removes a specific child node.
+    /// </summary>
     public bool RemoveChild(TreeNode<T> childNode)
     {
+        ArgumentNullException.ThrowIfNull(childNode);
+
         if (_children.Remove(childNode))
         {
             childNode.Parent = null;
+            _filteredChildren.Remove(childNode);
+            OnPropertyChanged(nameof(HasChildren));
             return true;
         }
+
         return false;
     }
 
-    // --- Filter Management ---
-
-    public void AddToFiltered(TreeNode<T> childNode)
+    /// <summary>
+    /// Clears all children from this node.
+    /// </summary>
+    public void ClearChildren()
     {
-        childNode.Parent = this;
-        _filtered.Add(childNode);
-        IsFiltered = true;
-    }
-
-    public void ClearFiltered()
-    {
-        _filtered.Clear();
-        IsFiltered = false;
         foreach (var child in _children)
         {
-            child.ClearFiltered();
+            child.Parent = null;
         }
+
+        _children.Clear();
+        _filteredChildren.Clear();
+        OnPropertyChanged(nameof(HasChildren));
     }
 
-    public IReadOnlyList<TreeNode<T>> ApplyFilters()
+    #endregion
+
+    #region Filter Helper Methods
+
+    /// <summary>
+    /// Clears the filtered children list during recalculation.
+    /// </summary>
+    public void ClearFiltered()
     {
-        ClearFiltered();
-
-        if (Filters.Count == 0)
-        {
-            return _children;
-        }
-
-        foreach (var filter in Filters)
-        {
-            TreeNodeUtility<T>.Filter(this, filter);
-        }
-
-        IsFiltered = true;
-        return _filtered;
+        _filteredChildren.Clear();
+        OnPropertyChanged(nameof(HasFilterActive));
+        OnPropertyChanged(nameof(RenderedChildren));
     }
+
+    /// <summary>
+    /// Adds a child to the filtered children list.
+    /// </summary>
+    public void AddToFiltered(TreeNode<T> child)
+    {
+        ArgumentNullException.ThrowIfNull(child);
+
+        if (!_filteredChildren.Contains(child))
+        {
+            _filteredChildren.Add(child);
+            OnPropertyChanged(nameof(HasFilterActive));
+            OnPropertyChanged(nameof(RenderedChildren));
+        }
+    }
+
+    #endregion
+
+    #region INotifyPropertyChanged Implementation
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    #endregion
 }
-
-
-// using System;
-// using System.Collections.Generic;
-// using System.Linq.Expressions;
-//
-// namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
-//
-// public class TreeNode<T> where T : class, new()
-// {
-//     public T Value { get; set; }
-//     public TreeNode<T> Parent { get; private set; }
-//     private List<TreeNode<T>> _children { get; } = new List<TreeNode<T>>();
-//     public List<TreeNode<T>> _filtered { get; } = new List<TreeNode<T>>();
-//     public List<TreeNode<T>> Children => _filtered.Count > 0? _filtered:_children;
-//     public List<Expression<Func<TreeNode<T>, bool>>> Filters { get; } = new();
-//     public TreeNode(T value)
-//     {
-//         Value = value;
-//     }
-//
-//     public void AddChild(T value)
-//     {
-//         var childNode = new TreeNode<T>(value) { Parent = this };
-//         _children.Add(childNode);
-//     }
-//     
-//     public bool? RemoveChild(T value)
-//     {
-//         var childNode = _children.FirstOrDefault(c => c.Value.Equals(value));
-//         if(childNode is not null) { _children.Remove(childNode); return true; }
-//         return false;
-//     }
-//
-//     public void AddChild(TreeNode<T> childNode)
-//     {
-//         childNode.Parent = this;
-//         _children.Add(childNode);
-//     }
-//     public void RemoveChild(TreeNode<T> childNode)
-//     {
-//         childNode.Parent = null;
-//         _children.Remove(childNode);
-//     }
-//     
-//     public void AddToFiltered(T value)
-//     {
-//         var childNode = new TreeNode<T>(value) { Parent = this };
-//         _filtered.Add(childNode);
-//     }
-//     
-//     public void AddToFiltered(TreeNode<T> childNode)
-//     {
-//         childNode.Parent = this;
-//         _filtered.Add(childNode);
-//     }
-//     
-//     public void ClearFiltered() => _filtered.Clear();
-//
-//     private List<TreeNode<T>> Filter() 
-//     {
-//         _filtered.Clear(); 
-//         foreach (var filter in Filters)
-//         {
-//             TreeNodeUtility<T>.Filter(this,filter); 
-//             if(_filtered.Count == 0) break;
-//         }
-//         return _filtered;
-//     }
-// }
