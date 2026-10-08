@@ -1,9 +1,25 @@
 ﻿@page "/block-nodes-tree"
 
-@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
-@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.TreeNode
 @using MudBlazor
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.TreeNode
+
+<style>
+  /* Hover styles for node action buttons */
+  .tree-node-row .node-hover-actions {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  }
+
+  .tree-node-row:hover .node-hover-actions {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .border-transparent {border-color: rgba(0, 0, 0, 0.01);}
+</style>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
   <MudText Typo="Typo.h4" Class="mb-4">BlockNode Tree Manager</MudText>
@@ -20,92 +36,109 @@
                       OnKeyUp="() => _treeManager.ApplyFilter(_searchQuery)" />
       </MudItem>
       <MudItem xs="12" sm="6" md="8" Class="d-flex justify-end gap-2">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSnapshotToDatabase">
+          Export Snapshot JSON
+        </MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="_treeManager.ExpandAll">
           Expand All
         </MudButton>
         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="_treeManager.CollapseAll">
           Collapse All
         </MudButton>
-        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="ResetTree">
-          Reset Sample
-        </MudButton>
       </MudItem>
     </MudGrid>
   </MudPaper>
 
-  <!-- Tree Renderer -->
+  <!-- Tree View -->
   <MudPaper Class="pa-4" Elevation="3">
-    @if (_treeManager.FlatNodes.Count == 0)
-    {
-      <MudText Typo="Typo.subtitle1" Class="pa-4 text-center">No nodes found in the tree.</MudText>
-    }
-    else
-    {
-      <MudTreeView T="BlockNodeAdapter" Items="_treeManager.TreeItemData" Dense="true" Hover="true">
-        <ItemTemplate Context="treeItem">
-          <MudTreeViewItem T="BlockNodeAdapter"
-                           Value="@treeItem.Value"
-                           Items="@treeItem.Children"
-                           @bind-Expanded="treeItem.Expanded">
-            <BodyContent>
-              @if (treeItem.Value != null)
-              {
-                var node = treeItem.Value;
-                bool isSelected = _treeManager.SelectedNode == node;
-                bool isBeingDragged = _treeManager.DraggedNode == node;
-                bool isDropTarget = _treeManager.TargetNode == node && !isBeingDragged;
+    <MudTreeView T="BlockNodeAdapter" Items="_treeManager.TreeItemData" Dense="true" Hover="true">
+      <ItemTemplate Context="treeItem">
+        <MudTreeViewItem T="BlockNodeAdapter"
+                         Value="@treeItem.Value"
+                         Items="@treeItem.Children"
+                         @bind-Expanded="treeItem.Expanded">
+          <BodyContent>
+            @if (treeItem.Value != null)
+            {
+              var node = treeItem.Value;
+              bool isSelected = _treeManager.SelectedNode == node;
+              bool isBeingDragged = _treeManager.DraggedNode == node;
+              bool isDropTarget = _treeManager.TargetNode == node && !isBeingDragged;
 
-                <div draggable="true"
-                     @onclick="() => _treeManager.SelectNode(node)"
-                     @ondragstart="() => _treeManager.HandleDragStart(node)"
-                     @ondragover:preventDefault="true"
-                     @ondragover="() => _treeManager.HandleDragOver(node)"
-                     @ondragleave="() => _treeManager.HandleDragLeave(node)"
-                     @ondrop="() => _treeManager.HandleDropOnNode(node)"
-                     @ondragend="_treeManager.ResetDragState"
-                     class="@GetNodeClass(isSelected, isBeingDragged, isDropTarget)"
-                     style="user-select: none; -webkit-user-select: none; cursor: grab; width: 100%;">
+              <div draggable="true"
+                   @onclick="() => _treeManager.SelectNode(node)"
+                   @ondragstart="() => _treeManager.HandleDragStart(node)"
+                   @ondragover:preventDefault="true"
+                   @ondragover="() => _treeManager.HandleDragOver(node)"
+                   @ondragleave="() => _treeManager.HandleDragLeave(node)"
+                   @ondrop="() => _treeManager.HandleDropOnNode(node)"
+                   @ondragend="_treeManager.ResetDragState"
+                   class="tree-node-row @GetNodeClass(isSelected, isBeingDragged, isDropTarget)"
+                   style="user-select: none; -webkit-user-select: none; cursor: grab; width: 100%;">
 
-                  <MudIcon Icon="@Icons.Material.Filled.DragIndicator"
-                           Class="mr-1 text-secondary"
-                           Size="Size.Small"
-                           Style="pointer-events: none;" />
+                <MudIcon Icon="@Icons.Material.Filled.DragIndicator" Class="mr-1 text-secondary" Size="Size.Small" Style="pointer-events: none;" />
+                <MudIcon Icon="@Icons.Material.Filled.AccountTree" Class="mr-2" Color="@(isSelected ? Color.Primary : Color.Info)" Size="Size.Small" Style="pointer-events: none;" />
 
-                  <MudIcon Icon="@Icons.Material.Filled.AccountTree"
-                           Class="mr-2"
-                           Color="@(isSelected ? Color.Primary : Color.Info)"
-                           Size="Size.Small"
-                           Style="pointer-events: none;" />
+                <MudText Typo="Typo.body1" Class="flex-grow-1" Style="pointer-events: none;">
+                  @node.Data.Name
+                </MudText>
 
-                  <MudText Typo="Typo.body1"
-                           Class="flex-grow-1"
-                           Style="user-select: none; -webkit-user-select: none; pointer-events: none;">
-                    @node.Data.Name
-                  </MudText>
+                <!-- Metadata Chips -->
+                <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined" Class="mr-1">
+                  L: @node.Level
+                </MudChip>
+                <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined" Class="mr-2">
+                  O: @node.Order
+                </MudChip>
+
+                <!-- Mouse Hover Action Buttons (Up / Down) -->
+                <div class="node-hover-actions d-flex align-center" @onclick:stopPropagation="true">
+                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   Disabled="@(!_treeManager.CanMoveUp(node))"
+                                   OnClick="() => _treeManager.MoveNodeUp(node)" />
+
+                    <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   Disabled="@(!_treeManager.CanMoveDown(node))"
+                                   OnClick="() => _treeManager.MoveNodeDown(node)" />
                 </div>
-              }
-            </BodyContent>
-          </MudTreeViewItem>
-        </ItemTemplate>
-      </MudTreeView>
-      <!-- Root Drop Zone with fixed border dimensions -->
-      <div class="@GetRootDropZoneClass()"
-           @ondragover:preventDefault="true"
-           @ondragover="_treeManager.HandleDragOverRoot"
-           @ondragleave="_treeManager.HandleDragLeaveRoot"
-           @ondrop="_treeManager.HandleDropOnRoot"
-           style="user-select: none; -webkit-user-select: none;">
-        <MudText Typo="Typo.caption" Color="Color.Secondary" Style="pointer-events: none;">
-          Drag a node here to make it a Root Node
-        </MudText>
-      </div>
-    }
+              </div>
+            }
+          </BodyContent>
+        </MudTreeViewItem>
+      </ItemTemplate>
+    </MudTreeView>
+
+    <!-- Root Drop Zone -->
+    <div class="@GetRootDropZoneClass()"
+         @ondragover:preventDefault="true"
+         @ondragover="_treeManager.HandleDragOverRoot"
+         @ondragleave="_treeManager.HandleDragLeaveRoot"
+         @ondrop="_treeManager.HandleDropOnRoot"
+         style="user-select: none; -webkit-user-select: none;">
+      <MudText Typo="Typo.caption" Color="Color.Secondary" Style="pointer-events: none;">
+        Drag a node here to make it a Root Node
+      </MudText>
+    </div>
   </MudPaper>
+
+  <!-- Output Modal / Text Area for DB Snapshot JSON -->
+  @if (!string.IsNullOrEmpty(_jsonSnapshot))
+  {
+    <MudPaper Class="pa-4 mt-4" Elevation="2">
+      <MudText Typo="Typo.h6" Class="mb-2">Database Snapshot JSON</MudText>
+      <MudTextField T="string" Value="@_jsonSnapshot" Lines="10" Variant="Variant.Outlined" ReadOnly="true" />
+    </MudPaper>
+  }
 </MudContainer>
 
 @code {
   private readonly TreeManager<BlockNodeAdapter> _treeManager = new();
   private string _searchQuery = string.Empty;
+  private string _jsonSnapshot = string.Empty;
 
   protected override void OnInitialized()
   {
@@ -119,46 +152,35 @@
     _treeManager.Initialize(sampleData);
   }
 
+  private void SaveSnapshotToDatabase()
+  {
+    _jsonSnapshot = _treeManager.ExportSnapshotToJson(n => n.Data.Name);
+  }
+
   private string GetNodeClass(bool isSelected, bool isBeingDragged, bool isDropTarget)
   {
-    // Permanent 2px solid border ensures layout dimensions never shift
     var classes = new List<string> { "d-flex align-center flex-grow-1 pa-1 rounded border-2 border-solid transition-all" };
 
     if (isBeingDragged)
-    {
-      // DRAGGING STATE: Primary dashed border with faded opacity
       classes.Add("border-dashed mud-border-primary opacity-50");
-    }
     else if (isDropTarget)
-    {
-      // DROP TARGET STATE: Green/Success border with soft background highlight
       classes.Add("mud-border-success mud-theme-success-light");
-    }
     else if (isSelected)
-    {
-      // SELECTED STATE: Primary solid border with subtle selection fill
       classes.Add("mud-border-primary mud-theme-primary-light");
-    }
     else
-    {
-      // DEFAULT STATE: Invisible transparent border preserves structural stability
       classes.Add("border-transparent");
-    }
 
     return string.Join(" ", classes);
   }
+
   private string GetRootDropZoneClass()
   {
     var classes = new List<string> { "pa-4 mt-4 border-2 border-dashed d-flex align-center justify-center transition-all" };
 
     if (_treeManager.IsOverRoot)
-    {
       classes.Add("mud-border-secondary mud-theme-secondary-light");
-    }
     else
-    {
       classes.Add("border-transparent");
-    }
 
     return string.Join(" ", classes);
   }
@@ -184,8 +206,7 @@
           Name = "Transformation Stage",
           Children = new List<BlockNode>
           {
-            new BlockNode { Name = "Data Cleaner" },
-            new BlockNode { Name = "Enrichment Engine" }
+            new BlockNode { Name = "Data Cleaner" }
           }
         }
       }

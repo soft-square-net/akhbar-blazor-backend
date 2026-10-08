@@ -30,7 +30,7 @@
     private void HandleValidSubmit()
     {
         Console.WriteLine("Submitted successfully!");
-
+        StateHasChanged();
         // Update the baseline snapshot to the current state after a successful save
        
     }
@@ -38,123 +38,40 @@
 
     
      private string JsonPayload = @"
-                                 {
-                                   ""Id"": ""node_301"",
-                                   ""Name"": ""Order Process Block"",
-                                   ""Inputs"": [
-                                    {
-                                        ""Id"": ""in_username"",
-                                        ""Label"": ""Desired Username"",
-                                        ""Type"": ""text"",
-                                        ""Value"": ""admin"",
-                                        ""Step"":1,
-                                        ""Validation"": {
-                                          ""IsRequired"": true,
-                                          ""RequiredMessage"": ""Username is required."",
-                                          ""AsyncRule"": {
-                                            ""RuleName"": ""CheckUsernameAvailability"",
-                                            ""EndpointUrl"": ""/api/users/check-username"",
-                                            ""Message"": ""This username is already taken.""
-                                          }
-                                        }
-                                     },
-                                     {
-                                       ""Id"": ""is_physical_shipment"",
-                                       ""Label"": ""Is Physical Shipment?"",
-                                       ""Type"": ""checkbox"",
-                                       ""Value"": true,
-                                        ""Step"":1
-                                     },
-                                     {
-                                       ""Id"": ""shipping_address"",
-                                       ""Label"": ""Shipping Address"",
-                                       ""Type"": ""textarea"",
-                                       ""Value"": "" "",
-                                        ""Step"":2,
-                                       ""Validation"": {
-                                         ""DependentRules"": [
-                                           {
-                                             ""TargetFieldId"": ""is_physical_shipment"",
-                                             ""Condition"": ""Equals"",
-                                             ""ExpectedValue"": true,
-                                             ""Enforcement"": ""Required"",
-                                             ""Message"": ""Shipping Address is required when Physical Shipment is enabled.""
-                                           }
-                                         ]
-                                       }
-                                     },
-                                     {
-                                       ""Id"": ""min_retry"",
-                                       ""Label"": ""Minimum Retries"",
-                                       ""Type"": ""number"",
-                                       ""Value"": 5,
-                                        ""Step"":2
-                                     },
-                                     {
-                                       ""Id"": ""max_retry"",
-                                       ""Label"": ""Maximum Retries"",
-                                       ""Type"": ""number"",
-                                       ""Value"": 2,
-                                        ""Step"":2,
-                                       ""Validation"": {
-                                         ""DependentRules"": [
-                                           {
-                                             ""TargetFieldId"": ""min_retry"",
-                                             ""Condition"": ""HasValue"",
-                                             ""Enforcement"": ""GreaterThanTarget"",
-                                             ""Message"": ""Maximum retries must be greater than Minimum retries.""
-                                           }
-                                         ]
-                                       }
-                                     },
-                                     {
-                                       ""Id"": ""is_corporate_account"",
-                                       ""Label"": ""Is this a Corporate Account?"",
-                                       ""Type"": ""checkbox"",
-                                       ""Value"": false,
-                                        ""Step"":2
-                                     },
-                                     {
-                                       ""Id"": ""company_name"",
-                                       ""Label"": ""Company Name"",
-                                       ""Type"": ""text"",
-                                       ""Value"": """",
-                                        ""Step"":2,
-                                       ""VisibilityRule"": {
-                                         ""TargetFieldId"": ""is_corporate_account"",
-                                         ""Condition"": ""Equals"",
-                                         ""ExpectedValue"": true
-                                       },
-                                       ""Validation"": {
-                                         ""IsRequired"": true,
-                                         ""RequiredMessage"": ""Company name is required for corporate accounts.""
-                                       }
-                                     },
-                                     {
-                                       ""Id"": ""tax_id"",
-                                       ""Label"": ""Tax Identification Number (TIN)"",
-                                       ""Type"": ""text"",
-                                       ""Value"": """",
-                                        ""Step"":2,
-                                       ""VisibilityRule"": {
-                                         ""TargetFieldId"": ""company_name"",
-                                         ""Condition"": ""HasValue""
-                                       }
-                                     },
-                                     {
-                                       ""Id"": ""payload_template"",
-                                       ""Label"": ""Request Body Payload (JSON)"",
-                                       ""Type"": ""json"",
-                                       ""Value"": ""{\n  \""event\"": \""user_signup\"",\n  \""retry_count\"": 3\n}"",
-                                        ""Step"":2,
-                                       ""JsonSchema"": ""{\""$schema\"":\""http://json-schema.org/draft-07/schema#\"",\""type\"":\""object\"",\""properties\"":{\""ContentType\"":{\""type\"":\""string\"",\""enum\"":[\""application/json\"",\""application/xml\"",\""text/plain\""]},\""Authorization\"":{\""type\"":\""string\"",\""description\"":\""Bearer or Basic token string\""},\""RetryLimit\"":{\""type\"":\""integer\"",\""minimum\"":0,\""maximum\"":10}},\""required\"":[\""ContentType\""]}"",
-                                       ""Validation"": {
-                                         ""IsRequired"": true,
-                                         ""RequiredMessage"": ""A valid JSON request payload template is required.""
-                                       }
-                                     }
-                                   ]
-                                 }
+                                {
+  ""Id"": ""node_wizard_1"",
+  ""Name"": ""Multi-Step Webhook Setup"",
+  ""Inputs"": [
+    {
+      ""Id"": ""webhook_name"",
+      ""Label"": ""Webhook Name"",
+      ""Type"": ""text"",
+      ""Step"": 1,
+      ""Validation"": { ""IsRequired"": true }
+    },
+    {
+      ""Id"": ""target_url"",
+      ""Label"": ""Target Endpoint URL"",
+      ""Type"": ""text"",
+      ""Step"": 1,
+      ""Validation"": { ""IsRequired"": true }
+    },
+    {
+      ""Id"": ""headers_json"",
+      ""Label"": ""Headers (JSON)"",
+      ""Type"": ""json"",
+      ""Step"": 2,
+      ""Validation"": { ""IsRequired"": true }
+    },
+    {
+      ""Id"": ""retry_count"",
+      ""Label"": ""Max Retries"",
+      ""Type"": ""number"",
+      ""Value"": 3,
+      ""Step"": 3
+    }
+  ]
+}
                                  ";
 }
 

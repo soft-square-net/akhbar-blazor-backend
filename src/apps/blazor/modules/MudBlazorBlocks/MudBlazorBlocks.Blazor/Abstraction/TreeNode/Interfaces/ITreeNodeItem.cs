@@ -17,7 +17,6 @@ public interface ITreeNodeItem<TItem> where TItem : class, ITreeNodeItem<TItem>
     List<TItem> Children { get; set; }
     bool IsExpanded { get; set; }
     bool IsVisible { get; set; }
-
     string ToJson();
     static abstract TItem? FromJson(string json);
     static abstract string ToJsonList(IEnumerable<TItem> items);
