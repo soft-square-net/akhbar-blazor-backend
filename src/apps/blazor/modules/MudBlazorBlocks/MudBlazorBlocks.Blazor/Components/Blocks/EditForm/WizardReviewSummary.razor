@@ -1,0 +1,106 @@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.Visibility
+@* WizardReviewSummary.razor *@
+
+<div class="review-summary">
+    <div class="alert alert-info d-flex align-items-center gap-2 mb-4">
+        <span>Please review your configuration below before submitting. Click <strong>Edit</strong> next to any section to make changes.</span>
+    </div>
+
+    @foreach (var stepGroup in VisibleInputsGroupedByStep)
+    {
+        <div class="card mb-3 shadow-sm border">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-primary">
+                    Step @stepGroup.Key: @GetStepTitle(stepGroup.Key)
+                </h6>
+                <button type="button" 
+                        class="btn btn-sm btn-outline-secondary" 
+                        @onclick="() => OnJumpToStep.InvokeAsync(stepGroup.Key)">
+                    Edit Step @stepGroup.Key
+                </button>
+            </div>
+
+            <div class="card-body">
+                <dl class="row mb-0">
+                    @foreach (var input in stepGroup)
+                    {
+                        <dt class="col-sm-4 text-secondary text-truncate">@input.Label</dt>
+                        <dd class="col-sm-8 fw-semibold">
+                            @if (IsJsonOrCodeType(input.Type))
+                            {
+                                <pre class="bg-dark text-light p-2 rounded small mb-0 font-monospace" style="max-height: 200px; overflow-y: auto;"><code>@FormatValue(input)</code></pre>
+                            }
+                            else if (input.Type.Equals("checkbox", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge @(Convert.ToBoolean(input.Value) ? "bg-success" : "bg-secondary")">
+                                    @(Convert.ToBoolean(input.Value) ? "Yes / Enabled" : "No / Disabled")
+                                </span>
+                            }
+                            else
+                            {
+                                <span>@FormatValue(input)</span>
+                            }
+                        </dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public BlockNode Node { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<int> OnJumpToStep { get; set; }
+
+    // Filter out fields hidden by dynamic visibility rules and group by step
+    private IEnumerable<IGrouping<int, BlockNodeInput>> VisibleInputsGroupedByStep => Node.Inputs
+        .Where(input => BlockNodeVisibilityEvaluator.IsFieldVisible(input, Node))
+        .GroupBy(input => input.Step)
+        .OrderBy(group => group.Key);
+
+    private bool IsJsonOrCodeType(string type) => 
+        type.Equals("json", StringComparison.OrdinalIgnoreCase) || 
+        type.Equals("code", StringComparison.OrdinalIgnoreCase);
+
+    private string FormatValue(BlockNodeInput input)
+    {
+        if (input.Value == null || string.IsNullOrWhiteSpace(input.Value.ToString()))
+        {
+            return "—"; // Render em-dash for empty/unconfigured values
+        }
+
+        var strVal = input.Value.ToString()!;
+
+        // Pretty-print JSON for code/JSON fields
+        if (IsJsonOrCodeType(input.Type))
+        {
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(strVal);
+                return System.Text.Json.JsonSerializer.Serialize(doc, new System.Text.Json.JsonSerializerOptions 
+                { 
+                    WriteIndented = true 
+                });
+            }
+            catch
+            {
+                return strVal; // Fallback to raw string if invalid JSON
+            }
+        }
+
+        return strVal;
+    }
+
+    private string GetStepTitle(int step) => step switch
+    {
+        1 => "Basic Information",
+        2 => "Advanced Settings & Payload Configuration",
+        3 => "Execution Options",
+        _ => $"Step {step}"
+    };
+}

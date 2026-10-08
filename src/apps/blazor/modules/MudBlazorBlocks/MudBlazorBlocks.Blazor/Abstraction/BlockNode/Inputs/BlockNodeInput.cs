@@ -13,6 +13,12 @@ public class BlockNodeInput
 
     public object? Value { get; set; }
     
+    // Defines which wizard step this field belongs to (1-based index)
+    public int Step { get; set; } = 1;
+    
+    // Optional raw JSON Schema string or object for IntelliSense/validation
+    public string? JsonSchema { get; set; }
+    
     [JsonIgnore]
     public bool IsValidating { get; set; } // Tracks field-level async validation state
     // Added Validation Configuration

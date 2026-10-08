@@ -15,7 +15,9 @@ function loadExternalScript(url) {
     });
 }
 
-export async function initMonacoEditor(elementId, initialValue, dotnetRef, readOnly,cdnUrl, customScriptText) {
+const editors = {};
+
+export async function initMonacoEditor(elementId, initialValue, dotnetRef, readOnly,cdnUrl, customScriptText,jsonSchemaJson) {
     try {
         // STEP 1: Await the online library script library first
         await loadExternalScript(cdnUrl);
@@ -42,19 +44,69 @@ export async function initMonacoEditor(elementId, initialValue, dotnetRef, readO
 
         // STEP 4: Now that 'window.monaco' exists, safely execute your custom instantiation code
         const container = document.getElementById(elementId);
-        if (!container) return null;
+        if (!container) {
+            console.warn(`[Monaco] Target container element #${elementId} not found.`);
+            return;
+        }
 
+        if (!window.monaco) {
+            console.error("[Monaco] Monaco library is not loaded.");
+            return;
+        }
+
+        if (editors[elementId]) {
+            editors[elementId].dispose();
+            delete editors[elementId];
+        }
+
+        // --- CONFIGURE JSON SCHEMA VALIDATION & INTELLISENSE ---
+        if (jsonSchemaJson) {
+            try {
+                const parsedSchema = typeof jsonSchemaJson === "string"
+                    ? JSON.parse(jsonSchemaJson)
+                    : jsonSchemaJson;
+
+                monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+                    validate: true,
+                    allowComments: false,
+                    schemas: [
+                        {
+                            uri: "http://myschema/dynamic-input-schema.json", // Unique virtual URI
+                            fileMatch: ["*"], // Match all JSON documents loaded in this editor
+                            schema: parsedSchema
+                        }
+                    ]
+                });
+            } catch (e) {
+                console.error("[Monaco] Invalid JSON Schema provided:", e);
+            }
+        }
+        
         const editor = monaco.editor.create(container, {
             value: initialValue || "{\n  \n}",
             language: "json",
             theme: "vs-dark",
-            automaticLayout: true,
+            automaticLayout: true, // Recalculates dimensions on DOM container resize
             readOnly: readOnly,
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             fontSize: 13
         });
 
+        editors[elementId] = editor;
+
+        // --- KEYBINDINGS REGISTRATION ---
+
+        // 1. Escape key -> Triggers OnEscapePressed in Blazor
+        editor.addCommand(monaco.KeyCode.Escape, () => {
+            dotnetRef.invokeMethodAsync("OnEscapePressed");
+        });
+
+        // 2. Ctrl + S (or Cmd + S on Mac) -> Triggers OnSavePressed in Blazor
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+            dotnetRef.invokeMethodAsync("OnSavePressed");
+        });
+        
         // Debounce updates back to Blazor when typing
         let timeout = null;
         editor.onDidChangeModelContent(() => {
@@ -77,14 +129,37 @@ export async function initMonacoEditor(elementId, initialValue, dotnetRef, readO
     };
 }
 
-export function updateMonacoContent(editorInstance, newValue) {
-    if (editorInstance && editorInstance.getValue() !== newValue) {
-        editorInstance.setValue(newValue || "");
+// Forces Monaco to re-calculate width & height when expanding to full-screen
+export function resizeMonacoEditor(elementId) {
+    const editor = editors[elementId];
+    if (editor) {
+        editor.layout();
     }
 }
 
-export function disposeMonaco(editorInstance) {
-    if (editorInstance) {
-        editorInstance.dispose();
+export function updateMonacoContent(elementId, newValue) {
+    const editor = editors[elementId];
+    if (editor && editor.getValue() !== newValue) {
+        editor.setValue(newValue || "");
+    }
+}
+
+export function disposeMonaco(elementId) {
+    if (editors[elementId]) {
+        editors[elementId].dispose();
+        delete editors[elementId];
+    }
+}
+
+export function focusMonacoEditor(elementId) {
+    const editor = editors[elementId];
+    if (editor) {
+        editor.focus();
+
+        // Scroll element into view smoothly if off-screen
+        const container = document.getElementById(elementId);
+        if (container) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 }

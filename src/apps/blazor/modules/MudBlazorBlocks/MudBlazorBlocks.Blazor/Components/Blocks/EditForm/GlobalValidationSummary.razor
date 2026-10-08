@@ -1,0 +1,95 @@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.Visibility
+@* GlobalValidationSummary.razor *@
+
+@inject IJSRuntime JSRuntime
+
+@if (EditContext != null && GetValidationErrors().Any())
+{
+    <div class="alert alert-danger mb-4 shadow-sm" role="alert">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="fw-bold fs-6">Please correct the following errors before submitting:</span>
+        </div>
+
+        <ul class="mb-0 ps-3">
+            @foreach (var error in GetValidationErrors())
+            {
+                <li class="mb-1">
+                    <button type="button" 
+                            class="btn btn-link text-danger p-0 text-start text-decoration-underline" 
+                            @onclick="() => FocusFieldAsync(error.FieldId, error.InputType)">
+                        <strong>@error.FieldLabel:</strong> @error.ErrorMessage
+                    </button>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public EditContext? EditContext { get; set; }
+
+    [CascadingParameter]
+    public BlockNode Node { get; set; } = default!;
+
+    private record ValidationErrorItem(string FieldId, string FieldLabel, string InputType, string ErrorMessage);
+
+    private IEnumerable<ValidationErrorItem> GetValidationErrors()
+    {
+        if (EditContext == null || Node == null) yield break;
+
+        foreach (var input in Node.Inputs)
+        {
+            // Skip hidden fields from validation summary
+            if (!BlockNodeVisibilityEvaluator.IsFieldVisible(input, Node))
+                continue;
+
+            // 1. Collect messages from EditContext
+            var fieldIdentifier = new FieldIdentifier(input, nameof(BlockNodeInput.Value));
+            var contextMessages = EditContext.GetValidationMessages(fieldIdentifier);
+
+            foreach (var msg in contextMessages)
+            {
+                yield return new ValidationErrorItem(input.Id, input.Label, input.Type, msg);
+            }
+
+            // 2. Collect fallback messages directly from model property
+            foreach (var err in input.ValidationErrors)
+            {
+                yield return new ValidationErrorItem(input.Id, input.Label, input.Type, err);
+            }
+        }
+    }
+
+    private async Task FocusFieldAsync(string fieldId, string inputType)
+    {
+        var containerId = $"field_container_{fieldId}";
+
+        if (inputType.Equals("json", StringComparison.OrdinalIgnoreCase) || 
+            inputType.Equals("code", StringComparison.OrdinalIgnoreCase))
+        {
+            // Special handling for Monaco Editors
+            var monacoContainerId = $"monaco_editor_{fieldId}"; 
+            try
+            {
+                var module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/monacoEditor.js");
+                await module.InvokeVoidAsync("focusMonacoEditor", monacoContainerId);
+            }
+            catch (JSException) { }
+        }
+        else
+        {
+            // Standard Inputs: Scroll to container and focus input element
+            await JSRuntime.InvokeVoidAsync("eval", $@"
+                const container = document.getElementById('{containerId}');
+                if (container) {{
+                    container.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+                    const input = container.querySelector('input, select, textarea');
+                    if (input) input.focus();
+                }}
+            ");
+        }
+    }
+}

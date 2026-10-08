@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.Visibility;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode;
 
@@ -135,5 +136,33 @@ public static class BlockNodeValidator
             }
         }
         return isValid;
+    }
+    
+    public static bool ValidateStep(BlockNode node, int currentStep, EditContext editContext)
+    {
+        bool isStepValid = true;
+
+        // Get all visible inputs for the active step
+        var stepInputs = node.Inputs
+            .Where(i => i.Step == currentStep)
+            .Where(i => BlockNodeVisibilityEvaluator.IsFieldVisible(i, node));
+
+        foreach (var input in stepInputs)
+        {
+            // Run sync validation rules
+            bool isInputValid = ValidateInput(input, node);
+
+            var fieldIdentifier = new FieldIdentifier(input, nameof(BlockNodeInput.Value));
+
+            if (!isInputValid)
+            {
+                isStepValid = false;
+            }
+
+            // Notify EditContext so field-level UI CSS (invalid state) updates instantly
+            editContext.NotifyFieldChanged(fieldIdentifier);
+        }
+
+        return isStepValid && !stepInputs.Any(i => i.IsValidating);
     }
 }

@@ -11,6 +11,7 @@ public abstract class InputComponentBase : ComponentBase
     [Parameter, EditorRequired]
     public BlockNodeInput Input { get; set; } = default!;
     protected bool IsLoading => Input.IsValidating;
+    
     [Parameter]
     public EventCallback<BlockNodeInput> InputChanged { get; set; }
 

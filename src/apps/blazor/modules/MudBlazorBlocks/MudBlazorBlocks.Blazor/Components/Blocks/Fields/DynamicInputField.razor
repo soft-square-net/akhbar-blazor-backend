@@ -6,8 +6,11 @@
 
 @if (IsVisible)
 {
-    <DynamicComponent Type="@GetComponentType()" Parameters="@GetParameters()" />
+    <div id="@($"field_container_{Input.Id}")">
+        <DynamicComponent Type="@GetComponentType()" Parameters="@GetParameters()" />
+    </div>
 }
+
 @code {
     [Parameter, EditorRequired]
     public BlockNodeInput Input { get; set; } = default!;

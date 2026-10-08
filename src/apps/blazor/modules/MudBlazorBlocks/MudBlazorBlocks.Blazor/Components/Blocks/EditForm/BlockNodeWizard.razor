@@ -1,0 +1,175 @@
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Fields
+@* BlockNodeWizard.razor *@
+@inject IJSRuntime JSRuntime
+
+@if (editContext != null)
+{
+    <EditForm EditContext="editContext" OnValidSubmit="HandleFinalSubmit">
+        <BlockNodeValidationManager Node="Node" />
+
+    
+        <!-- Wizard Step Indicators (Includes Final Review Step) -->
+        <div class="wizard-steps d-flex justify-content-between mb-4 border-bottom pb-3">
+            @for (int i = 1; i <= ReviewStepNumber; i++)
+            {
+                var stepNum = i;
+                var isActive = currentStep == stepNum;
+                var isCompleted = stepNum < currentStep;
+                var isReviewStep = stepNum == ReviewStepNumber;
+
+                <button type="button" 
+                        class="btn @(isActive ? "btn-primary" : isCompleted ? "btn-outline-success" : "btn-outline-secondary") rounded-pill px-3 py-1 small fw-bold"
+                        disabled="@(!isCompleted && !isActive)"
+                        @onclick="() => GoToStep(stepNum)">
+                    @(isReviewStep ? "Review & Submit" : $"Step {stepNum}")
+                </button>
+            }
+        </div>
+        
+        <div class="mb-3">
+            <h4 class="fw-bold">
+                @(IsOnReviewStep ? "Review Configuration" : GetStepTitle(currentStep))
+            </h4>
+        </div>
+        <!-- Global Validation Summary for active step errors -->
+        <GlobalValidationSummary />
+
+       
+        <!-- Render Inputs OR Review Step -->
+        @if (IsOnReviewStep)
+        {
+            <WizardReviewSummary Node="Node" OnJumpToStep="GoToStep" />
+        }
+        else
+        {
+            <div class="card mb-4">
+                <div class="card-body">
+                    @foreach (var input in CurrentStepInputs)
+                    {
+                        <DynamicInputField Input="input" InputChanged="OnInputUpdated" />
+                    }
+                </div>
+            </div>
+        }
+        
+        <!-- Wizard Navigation Controls -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button type="button" 
+                    class="btn btn-outline-secondary" 
+                    disabled="@(currentStep == 1)" 
+                    @onclick="PreviousStep">
+                Previous
+            </button>
+
+            @if (!IsOnReviewStep)
+            {
+                <button type="button" 
+                        class="btn btn-primary" 
+                        @onclick="NextStepAsync">
+                    @(currentStep == DataStepsCount ? "Proceed to Review" : "Next Step")
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-success btn-lg px-4">
+                    Confirm & Submit
+                </button>
+            }
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public BlockNode Node { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<BlockNode> OnValidSubmit { get; set; }
+
+    private EditContext? editContext;
+    private int currentStep = 1;
+    
+    // Highest step configured in field inputs
+    private int DataStepsCount => Node.Inputs.Any() ? Node.Inputs.Max(x => x.Step) : 1;
+    // private int TotalSteps => Node.Inputs.Any() ? Node.Inputs.Max(x => x.Step) : 1;
+    // Review step is auto-appended after all data steps
+    private int ReviewStepNumber => DataStepsCount + 1;
+
+    private bool IsOnReviewStep => currentStep == ReviewStepNumber;
+    
+    private IEnumerable<BlockNodeInput> CurrentStepInputs => Node.Inputs
+        .Where(i => i.Step == currentStep);
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(Node);
+    }
+    
+    private async Task NextStepAsync()
+    {
+        if (editContext == null) return;
+
+        // Validate step fields before advancing
+        bool isValid = BlockNodeValidator.ValidateStep(Node, currentStep, editContext);
+
+        if (isValid && currentStep < ReviewStepNumber)
+        {
+            currentStep++;
+            StateHasChanged();
+        }
+    }
+
+    private void PreviousStep()
+    {
+        if (currentStep > 1)
+        {
+            currentStep--;
+            StateHasChanged();
+        }
+    }
+
+    private void GoToStep(int targetStep)
+    {
+        if (targetStep <= currentStep || targetStep <= ReviewStepNumber)
+        {
+            currentStep = targetStep;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task HandleFinalSubmit()
+    {
+        if (OnValidSubmit.HasDelegate)
+        {
+            await OnValidSubmit.InvokeAsync(Node);
+        }
+    }
+
+    // private async Task HandleFinalSubmit()
+    // {
+    //     // Validate final step before triggering completion callback
+    //     if (editContext != null && BlockNodeValidator.ValidateStep(Node, currentStep, editContext))
+    //     {
+    //         await OnValidSubmit.InvokeAsync(Node);
+    //     }
+    // }
+
+    // private string GetStepTitle(int step) => step switch
+    // {
+    //     1 => "Basic Information",
+    //     2 => "Advanced Settings & JSON Rules",
+    //     3 => "Confirmation & Review",
+    //     _ => $"Step {step}"
+    // };
+    //
+    private void OnInputUpdated(BlockNodeInput input) => StateHasChanged();
+
+    private string GetStepTitle(int step) => step switch
+    {
+        1 => "Basic Information",
+        2 => "Advanced Settings",
+        _ => $"Step {step}"
+    };
+}

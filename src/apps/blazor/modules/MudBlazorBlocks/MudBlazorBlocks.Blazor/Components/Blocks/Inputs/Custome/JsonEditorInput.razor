@@ -22,66 +22,150 @@
                     <span>Validating...</span>
                 </span>
             }
-            <button type="button" 
-                    class="btn btn-sm btn-outline-secondary py-0" 
-                    @onclick="FormatJsonAsync" 
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary py-0"
+                    @onclick="FormatJsonAsync"
                     disabled="@Input.IsValidating">
                 Format JSON
+            </button>
+
+            <!-- Full-Screen Toggle Button -->
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary py-0 d-flex align-items-center gap-1"
+                    @onclick="ToggleFullScreenAsync">
+                <span>@(isFullScreen ? "Exit Fullscreen (Esc)" : "Fullscreen")</span>
             </button>
         </div>
     </label>
 
-    <!-- Container element bound to Monaco Editor JS -->
-    <div id="@editorElementId" 
-         class="border rounded @(Input.ValidationErrors.Any() ? "border-danger" : "")" 
-         style="height: 250px; width: 100%;">
+    <!-- Overlay Container -->
+    <div class="@(isFullScreen ? "monaco-fullscreen-overlay" : "position-relative")">
+        @if (isFullScreen)
+        {
+            <div class="d-flex justify-content-between align-items-center p-2 bg-dark text-white border-bottom">
+                <span class="fw-bold">@Input.Label (Full Screen) - Shortcuts: [Esc] Exit | [Ctrl+S] Save</span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-light" @onclick="FormatJsonAsync">Format
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" @onclick="ToggleFullScreenAsync">Close [Esc]
+                    </button>
+                </div>
+            </div>
+        }
+
+        <div id="@editorElementId"
+             class="border rounded @(Input.ValidationErrors.Any() ? "border-danger" : "")"
+             style="@GetEditorStyle()">
+        </div>
     </div>
 
-    <!-- Integrate standard Blazor Validation Message -->
-    <ValidationMessage For="@(() => Input.Value)" />
+    <ValidationMessage For="@(() => Input.Value)"/>
+    
+    <div id="@($"field_container_{Input.Id}")" class="mb-3">
+        <!-- Existing component markup -->
+    </div>
 </div>
 
+<style>
+    .monaco-fullscreen-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 2000;
+        background-color: #1e1e1e;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+</style>
+
 @code {
+    // Expose a public method for external focus calls
+    public async Task FocusAsync()
+    {
+        if (jsModule != null)
+        {
+            await jsModule.InvokeVoidAsync("focusMonacoEditor", editorElementId);
+        }
+    }
+    
+    [Parameter] public EventCallback OnSaveRequested { get; set; }
+
     private string editorElementId = $"monaco_editor_{Guid.NewGuid():N}";
     private IJSObjectReference? jsModule;
-    private IJSObjectReference? monacoInstance;
     private DotNetObjectReference<JsonEditorInput>? dotnetRef;
+    private bool isFullScreen = false;
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    protected override async Task OnInitializedAsync()
+    private string GetEditorStyle() => isFullScreen
+        ? "height: calc(100vh - 48px); width: 100vw;"
+        : "height: 250px; width: 100%;";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // if (firstRender)
-        if (true)
+        if (firstRender)
         {
             dotnetRef = DotNetObjectReference.Create(this);
-
-            // Load JS Interop module it must be the min.js file the js code replce extension as follow
-            // * const basePath = cdnUrl.replace('/vs/loader.min.js', '/vs');
-            var cdnUrl = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js";
-            string customScriptText = @"
+            try
+            {
+                // Load JS Interop module it must be the min.js file the js code replce extension as follow
+                // * const basePath = cdnUrl.replace('/vs/loader.min.js', '/vs');
+                var cdnUrl = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js";
+                string customScriptText = @"
                                    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
                                    require(['vs/editor/editor.main'], function() {
                                        console.log(""Monaco loaded globally."");
                                    });
                                    ";
-            jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./js/monacoEditor.js");
+                jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./js/monacoEditor.js");
 
-            // Initialize Monaco
-            monacoInstance = await jsModule.InvokeAsync<IJSObjectReference>(
-                "initMonacoEditor", 
-                editorElementId, 
-                Input.Value?.ToString() ?? "{}", 
-                dotnetRef, 
-                Input.IsValidating,
-                cdnUrl );
+                // Initialize Monaco
+                await jsModule.InvokeAsync<IJSObjectReference>(
+                    "initMonacoEditor",
+                    editorElementId,
+                    Input.Value?.ToString() ?? "{}",
+                    dotnetRef,
+                    Input.IsValidating,
+                    cdnUrl,
+                    "console.log('Hi From inside JsonEditorInput.razor!!!');",
+                    Input.JsonSchema); // Pass JSON schema string or object
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+    }
+
+    // --- JSINVOKABLE SHORTCUT HANDLERS ---
+
+    [JSInvokable]
+    public async Task OnEscapePressed()
+    {
+        // If in full screen mode, exit it on Escape
+        if (isFullScreen)
+        {
+            await ToggleFullScreenAsync();
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnSavePressed()
+    {
+        // Trigger save callback on parent form (e.g., submit action)
+        if (OnSaveRequested.HasDelegate)
+        {
+            await OnSaveRequested.InvokeAsync();
         }
     }
 
     [JSInvokable]
     public async Task OnJsEditorContentChanged(string newContent)
     {
-        // 1. Update the underlying model value
         Input.Value = newContent;
 
         // 2. Notify parent form framework of changes
@@ -97,11 +181,29 @@
         StateHasChanged();
     }
 
+    private async Task ToggleFullScreenAsync()
+    {
+        isFullScreen = !isFullScreen;
+        StateHasChanged();
+
+
+        // Give Blazor time to re-render DOM container before triggering Monaco resize
+        await Task.Delay(50);
+
+
+        if (jsModule != null)
+        {
+            await jsModule.InvokeVoidAsync("resizeMonacoEditor", editorElementId);
+        }
+    }
+
+
     private async Task FormatJsonAsync()
     {
         try
         {
             var currentText = Input.Value?.ToString();
+
             if (!string.IsNullOrWhiteSpace(currentText))
             {
                 using var jsonDoc = System.Text.Json.JsonDocument.Parse(currentText);
@@ -112,9 +214,9 @@
 
                 Input.Value = formattedJson;
 
-                if (jsModule != null && monacoInstance != null)
+                if (jsModule != null)
                 {
-                    await jsModule.InvokeVoidAsync("updateMonacoContent", monacoInstance, formattedJson);
+                    await jsModule.InvokeVoidAsync("updateMonacoContent", editorElementId, formattedJson);
                 }
 
                 await OnJsEditorContentChanged(formattedJson);
@@ -128,13 +230,19 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (jsModule != null && monacoInstance != null)
+        if (jsModule != null)
         {
-            await jsModule.InvokeVoidAsync("disposeMonaco", monacoInstance);
-            await monacoInstance.DisposeAsync();
-            await jsModule.DisposeAsync();
+            try
+            {
+                await jsModule.InvokeVoidAsync("disposeMonaco", editorElementId);
+                await jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
 
         dotnetRef?.Dispose();
     }
+
 }
