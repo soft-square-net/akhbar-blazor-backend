@@ -1,28 +1,29 @@
 ﻿@page "/block-nodes-tree"
 
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.TreeNode
 @using MudBlazor
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction
-@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
   <MudText Typo="Typo.h4" Class="mb-4">BlockNode Tree Manager</MudText>
 
-  <!-- Toolbar & Action Controls -->
+  <!-- Controls -->
   <MudPaper Class="pa-4 mb-4" Elevation="1">
     <MudGrid AlignItems="AlignItems.Center">
       <MudItem xs="12" sm="6" md="4">
         <MudTextField @bind-Value="_searchQuery"
-                      Placeholder="Filter nodes by Json Filter or Name..."
+                      Placeholder="Filter nodes..."
                       Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search"
                       Immediate="true"
-                      OnKeyUp="ApplyFilter" />
+                      OnKeyUp="() => _treeManager.ApplyFilter(_searchQuery)" />
       </MudItem>
       <MudItem xs="12" sm="6" md="8" Class="d-flex justify-end gap-2">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ExpandAll">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="_treeManager.ExpandAll">
           Expand All
         </MudButton>
-        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="CollapseAll">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="_treeManager.CollapseAll">
           Collapse All
         </MudButton>
         <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="ResetTree">
@@ -32,15 +33,15 @@
     </MudGrid>
   </MudPaper>
 
-  <!-- Interactive MudTreeView with Native Drag and Drop -->
+  <!-- Tree Renderer -->
   <MudPaper Class="pa-4" Elevation="3">
-    @if (_flatAdapters.Count == 0)
+    @if (_treeManager.FlatNodes.Count == 0)
     {
       <MudText Typo="Typo.subtitle1" Class="pa-4 text-center">No nodes found in the tree.</MudText>
     }
     else
     {
-      <MudTreeView T="BlockNodeAdapter" Items="_treeItemData" Dense="true" Hover="true">
+      <MudTreeView T="BlockNodeAdapter" Items="_treeManager.TreeItemData" Dense="true" Hover="true">
         <ItemTemplate Context="treeItem">
           <MudTreeViewItem T="BlockNodeAdapter"
                            Value="@treeItem.Value"
@@ -50,24 +51,35 @@
               @if (treeItem.Value != null)
               {
                 var node = treeItem.Value;
-                bool isBeingDragged = _draggedNode == node;
-                bool isDropTarget = _targetNode == node && !isBeingDragged;
+                bool isSelected = _treeManager.SelectedNode == node;
+                bool isBeingDragged = _treeManager.DraggedNode == node;
+                bool isDropTarget = _treeManager.TargetNode == node && !isBeingDragged;
 
-                <!-- user-select: none prevents browser text highlighting on drag -->
                 <div draggable="true"
-                     @ondragstart="() => HandleDragStart(node)"
+                     @onclick="() => _treeManager.SelectNode(node)"
+                     @ondragstart="() => _treeManager.HandleDragStart(node)"
                      @ondragover:preventDefault="true"
-                     @ondragover="() => HandleDragOver(node)"
-                     @ondragleave="HandleDragLeave"
-                     @ondrop="() => HandleDropOnNode(node)"
-                     @ondragend="HandleDragEnd"
-                     class="@GetNodeClass(isBeingDragged, isDropTarget)"
+                     @ondragover="() => _treeManager.HandleDragOver(node)"
+                     @ondragleave="() => _treeManager.HandleDragLeave(node)"
+                     @ondrop="() => _treeManager.HandleDropOnNode(node)"
+                     @ondragend="_treeManager.ResetDragState"
+                     class="@GetNodeClass(isSelected, isBeingDragged, isDropTarget)"
                      style="user-select: none; -webkit-user-select: none; cursor: grab; width: 100%;">
 
-                  <MudIcon Icon="@Icons.Material.Filled.DragIndicator" Class="mr-1 text-secondary" Size="Size.Small" />
-                  <MudIcon Icon="@Icons.Material.Filled.AccountTree" Class="mr-2" Color="Color.Info" Size="Size.Small" />
+                  <MudIcon Icon="@Icons.Material.Filled.DragIndicator"
+                           Class="mr-1 text-secondary"
+                           Size="Size.Small"
+                           Style="pointer-events: none;" />
 
-                  <MudText Typo="Typo.body1" Class="flex-grow-1" Style="user-select: none; -webkit-user-select: none;">
+                  <MudIcon Icon="@Icons.Material.Filled.AccountTree"
+                           Class="mr-2"
+                           Color="@(isSelected ? Color.Primary : Color.Info)"
+                           Size="Size.Small"
+                           Style="pointer-events: none;" />
+
+                  <MudText Typo="Typo.body1"
+                           Class="flex-grow-1"
+                           Style="user-select: none; -webkit-user-select: none; pointer-events: none;">
                     @node.Data.Name
                   </MudText>
                 </div>
@@ -76,15 +88,14 @@
           </MudTreeViewItem>
         </ItemTemplate>
       </MudTreeView>
-
-      <!-- CORRECT: Event directives applied to native div element -->
+      <!-- Root Drop Zone with fixed border dimensions -->
       <div class="@GetRootDropZoneClass()"
            @ondragover:preventDefault="true"
-           @ondragover="HandleDragOverRoot"
-           @ondragleave="HandleDragLeaveRoot"
-           @ondrop="HandleDropOnRoot"
+           @ondragover="_treeManager.HandleDragOverRoot"
+           @ondragleave="_treeManager.HandleDragLeaveRoot"
+           @ondrop="_treeManager.HandleDropOnRoot"
            style="user-select: none; -webkit-user-select: none;">
-        <MudText Typo="Typo.caption" Color="Color.Secondary">
+        <MudText Typo="Typo.caption" Color="Color.Secondary" Style="pointer-events: none;">
           Drag a node here to make it a Root Node
         </MudText>
       </div>
@@ -93,300 +104,68 @@
 </MudContainer>
 
 @code {
-  private List<BlockNodeAdapter> _rootAdapters = new();
-  private List<BlockNodeAdapter> _flatAdapters = new();
-
-  private IReadOnlyCollection<ITreeItemData<BlockNodeAdapter>> _treeItemData =
-      Array.Empty<ITreeItemData<BlockNodeAdapter>>();
-
+  private readonly TreeManager<BlockNodeAdapter> _treeManager = new();
   private string _searchQuery = string.Empty;
-
-  // Drag and Drop State Tracking
-  private BlockNodeAdapter? _draggedNode;
-  private BlockNodeAdapter? _targetNode;
-  private bool _isOverRoot;
 
   protected override void OnInitialized()
   {
-    LoadExampleData();
-  }
-
-  private void RefreshTreeState()
-  {
-    _flatAdapters = FlattenHierarchy(_rootAdapters).ToList();
-    _treeItemData = BuildTreeItemData(_rootAdapters);
-    StateHasChanged();
-  }
-
-  private List<ITreeItemData<BlockNodeAdapter>> BuildTreeItemData(IEnumerable<BlockNodeAdapter> adapters)
-  {
-    var list = new List<ITreeItemData<BlockNodeAdapter>>();
-
-    foreach (var adapter in adapters)
-    {
-      if (!adapter.IsVisible) continue;
-
-      var childTreeItems = BuildConcreteTreeItemData(adapter.Children);
-
-      var item = new TreeItemData<BlockNodeAdapter>
-      {
-        Value = adapter,
-        Expanded = adapter.IsExpanded,
-        Children = childTreeItems
-      };
-
-      list.Add(item);
-    }
-
-    return list;
-  }
-
-  private List<TreeItemData<BlockNodeAdapter>> BuildConcreteTreeItemData(IEnumerable<BlockNodeAdapter> adapters)
-  {
-    var list = new List<TreeItemData<BlockNodeAdapter>>();
-
-    foreach (var adapter in adapters)
-    {
-      if (!adapter.IsVisible) continue;
-
-      var item = new TreeItemData<BlockNodeAdapter>
-      {
-        Value = adapter,
-        Expanded = adapter.IsExpanded,
-        Children = BuildConcreteTreeItemData(adapter.Children)
-      };
-
-      list.Add(item);
-    }
-
-    return list;
-  }
-
-  #region Drag and Drop Handlers
-
-  private void HandleDragStart(BlockNodeAdapter node)
-  {
-    _draggedNode = node;
-  }
-
-  private void HandleDragOver(BlockNodeAdapter node)
-  {
-    if (_draggedNode == null || _draggedNode == node || IsDescendant(_draggedNode, node.Id))
-      return;
-
-    _targetNode = node;
-    _isOverRoot = false;
-  }
-
-  private void HandleDragLeave()
-  {
-    _targetNode = null;
-  }
-
-  private void HandleDragOverRoot()
-  {
-    if (_draggedNode != null)
-    {
-      _isOverRoot = true;
-      _targetNode = null;
-    }
-  }
-
-  private void HandleDragLeaveRoot()
-  {
-    _isOverRoot = false;
-  }
-
-  private void HandleDropOnNode(BlockNodeAdapter targetNode)
-  {
-    if (_draggedNode == null || targetNode == null) return;
-    if (_draggedNode == targetNode || IsDescendant(_draggedNode, targetNode.Id)) return;
-
-    // Unlink source node from current location
-    UnlinkNode(_draggedNode);
-
-    // Relink as child of target node
-    _draggedNode.Parent = targetNode;
-    _draggedNode.ParentId = targetNode.Id;
-
-    if (!targetNode.Children.Contains(_draggedNode))
-    {
-      targetNode.Children.Add(_draggedNode);
-    }
-
-    if (!targetNode.Data.Children.Contains(_draggedNode.Data))
-    {
-      targetNode.Data.Children.Add(_draggedNode.Data);
-    }
-
-    targetNode.IsExpanded = true;
-
-    ResetDragState();
-    RefreshTreeState();
-  }
-
-  private void HandleDropOnRoot()
-  {
-    if (_draggedNode == null) return;
-
-    UnlinkNode(_draggedNode);
-
-    _draggedNode.Parent = null;
-    _draggedNode.ParentId = null;
-
-    if (!_rootAdapters.Contains(_draggedNode))
-    {
-      _rootAdapters.Add(_draggedNode);
-    }
-
-    ResetDragState();
-    RefreshTreeState();
-  }
-
-  private void HandleDragEnd()
-  {
-    ResetDragState();
-  }
-
-  private void ResetDragState()
-  {
-    _draggedNode = null;
-    _targetNode = null;
-    _isOverRoot = false;
-  }
-
-  private void UnlinkNode(BlockNodeAdapter node)
-  {
-    if (node.Parent != null)
-    {
-      node.Parent.Children.Remove(node);
-      node.Parent.Data.Children.Remove(node.Data);
-    }
-    else
-    {
-      _rootAdapters.Remove(node);
-    }
-  }
-
-  private bool IsDescendant(BlockNodeAdapter node, string targetId)
-  {
-    foreach (var child in node.Children)
-    {
-      if (child.Id == targetId || IsDescendant(child, targetId))
-        return true;
-    }
-    return false;
-  }
-
-  private string GetNodeClass(bool isBeingDragged, bool isDropTarget)
-  {
-    var classes = new List<string> { "d-flex align-center flex-grow-1 pa-1 rounded transition-all" };
-    if (isBeingDragged) classes.Add("mud-border-primary border-2 border-dashed opacity-50");
-    if (isDropTarget) classes.Add("mud-theme-primary-light border-2 border-solid");
-    return string.Join(" ", classes);
-  }
-
-  private string GetRootDropZoneClass()
-  {
-    var classes = new List<string> { "pa-4 mt-4 border-dashed d-flex align-center justify-center transition-all" };
-    if (_isOverRoot) classes.Add("mud-theme-secondary-light border-2");
-    return string.Join(" ", classes);
-  }
-
-  #endregion
-
-  private IEnumerable<BlockNodeAdapter> FlattenHierarchy(IEnumerable<BlockNodeAdapter> nodes)
-  {
-    foreach (var node in nodes)
-    {
-      yield return node;
-      foreach (var child in FlattenHierarchy(node.Children))
-      {
-        yield return child;
-      }
-    }
+    _treeManager.OnStateChanged += StateHasChanged;
+    ResetTree();
   }
 
   private void ResetTree()
   {
-    LoadExampleData();
+    var sampleData = LoadExampleData();
+    _treeManager.Initialize(sampleData);
   }
 
-  #region Tree Navigation & Filtering Actions
-
-  private void ApplyFilter()
+  private string GetNodeClass(bool isSelected, bool isBeingDragged, bool isDropTarget)
   {
-    if (string.IsNullOrWhiteSpace(_searchQuery))
+    // Permanent 2px solid border ensures layout dimensions never shift
+    var classes = new List<string> { "d-flex align-center flex-grow-1 pa-1 rounded border-2 border-solid transition-all" };
+
+    if (isBeingDragged)
     {
-      foreach (var node in _flatAdapters)
-      {
-        node.IsVisible = true;
-      }
+      // DRAGGING STATE: Primary dashed border with faded opacity
+      classes.Add("border-dashed mud-border-primary opacity-50");
+    }
+    else if (isDropTarget)
+    {
+      // DROP TARGET STATE: Green/Success border with soft background highlight
+      classes.Add("mud-border-success mud-theme-success-light");
+    }
+    else if (isSelected)
+    {
+      // SELECTED STATE: Primary solid border with subtle selection fill
+      classes.Add("mud-border-primary mud-theme-primary-light");
     }
     else
     {
-      string query = _searchQuery.Trim();
-      foreach (var root in _rootAdapters)
-      {
-        EvaluateNodeVisibility(root, query);
-      }
+      // DEFAULT STATE: Invisible transparent border preserves structural stability
+      classes.Add("border-transparent");
     }
 
-    RefreshTreeState();
+    return string.Join(" ", classes);
+  }
+  private string GetRootDropZoneClass()
+  {
+    var classes = new List<string> { "pa-4 mt-4 border-2 border-dashed d-flex align-center justify-center transition-all" };
+
+    if (_treeManager.IsOverRoot)
+    {
+      classes.Add("mud-border-secondary mud-theme-secondary-light");
+    }
+    else
+    {
+      classes.Add("border-transparent");
+    }
+
+    return string.Join(" ", classes);
   }
 
-  private bool EvaluateNodeVisibility(BlockNodeAdapter node, string query)
+  private List<BlockNodeAdapter> LoadExampleData()
   {
-    bool matches = node.Data.Name != null &&
-                   node.Data.Name.Contains(query, StringComparison.OrdinalIgnoreCase);
-
-    bool hasVisibleChild = false;
-
-    foreach (var child in node.Children)
-    {
-      if (EvaluateNodeVisibility(child, query))
-      {
-        hasVisibleChild = true;
-      }
-    }
-
-    node.IsVisible = matches || hasVisibleChild;
-
-    if (hasVisibleChild)
-    {
-      node.IsExpanded = true;
-    }
-
-    return node.IsVisible;
-  }
-
-  private void ExpandAll()
-  {
-    foreach (var node in _flatAdapters)
-    {
-      node.IsExpanded = true;
-    }
-
-    RefreshTreeState();
-  }
-
-  private void CollapseAll()
-  {
-    foreach (var node in _flatAdapters)
-    {
-      node.IsExpanded = false;
-    }
-
-    RefreshTreeState();
-  }
-
-  #endregion
-
-  #region Sample Data Loading
-
-  private void LoadExampleData()
-  {
-    var pipelineRoot = new BlockNode
+    var rootNode = new BlockNode
     {
       Name = "ETL Processing Pipeline",
       Children = new List<BlockNode>
@@ -396,24 +175,8 @@
           Name = "Data Ingestion Stage",
           Children = new List<BlockNode>
           {
-            new BlockNode
-            {
-              Name = "REST API Connector",
-              Children = new List<BlockNode>
-              {
-                new BlockNode { Name = "Auth Token Fetcher" },
-                new BlockNode { Name = "Payload Deserializer" }
-              }
-            },
-            new BlockNode
-            {
-              Name = "Database Reader",
-              Children = new List<BlockNode>
-              {
-                new BlockNode { Name = "SQL Query Executor" },
-                new BlockNode { Name = "Schema Validator" }
-              }
-            }
+            new BlockNode { Name = "REST API Connector" },
+            new BlockNode { Name = "Database Reader" }
           }
         },
         new BlockNode
@@ -421,48 +184,13 @@
           Name = "Transformation Stage",
           Children = new List<BlockNode>
           {
-            new BlockNode
-            {
-              Name = "Data Cleaner",
-              Children = new List<BlockNode>
-              {
-                new BlockNode { Name = "Null Value Imputer" },
-                new BlockNode { Name = "Duplicate Remover" }
-              }
-            },
-            new BlockNode
-            {
-              Name = "Enrichment Engine",
-              Children = new List<BlockNode>
-              {
-                new BlockNode { Name = "Geocoding Lookup" },
-                new BlockNode { Name = "Currency Converter" }
-              }
-            }
-          }
-        },
-        new BlockNode
-        {
-          Name = "Data Export Stage",
-          Children = new List<BlockNode>
-          {
-            new BlockNode { Name = "S3 Bucket Uploader" },
-            new BlockNode { Name = "Webhook Notification Sender" }
+            new BlockNode { Name = "Data Cleaner" },
+            new BlockNode { Name = "Enrichment Engine" }
           }
         }
       }
     };
 
-    _rootAdapters = new List<BlockNodeAdapter> { BlockNodeAdapter.FromBlockNode(pipelineRoot) };
-
-    foreach (var adapter in FlattenHierarchy(_rootAdapters))
-    {
-      adapter.IsExpanded = true;
-      adapter.IsVisible = true;
-    }
-
-    RefreshTreeState();
+    return new List<BlockNodeAdapter> { BlockNodeAdapter.FromBlockNode(rootNode) };
   }
-
-  #endregion
 }
