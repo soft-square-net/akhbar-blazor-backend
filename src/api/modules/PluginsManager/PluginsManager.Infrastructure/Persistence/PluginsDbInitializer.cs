@@ -1,0 +1,53 @@
+﻿
+using FSH.Framework.Core.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Shared.Enums;
+
+namespace FSH.Starter.WebApi.PlugindManager.Infrastructure.Persistence;
+internal sealed class PluginsDbInitializer(
+    ILogger<PluginsDbInitializer> logger,
+    PluginsDbContext context) : IDbInitializer
+{
+    public async Task MigrateAsync(CancellationToken cancellationToken)
+    {
+        if ((await context.Database.GetPendingMigrationsAsync(cancellationToken)).Any())
+        {
+            await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+            logger.LogInformation("[{Tenant}] applied database migrations for document module", context.TenantInfo!.Identifier);
+        }
+    }
+
+    public async Task SeedAsync(CancellationToken cancellationToken)
+    {
+        // logger.LogInformation("Start Seeding Document Database...");
+        // const string Name = "Document 01";
+        // const string Description = "A test Document 01";
+        // if (await context.Documents.FirstOrDefaultAsync(t => t.Name == Name, cancellationToken).ConfigureAwait(false) is null)
+        // {
+        //     var document = Domain.Document.Create(Name, Description);
+        //     await context.Documents.AddAsync(document, cancellationToken);
+        //     await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        //     logger.LogInformation("[{Tenant}] seeding default document data", context.TenantInfo!.Identifier);
+        // }
+        // StorageAccount storageAccount = null;
+        // if (!await context.StorageAccounts.AnyAsync().ConfigureAwait(false))
+        // {
+        //     storageAccount = StorageAccount.Create(StorageProvider.AmazonS3 ,"MinIO", "wrZ1ifuJ9Fo8wbGv", "unKdEMhO3naR4RVHD7sRCJoC5OwKbYv2", "Amazon Web Services Storage Account");
+        //     await context.StorageAccounts.AddAsync(storageAccount, cancellationToken);
+        //     await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        //
+        // }
+        //
+        // if (storageAccount is not null && !await context.Buckets.AnyAsync().ConfigureAwait(false))
+        // {
+        //     // var bucket = Bucket.Create(storageAccount, "us-east-1", "akhbar-demo", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
+        //     var bucket = Bucket.Create(storageAccount, "us-east-1", "fsh-uploads", "arn:aws:s3:::akhbar-demo", "My Application Bucket", 0, 0);
+        //     // bucket.Folders.Add(Domain.Folder.Create(bucket));
+        //     await context.Buckets.AddAsync(bucket, cancellationToken);
+        //     await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        //
+        // }
+    }
+
+}

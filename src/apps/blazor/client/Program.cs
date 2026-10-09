@@ -13,20 +13,24 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 
-await builder.Services.ConfigureBlazorModules(builder);
-
+await builder.BeforeAddingAppComponents();
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.RootComponents.Add<PageAfterScripts>("#custom-scripts");
-builder.Services.AddClientServices(builder.Configuration);
+await builder.AfterAddingAppComponents();
+
+/* builder.Services.AddClientServices(builder.Configuration); */
 
 
 var app = builder.Build();
 
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
+/*
+ var logger = app.Services.GetRequiredService<ILogger<Program>>();
+ logger.LogInformation("Logging an Information message from Program.cs");
+ */
 
-logger.LogInformation("Logging an Information message from Program.cs");
 await app.UseFSHLocalization();
-await app.UseBlazorModules();
+
+await app.UseModules();
 
 await   app.RunAsync();

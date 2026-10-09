@@ -13,11 +13,57 @@ using Microsoft.Extensions.Logging;
 using static FSH.Starter.Blazor.Modules.ModulesConstants;
 using Microsoft.AspNetCore.Components;
 using FSH.Starter.Blazor.Client.Layout;
+using FSH.Starter.Blazor.Infrastructure;
 
 namespace FSH.Starter.Blazor.Modules;
+
 public static class ModulesExtensions
 {
-   public static async  Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services, WebAssemblyHostBuilder builder/*, LazyAssemblyLoader AssemblyLoader*/)
+    public static async Task<WebAssemblyHostBuilder> BeforeAddingAppComponents(
+        this WebAssemblyHostBuilder builder)
+    {
+        await ConfigureBlazorModules(builder.Services, builder); /**************/
+        
+        return builder;
+    }
+    
+    public static async Task<WebAssemblyHostBuilder> AfterAddingAppComponents(
+        this WebAssemblyHostBuilder builder)
+    {
+        builder.Services.AddClientServices(builder.Configuration); /*************/
+        
+        // // 1. Configure HttpClient using HostEnvironment
+        // builder.Services.AddScoped(sp => new HttpClient 
+        // { 
+        //     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
+        // });
+
+        // 2. Register PluginManager as a Scoped service
+        builder.Services.AddScoped<PluginManager>();
+        return builder;
+    }
+
+    public static async Task<WebAssemblyHost> UseModules(this WebAssemblyHost host)
+    {
+        host.UseBlazorModules();
+        
+//         // 3. Optional: Initializing default plugins on startup before rendering
+//         var pluginManager = host.Services.GetRequiredService<PluginManager>();
+//
+// // Fetch manifest or register initial plugins from wwwroot/plugins/
+//         await pluginManager.LoadPluginAsync(
+//             id: "MyPluginRcl",
+//             name: "My Custom Module",
+//             dllRelativeUrl: "plugins/MyPluginRcl.dll",
+//             enabledByDefault: true
+//         );
+        return host;
+    }
+
+    
+    
+    private static async Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services,
+        WebAssemblyHostBuilder builder /*, LazyAssemblyLoader AssemblyLoader*/)
     {
         await LoadModulesFromConfiguration(services, builder);
 
@@ -32,7 +78,7 @@ public static class ModulesExtensions
         return services;
     }
 
-    public  static async Task<WebAssemblyHost> UseBlazorModules(this WebAssemblyHost app)
+    private static async Task<WebAssemblyHost>? UseBlazorModules(this WebAssemblyHost app)
     {
         var ModuleLoaderService = app.Services.GetService<IModulesLoader>();
         RegisteredModules.ToList().ForEach(kv =>
@@ -43,14 +89,14 @@ public static class ModulesExtensions
             Console.WriteLine($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
         });
 
-        List<Type> layoutTypes = new List<Type>();   
+        List<Type> layoutTypes = new List<Type>();
         ModulesCache.ToList().ForEach(async kv =>
         {
             ModuleLoaderService?.AddComponent(kv.Value.ModuleMenu);
             await kv.Value.UseModuleAsync(app);
             var modulesAssembly = kv.Value.GetType().Assembly;
             layoutTypes.AddRange(modulesAssembly.GetTypes()
-                    .Where(t => t.IsAssignableTo(typeof(LayoutComponentBase)) && !t.IsAbstract));
+                .Where(t => t.IsAssignableTo(typeof(LayoutComponentBase)) && !t.IsAbstract));
         });
 
 
@@ -60,11 +106,13 @@ public static class ModulesExtensions
         return app;
     }
 
-    private static async Task LoadModulesFromConfiguration(IServiceCollection services, WebAssemblyHostBuilder builder) {
-       
+    private static async Task LoadModulesFromConfiguration(IServiceCollection services, WebAssemblyHostBuilder builder)
+    {
         var serviceProvider = services.BuildServiceProvider();
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("BlazorModules");
-        List<ModulesConfiguration> modules = builder.Configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ?? new List<ModulesConfiguration>();
+        List<ModulesConfiguration> modules =
+            builder.Configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ??
+            new List<ModulesConfiguration>();
         var modulesAssembleyName = Assembly.GetExecutingAssembly().GetName().Name;
         foreach (var module in modules.Where(m => m.IsEnabled))
         {
@@ -75,17 +123,16 @@ public static class ModulesExtensions
                 RegisteredModules.Add(assemblyName, modulesAssembly);
                 object? IsInitialized = await InitializeModule(modulesAssembly, services, builder, logger);
                 // Get Layout Types from Assembly LayoutComponentBase
-                
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Error loading module assembly: {module.Name}");
             }
         }
-
     }
 
-    private static async Task<object?> InitializeModule(Assembly ans, IServiceCollection services, WebAssemblyHostBuilder builder, ILogger logger)
+    private static async Task<object?> InitializeModule(Assembly ans, IServiceCollection services,
+        WebAssemblyHostBuilder builder, ILogger logger)
     {
         Type? type = ans.GetTypes()
             .Where(t => typeof(IBlazorModule).IsAssignableFrom(t))
@@ -109,7 +156,6 @@ public static class ModulesExtensions
 
     private static async Task SetupLayouts(ILayoutService layoutService, IEnumerable<Type>? layoutTypes)
     {
-        
         foreach (var layoutType in layoutTypes)
         {
             var layoutInstance = (LayoutComponentBase)Activator.CreateInstance(layoutType);
@@ -122,6 +168,7 @@ public static class ModulesExtensions
 
 
 #region UnusedMethods
+
 //public static async Task<bool> RunInstanceMethodAsync(object? instance, MethodInfo? methodInfo,object[] parameters)
 //{
 //    if (instance == null || methodInfo == null)
@@ -165,7 +212,6 @@ public static class ModulesExtensions
 //}
 
 
-
 //private static IEnumerable<Assembly> GetAllModulesAssemblies()
 //{
 //    // Get all loaded assemblies in the current application domain
@@ -175,7 +221,6 @@ public static class ModulesExtensions
 //                    t.GetName().Name!.StartsWith(ModulesGlobalNameSpace, StringComparison.OrdinalIgnoreCase)
 //              );
 //}
-
 
 
 //var procPath = Environment.ProcessPath;
@@ -258,4 +303,5 @@ public static class ModulesExtensions
 //     Assembly assembly = Assembly.LoadFrom(assemblyPath);
 //     return assembly;
 // }
+
 #endregion

@@ -23,6 +23,8 @@
     <ProjectReference Include="..\modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\modules\Document\Document.Infrastructure\Document.Infrastructure.csproj" />
     <ProjectReference Include="..\modules\Elsa\ElsaWorkflow.Infrastructure\ElsaWorkflow.Infrastructure.csproj" />
+    <ProjectReference Include="..\modules\PluginsManager\PluginsManager.Application\PluginsManager.Application.csproj" />
+    <ProjectReference Include="..\modules\PluginsManager\PluginsManager.Infrastructure\PluginsManager.Infrastructure.csproj" />
     <ProjectReference Include="..\modules\Todo\Todo.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,24 @@
+@* Components/PluginStyleInjector.razor *@
+@* Components/PluginStyleInjector.razor *@
+@inject PluginManager PluginMgr
+@implements IDisposable
+@using Microsoft.AspNetCore.Components.Sections
+
+<HeadContent>
+    @foreach (var plugin in PluginMgr.Plugins.Where(p => p.IsEnabled && p.LoadedAssembly != null))
+    {
+        <link rel="stylesheet" href="@plugin.CssBundlePath" />
+    }
+</HeadContent>
+
+@code {
+    protected override void OnInitialized()
+    {
+        PluginMgr.OnPluginsChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        PluginMgr.OnPluginsChanged -= StateHasChanged;
+    }
+}

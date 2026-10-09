@@ -7,6 +7,8 @@ using FSH.Starter.WebApi.Catalog.Infrastructure;
 using FSH.Starter.WebApi.Document;
 using FSH.Starter.WebApi.Document.Application;
 using FSH.Starter.WebApi.ElsaWorkflow.Infrastructure;
+using FSH.Starter.WebApi.PluginManager;
+using FSH.Starter.WebApi.PluginsManager.Application;
 using FSH.Starter.WebApi.Todo;
 
 namespace FSH.Starter.WebApi.Host;
@@ -23,7 +25,8 @@ internal static class Extensions
             typeof(CatalogMetadata).Assembly,
             typeof(DocumentMetadata).Assembly,
             typeof(TodoModule).Assembly,
-            typeof(ElsaModule).Assembly
+            typeof(ElsaModule).Assembly,
+            typeof(PluginMetadata).Assembly,
         };
 
         //register validators
@@ -38,6 +41,7 @@ internal static class Extensions
         //register module services
         builder.RegisterCatalogServices();
         builder.RegisterDocumentServices();
+        builder.RegisterPluginServices();
         builder.RegisterTodoServices();
         builder.RegisterElsaServices();
         //add carter endpoint modules
@@ -45,6 +49,7 @@ internal static class Extensions
         {
             config.WithModule<CatalogModule.Endpoints>();
             config.WithModule<DocumentModule.Endpoints>();
+            config.WithModule<PluginModule.Endpoints>();
             config.WithModule<TodoModule.Endpoints>();
             config.WithModule<ElsaModule.Endpoints>();
            //  config.WithModule<DocumentModule.Endpoints>();
@@ -60,8 +65,10 @@ internal static class Extensions
         //register modules
         app.UseCatalogModule();
         app.UseDocumentModule();
+        app.UsePluginModule();
         app.UseTodoModule();
         app.UseElsaModule();
+        
         //register api versions
         var versions = app.NewApiVersionSet()
                     .HasApiVersion(1)
@@ -69,6 +76,7 @@ internal static class Extensions
                     .ReportApiVersions()
                     .Build();
 
+        
         //map versioned endpoint
         var endpoints = app.MapGroup("api/v{version:apiVersion}").WithApiVersionSet(versions);
 

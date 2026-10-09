@@ -21,14 +21,14 @@ namespace FSH.Starter.Blazor.Modules.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ModulesResources {
+    internal class ModulesResources_ar {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ModulesResources() {
+        internal ModulesResources_ar() {
         }
         
         /// <summary>
@@ -38,7 +38,7 @@ namespace FSH.Starter.Blazor.Modules.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FSH.Starter.Blazor.Modules.Resources.ModulesResources", typeof(ModulesResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FSH.Starter.Blazor.Modules.Resources.ModulesResources.ar", typeof(ModulesResources_ar).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,7 +60,7 @@ namespace FSH.Starter.Blazor.Modules.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Module Name.
+        ///   Looks up a localized string similar to أسم الإضافة.
         /// </summary>
         internal static string Modules_Module_Name {
             get {
