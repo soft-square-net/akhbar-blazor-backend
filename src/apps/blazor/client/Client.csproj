@@ -34,6 +34,11 @@
 	  <Folder Include="Components\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Remove="wwwroot\Plugins\FSH.Starter.Blazor.Modules.DesktopLayout.Blazor.dll" />
+	  <EmbeddedResource Include="wwwroot\Plugins\FSH.Starter.Blazor.Modules.DesktopLayout.Blazor.dll" />
+	</ItemGroup>
+
   <Target Name="BuildVitePackage" BeforeTargets="CoreCompile">
     <Exec WorkingDirectory="node-app" Command="npm install" />
     <Exec WorkingDirectory="node-app" Command="npm run build" />

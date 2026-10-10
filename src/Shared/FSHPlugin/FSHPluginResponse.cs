@@ -1,8 +1,8 @@
 using System.Reflection;
 
-namespace FSH.Starter.WebApi.PluginsManager.Application.Plugins.Search;
+namespace Shared.FSHPlugin;
 
-public record SearchPluginsResponse
+public record FSHPluginResponse
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 using FSH.Starter.Blazor.Modules.Configuration;
 using FSH.Starter.BlazorShared.Services;
 using FSH.Starter.BlazorShared.Services.Interfaces;
@@ -14,16 +15,46 @@ using static FSH.Starter.Blazor.Modules.ModulesConstants;
 using Microsoft.AspNetCore.Components;
 using FSH.Starter.Blazor.Client.Layout;
 using FSH.Starter.Blazor.Infrastructure;
+using FSH.Starter.Blazor.Infrastructure.Api;
+// using Shared.FSHPlugin;
 
 namespace FSH.Starter.Blazor.Modules;
 
 public static class ModulesExtensions
 {
+    private static IApiClient? _apiClient;
+    
     public static async Task<WebAssemblyHostBuilder> BeforeAddingAppComponents(
         this WebAssemblyHostBuilder builder)
     {
-        await ConfigureBlazorModules(builder.Services, builder); /**************/
+        // Load Plugins from the api Server
+        _apiClient = new ApiClient(
+            new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("ApiBaseUrl")) });
+
+
+        var PluginResponse  = await _apiClient.SearchPluginsEndpointAsync( 
+            new SearchPluginsCommand()
+            {
+                PageNumber = 0,
+                PageSize = 10,
+                Keyword = "",
+                OrderBy = [],
+                AdvancedFilter = default!,
+                AdvancedSearch = default!
+            });
         
+        // 1. Define your runtime variables in a Dictionary 
+        var customSettings = new Dictionary<string, string>
+        {
+            { "Plugins", JsonSerializer.Serialize(PluginResponse.Items)}
+        };
+        
+        // 2. Add Plugins to Configurations
+        builder.Configuration.AddInMemoryCollection(customSettings);
+        
+        
+        
+        await ConfigureBlazorModules(builder.Services, builder); /**************/
         return builder;
     }
     
@@ -32,21 +63,42 @@ public static class ModulesExtensions
     {
         builder.Services.AddClientServices(builder.Configuration); /*************/
         
-        // // 1. Configure HttpClient using HostEnvironment
-        // builder.Services.AddScoped(sp => new HttpClient 
-        // { 
-        //     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
-        // });
 
-        // 2. Register PluginManager as a Scoped service
-        builder.Services.AddScoped<PluginManager>();
         return builder;
     }
 
+
+    public static async Task<WebAssemblyHostBuilder> BrforeBuildApp(
+        this WebAssemblyHostBuilder builder)
+    {
+        
+        // 2. Register PluginManager as a Scoped service
+        builder.Services.AddScoped<PluginManager>();
+        
+        return builder;
+    }
+
+    public static async Task<WebAssemblyHost> AftereBuildApp(this WebAssemblyHost host)
+    {
+        return host;
+    }
+    
+    public static async Task<WebAssemblyHost> BeforeRunApp(this WebAssemblyHost host)
+    {
+        // await host.UsePluginsAsync();
+        await host.UsePluginsAsync();
+        return host;
+    }
+
+    
+    public static async Task<WebAssemblyHost> AfterRuApp(this WebAssemblyHost host)
+    {
+        return host;
+    }
     public static async Task<WebAssemblyHost> UseModules(this WebAssemblyHost host)
     {
-        host.UseBlazorModules();
-        
+        // host.UseBlazorModules();
+        // await host.UsePluginsAsync();
 //         // 3. Optional: Initializing default plugins on startup before rendering
 //         var pluginManager = host.Services.GetRequiredService<PluginManager>();
 //
@@ -57,6 +109,9 @@ public static class ModulesExtensions
 //             dllRelativeUrl: "plugins/MyPluginRcl.dll",
 //             enabledByDefault: true
 //         );
+        
+        // Dispose the _apiClient before the app Run
+        _apiClient = null;
         return host;
     }
 
@@ -65,7 +120,8 @@ public static class ModulesExtensions
     private static async Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services,
         WebAssemblyHostBuilder builder /*, LazyAssemblyLoader AssemblyLoader*/)
     {
-        await LoadModulesFromConfiguration(services, builder);
+        // await LoadModulesFromConfiguration(services, builder);
+        await PluginsUtilities.LoadModulesFromConfiguration(builder);
 
         // await new DocumentModule().InitializeAsync();
         services.AddSingleton<IModulesManager>(new ModulesManager(RegisteredModules));

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Shared.FSHPlugin;
 
 namespace PluginsManager.Infrastructure.Endpoints;
 
@@ -21,7 +22,7 @@ public static class SearchPluginsEndpoint
             .WithName(nameof(SearchPluginsEndpoint))
             .WithSummary("Gets a list of todo items with paging support")
             .WithDescription("Gets a list of todo items with paging support")
-            .Produces<PagedList<SearchPluginsResponse>>()
+            .Produces<PagedList<FSHPluginResponse>>()
             .RequirePermission("Permissions.Plugins.View")
             .MapToApiVersion(1);
     }

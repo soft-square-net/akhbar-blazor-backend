@@ -21,9 +21,9 @@ await builder.AfterAddingAppComponents();
 
 /* builder.Services.AddClientServices(builder.Configuration); */
 
-
-var app = builder.Build();
-
+await builder.BrforeBuildApp();
+  var app = builder.Build();
+ await app.AftereBuildApp();
 /*
  var logger = app.Services.GetRequiredService<ILogger<Program>>();
  logger.LogInformation("Logging an Information message from Program.cs");
@@ -31,6 +31,8 @@ var app = builder.Build();
 
 await app.UseFSHLocalization();
 
-await app.UseModules();
+// await app.UseModules();
 
+await app.BeforeRunApp();
 await   app.RunAsync();
+await app.AftereBuildApp();
