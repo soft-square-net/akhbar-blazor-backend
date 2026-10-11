@@ -1,0 +1,37 @@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <main>
+        <!-- Your standard application markup rendering here -->
+        @Body
+    </main>
+</div>
+
+<!-- 🟢 Inject Loader Component Controlled globally or by page variables -->
+<CmsLoadingScreen IsVisible="@IsSystemLoading" 
+                  Title="Loading Extensions" 
+                  StatusMessage="@CurrentSystemMessage" 
+                  Progress="@CurrentLoadPercentage" />
+
+@code {
+    private bool IsSystemLoading = true;
+    private string CurrentSystemMessage = "Loading assembly dependencies...";
+    private int CurrentLoadPercentage = 15;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate step 1 loading
+        await Task.Delay(1000);
+        CurrentLoadPercentage = 50;
+        CurrentSystemMessage = "Registering modular plugin routers...";
+
+        // Simulate step 2 loading
+        await Task.Delay(1200);
+        CurrentLoadPercentage = 90;
+        CurrentSystemMessage = "Injecting custom stylesheet overrides...";
+
+        // Complete loading sequence
+        await Task.Delay(800);
+        IsSystemLoading = false;
+    }
+}

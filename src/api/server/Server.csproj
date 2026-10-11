@@ -2,7 +2,9 @@
   <PropertyGroup>
     <RootNamespace>FSH.Starter.WebApi.Host</RootNamespace>
     <AssemblyName>FSH.Starter.WebApi.Host</AssemblyName>
+    <RunAOTCompilation>true</RunAOTCompilation>
     <ContainerUser>root</ContainerUser>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</RepoRoot>
   </PropertyGroup>
   <PropertyGroup>
     <ContainerRepository>webapi</ContainerRepository>
@@ -52,4 +54,23 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+
+  <ItemGroup>
+    <!-- Links the source assets folder at the repository root to the build engine -->
+    <Content Include="$(RepoRoot)assets\**\*">
+      <!-- Keeps the inner folder structure (assets/plugins/...) intact -->
+      <Link>assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <!-- Copies it to bin/Debug/net9.0/ during standard build -->
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <!-- Copies it to the publish/ folder during dotnet publish -->
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <!-- Ensures everything inside root/assets/plugins is copied automatically -->
+    <None Update="assets\plugins\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

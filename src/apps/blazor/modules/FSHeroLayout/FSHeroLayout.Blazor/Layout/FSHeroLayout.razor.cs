@@ -25,12 +25,15 @@ public partial class FSHeroLayout
 
         SetCurrentTheme(_themePreference);
 
-        Toast.Add("Like this project? ", Severity.Info, config =>
+        Toast.Add("(Toast/Snakbar) from FSHHeroLayout.razor.cs", Severity.Info, config =>
         {
             config.BackgroundBlurred = true;
             config.Icon = Icons.Custom.Brands.GitHub;
+            config.RequireInteraction = false;
+            config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
             config.Action = "Star us on Github!";
             config.ActionColor = Color.Info;
+            config.VisibleStateDuration = 2000;
             config.OnClick = snackbar =>
             {
                 Navigation.NavigateTo("https://github.com/fullstackhero/dotnet-starter-kit");

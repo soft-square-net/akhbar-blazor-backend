@@ -22,7 +22,7 @@ public static class SearchPluginsEndpoint
             .WithName(nameof(SearchPluginsEndpoint))
             .WithSummary("Gets a list of todo items with paging support")
             .WithDescription("Gets a list of todo items with paging support")
-            .Produces<PagedList<FSHPluginResponse>>()
+            .Produces<PagedList<PluginModelDto>>()
             .RequirePermission("Permissions.Plugins.View")
             .MapToApiVersion(1);
     }

@@ -55,6 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Common\" />
     <Folder Include="Pages\" />
     <Folder Include="wwwroot\Plugins\" />
   </ItemGroup>

@@ -13,88 +13,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static FSH.Starter.Blazor.Modules.ModulesConstants;
 using Microsoft.AspNetCore.Components;
-using FSH.Starter.Blazor.Client.Layout;
 using FSH.Starter.Blazor.Infrastructure;
 using FSH.Starter.Blazor.Infrastructure.Api;
+using FSH.Starter.Blazor.Modules.Plugins;
+using FSH.Starter.Blazor.Modules.Services;
+
 // using Shared.FSHPlugin;
 
 namespace FSH.Starter.Blazor.Modules;
 
 public static class ModulesExtensions
 {
-    private static IApiClient? _apiClient;
+    // private static IApiClient? _apiClient;
+    private static HttpClient? _httpClient;
+    private static ILogger? _logger;
     
-    public static async Task<WebAssemblyHostBuilder> BeforeAddingAppComponents(
-        this WebAssemblyHostBuilder builder)
-    {
-        // Load Plugins from the api Server
-        _apiClient = new ApiClient(
-            new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("ApiBaseUrl")) });
 
-
-        var PluginResponse  = await _apiClient.SearchPluginsEndpointAsync( 
-            new SearchPluginsCommand()
-            {
-                PageNumber = 0,
-                PageSize = 10,
-                Keyword = "",
-                OrderBy = [],
-                AdvancedFilter = default!,
-                AdvancedSearch = default!
-            });
-        
-        // 1. Define your runtime variables in a Dictionary 
-        var customSettings = new Dictionary<string, string>
-        {
-            { "Plugins", JsonSerializer.Serialize(PluginResponse.Items)}
-        };
-        
-        // 2. Add Plugins to Configurations
-        builder.Configuration.AddInMemoryCollection(customSettings);
-        
-        
-        
-        await ConfigureBlazorModules(builder.Services, builder); /**************/
-        return builder;
-    }
-    
-    public static async Task<WebAssemblyHostBuilder> AfterAddingAppComponents(
-        this WebAssemblyHostBuilder builder)
-    {
-        builder.Services.AddClientServices(builder.Configuration); /*************/
-        
-
-        return builder;
-    }
-
-
-    public static async Task<WebAssemblyHostBuilder> BrforeBuildApp(
-        this WebAssemblyHostBuilder builder)
-    {
-        
-        // 2. Register PluginManager as a Scoped service
-        builder.Services.AddScoped<PluginManager>();
-        
-        return builder;
-    }
-
-    public static async Task<WebAssemblyHost> AftereBuildApp(this WebAssemblyHost host)
-    {
-        return host;
-    }
-    
-    public static async Task<WebAssemblyHost> BeforeRunApp(this WebAssemblyHost host)
-    {
-        // await host.UsePluginsAsync();
-        await host.UsePluginsAsync();
-        return host;
-    }
-
-    
-    public static async Task<WebAssemblyHost> AfterRuApp(this WebAssemblyHost host)
-    {
-        return host;
-    }
     public static async Task<WebAssemblyHost> UseModules(this WebAssemblyHost host)
     {
         // host.UseBlazorModules();
@@ -109,20 +43,22 @@ public static class ModulesExtensions
 //             dllRelativeUrl: "plugins/MyPluginRcl.dll",
 //             enabledByDefault: true
 //         );
-        
+
         // Dispose the _apiClient before the app Run
-        _apiClient = null;
+        // _apiClient = null;
         return host;
     }
 
-    
-    
-    private static async Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services,
+
+    public static async Task<IServiceCollection> ConfigureBlazorModules(this IServiceCollection services,
         WebAssemblyHostBuilder builder /*, LazyAssemblyLoader AssemblyLoader*/)
     {
-        // await LoadModulesFromConfiguration(services, builder);
         await PluginsUtilities.LoadModulesFromConfiguration(builder);
-
+        
+        /* Load Modules Utilities Services for Haneling
+         * For handeling the Menu loading, Dynamic Component Service, Layout Service, NavigationService
+         */
+        // services.AddScoped<PluginManager>();
         // await new DocumentModule().InitializeAsync();
         services.AddSingleton<IModulesManager>(new ModulesManager(RegisteredModules));
         services.AddSingleton<IModulesLoader>(new ModulesLoader());
@@ -134,92 +70,96 @@ public static class ModulesExtensions
         return services;
     }
 
-    private static async Task<WebAssemblyHost>? UseBlazorModules(this WebAssemblyHost app)
-    {
-        var ModuleLoaderService = app.Services.GetService<IModulesLoader>();
-        RegisteredModules.ToList().ForEach(kv =>
-        {
-            var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger("BlazorModules");
-            logger.LogInformation($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
-            Console.WriteLine($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
-        });
+    #region Class Old Methods
 
-        List<Type> layoutTypes = new List<Type>();
-        ModulesCache.ToList().ForEach(async kv =>
-        {
-            ModuleLoaderService?.AddComponent(kv.Value.ModuleMenu);
-            await kv.Value.UseModuleAsync(app);
-            var modulesAssembly = kv.Value.GetType().Assembly;
-            layoutTypes.AddRange(modulesAssembly.GetTypes()
-                .Where(t => t.IsAssignableTo(typeof(LayoutComponentBase)) && !t.IsAbstract));
-        });
+    // private static async Task<WebAssemblyHost>? UseBlazorModules(this WebAssemblyHost app)
+    // {
+    //     var ModuleLoaderService = app.Services.GetService<IModulesLoader>();
+    //     RegisteredModules.ToList().ForEach(kv =>
+    //     {
+    //         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+    //         var logger = loggerFactory.CreateLogger("BlazorModules");
+    //         logger.LogInformation($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
+    //         Console.WriteLine($"Blazor Module Registered: {kv.Key}, Assembly: {kv.Value.FullName}");
+    //     });
+    //
+    //     List<Type> layoutTypes = new List<Type>();
+    //     ModulesCache.ToList().ForEach(async kv =>
+    //     {
+    //         ModuleLoaderService?.AddComponent(kv.Value.ModuleMenu);
+    //         await kv.Value.UseModuleAsync(app);
+    //         var modulesAssembly = kv.Value.GetType().Assembly;
+    //         layoutTypes.AddRange(modulesAssembly.GetTypes()
+    //             .Where(t => t.IsAssignableTo(typeof(LayoutComponentBase)) && !t.IsAbstract));
+    //     });
+    //
+    //
+    //     // Setup Layouts Modules
+    //     var layoutService = app.Services.GetRequiredService<ILayoutService>();
+    //     SetupLayouts(layoutService, layoutTypes);
+    //     return app;
+    // }
 
+    // private static async Task LoadModulesFromConfiguration(IServiceCollection services, WebAssemblyHostBuilder builder)
+    // {
+    //     var serviceProvider = services.BuildServiceProvider();
+    //     var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("BlazorModules");
+    //     List<ModulesConfiguration> modules =
+    //         builder.Configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ??
+    //         new List<ModulesConfiguration>();
+    //     var modulesAssembleyName = Assembly.GetExecutingAssembly().GetName().Name;
+    //     foreach (var module in modules.Where(m => m.IsEnabled))
+    //     {
+    //         try
+    //         {
+    //             var assemblyName = $"{modulesAssembleyName}.{module.Name}";
+    //             var modulesAssembly = Assembly.Load($"{assemblyName}.dll");
+    //             RegisteredModules.Add(assemblyName, modulesAssembly);
+    //             object? IsInitialized = await InitializeModule(modulesAssembly, services, builder, logger);
+    //             // Get Layout Types from Assembly LayoutComponentBase
+    //         }
+    //         catch (Exception ex)
+    //         {
+    //             logger.LogError(ex, $"Error loading module assembly: {module.Name}");
+    //         }
+    //     }
+    // }
+    //
+    // private static async Task<object?> InitializeModule(Assembly ans, IServiceCollection services,
+    //     WebAssemblyHostBuilder builder, ILogger logger)
+    // {
+    //     Type? type = ans.GetTypes()
+    //         .Where(t => typeof(IBlazorModule).IsAssignableFrom(t))
+    //         .FirstOrDefault();
+    //     if (type == null) return false;
+    //
+    //     IBlazorModule instance = (IBlazorModule)Activator.CreateInstance(type, new object[] { logger });
+    //     ModulesCache.Add(instance.Name, instance);
+    //     await instance.InitializeAsync();
+    //     await instance.ConfigureModule(services, builder);
+    //
+    //     //object[] initParams = Array.Empty<object>();
+    //     //_ = await RunInstanceMethodAsync(instance, type.GetMethod("InitializeAsync"), initParams);
+    //
+    //     //object[] configParams = new object[] { services };
+    //     //_ = await RunInstanceMethodAsync(instance, type.GetMethod("ConfigureModule"), configParams);
+    //
+    //     return instance;
+    // }
+    //
+    //
+    // private static async Task SetupLayouts(ILayoutService layoutService, IEnumerable<Type>? layoutTypes)
+    // {
+    //     foreach (var layoutType in layoutTypes)
+    //     {
+    //         var layoutInstance = (LayoutComponentBase)Activator.CreateInstance(layoutType);
+    //         layoutService.RegisterLayout(layoutInstance);
+    //         layoutService.SetLayout(layoutInstance);
+    //         Console.WriteLine($"Layout Registered: {layoutType.FullName}");
+    //     }
+    // }
 
-        // Setup Layouts Modules
-        var layoutService = app.Services.GetRequiredService<ILayoutService>();
-        SetupLayouts(layoutService, layoutTypes);
-        return app;
-    }
-
-    private static async Task LoadModulesFromConfiguration(IServiceCollection services, WebAssemblyHostBuilder builder)
-    {
-        var serviceProvider = services.BuildServiceProvider();
-        var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("BlazorModules");
-        List<ModulesConfiguration> modules =
-            builder.Configuration.GetSection("Modules").Get<List<ModulesConfiguration>>() ??
-            new List<ModulesConfiguration>();
-        var modulesAssembleyName = Assembly.GetExecutingAssembly().GetName().Name;
-        foreach (var module in modules.Where(m => m.IsEnabled))
-        {
-            try
-            {
-                var assemblyName = $"{modulesAssembleyName}.{module.Name}";
-                var modulesAssembly = Assembly.Load($"{assemblyName}.dll");
-                RegisteredModules.Add(assemblyName, modulesAssembly);
-                object? IsInitialized = await InitializeModule(modulesAssembly, services, builder, logger);
-                // Get Layout Types from Assembly LayoutComponentBase
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Error loading module assembly: {module.Name}");
-            }
-        }
-    }
-
-    private static async Task<object?> InitializeModule(Assembly ans, IServiceCollection services,
-        WebAssemblyHostBuilder builder, ILogger logger)
-    {
-        Type? type = ans.GetTypes()
-            .Where(t => typeof(IBlazorModule).IsAssignableFrom(t))
-            .FirstOrDefault();
-        if (type == null) return false;
-
-        IBlazorModule instance = (IBlazorModule)Activator.CreateInstance(type, new object[] { logger });
-        ModulesCache.Add(instance.Name, instance);
-        await instance.InitializeAsync();
-        await instance.ConfigureModule(services, builder);
-
-        //object[] initParams = Array.Empty<object>();
-        //_ = await RunInstanceMethodAsync(instance, type.GetMethod("InitializeAsync"), initParams);
-
-        //object[] configParams = new object[] { services };
-        //_ = await RunInstanceMethodAsync(instance, type.GetMethod("ConfigureModule"), configParams);
-
-        return instance;
-    }
-
-
-    private static async Task SetupLayouts(ILayoutService layoutService, IEnumerable<Type>? layoutTypes)
-    {
-        foreach (var layoutType in layoutTypes)
-        {
-            var layoutInstance = (LayoutComponentBase)Activator.CreateInstance(layoutType);
-            layoutService.RegisterLayout(layoutInstance);
-            layoutService.SetLayout(layoutInstance);
-            Console.WriteLine($"Layout Registered: {layoutType.FullName}");
-        }
-    }
+    #endregion
 }
 
 

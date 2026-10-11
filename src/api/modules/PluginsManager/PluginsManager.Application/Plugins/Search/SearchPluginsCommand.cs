@@ -4,7 +4,7 @@ using Shared.FSHPlugin;
 
 namespace FSH.Starter.WebApi.PluginsManager.Application.Plugins.Search;
 
-public class SearchPluginsCommand() : PaginationFilter, IRequest<PagedList<FSHPluginResponse>>
+public class SearchPluginsCommand() : PaginationFilter, IRequest<PagedList<PluginModelDto>>
 {
     
 }

@@ -1,15 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using FSH.Starter.BlazorShared.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
+using FSH.Starter.BlazorShared.Layout.Loading;
 using MudBlazor;
 
-namespace FSH.Starter.Blazor.Client.Layout;
+namespace FSH.Starter.BlazorShared.Services;
 
 public class LayoutService : ILayoutService
 {
     private LayoutComponentBase _currentLayout;
+
     private LayoutProperties _layoutProperties;
-    private List<LayoutComponentBase> _availableLayouts = new();
+    private List<LayoutComponentBase> _availableLayouts = new() {new LoadingLayout()};
     private readonly Collection<ModuleMenu> _menuItemsList = new ();
 
     public LayoutComponentBase CurrentLayout => _currentLayout;

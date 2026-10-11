@@ -74,4 +74,5 @@ public abstract class BlazorModuleBase : IBlazorModule
     {
         _startupComponent = component;
     }
+    
 }
