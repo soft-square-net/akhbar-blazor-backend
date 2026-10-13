@@ -18,17 +18,14 @@ public partial class App
         _logger = logger;
         _modulesManager = modulesManager;
         _modules = configuration.GetSection("Modules").Get<ICollection<ModulesConfiguration>>();
-        additionalAssemblies = _modulesManager.ModulesAssemblies.Values.ToList();
+        additionalAssemblies = new List<Assembly>(); //_modulesManager.ModulesAssemblies.Values.ToList();
         logger.LogInformation("Registered Modules Assemblies: {Assemblies}", string.Join(", ", additionalAssemblies.Select(a => a.FullName)));
     }
-    //protected readonly List<Assembly> additionalAssemblies = new List<Assembly>() {
-    //  typeof(FSH.Starter.Blazor.Modules.Pages.Document.Counter).Assembly
-    //};
 
-    protected readonly List<Assembly> additionalAssemblies;
+    protected readonly List<Assembly> additionalAssemblies = new List<Assembly>();
     private List<Assembly> lazyLoadedAssemblies = [];
     [Inject] LazyAssemblyLoader AssemblyLoader { get; set; } = default!;
-    // [Inject] ILayoutService layoutService { get; set; } = default!;
+    [Inject] ILayoutService layoutService { get; set; } = default!;
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
@@ -49,5 +46,28 @@ public partial class App
         {
             _logger.LogError("Error: {Message}", ex.Message);
         }
+    }
+
+
+    public void AddAdditionalAssemblies(Assembly assembly)
+    {
+        if (additionalAssemblies.All(asm => asm.FullName != assembly.FullName))
+        {
+            additionalAssemblies.Add(assembly);
+            StateHasChanged();
+        }
+    }
+
+    // new Plugin Methods
+    protected override void OnInitialized()
+    {
+        PluginMgr.OnPluginsChanged += StateHasChanged;
+        PluginMgr.OnAssemblyLoaded += AddAdditionalAssemblies;
+    }
+
+    public void Dispose()
+    {
+        PluginMgr.OnPluginsChanged -= StateHasChanged;
+        PluginMgr.OnAssemblyLoaded += AddAdditionalAssemblies;
     }
 }

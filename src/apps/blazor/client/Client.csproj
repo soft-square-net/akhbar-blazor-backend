@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
+    <RunAOTCompilation>true</RunAOTCompilation>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>FSH.Starter.Blazor.Client</RootNamespace>
 		<AssemblyName>FSH.Starter.Blazor.Client</AssemblyName>
@@ -29,11 +30,13 @@
 	<ItemGroup>
 		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Components\" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <Content Remove="wwwroot\Plugins\FSH.Starter.Blazor.Modules.DesktopLayout.Blazor.dll" />
+    <EmbeddedResource Include="wwwroot\Plugins\FSH.Starter.Blazor.Modules.DesktopLayout.Blazor.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
   <Target Name="BuildVitePackage" BeforeTargets="CoreCompile">
     <Exec WorkingDirectory="node-app" Command="npm install" />
     <Exec WorkingDirectory="node-app" Command="npm run build" />

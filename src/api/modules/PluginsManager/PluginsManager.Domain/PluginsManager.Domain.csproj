@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>FSH.Starter.WebApi.PluginsManager.Domain</RootNamespace>
+    <AssemblyName>FSH.Starter.WebApi.PluginsManager.Domain</AssemblyName>
+  </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\framework\Core\Core.csproj" />
+    </ItemGroup>
+
+</Project>

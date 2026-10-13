@@ -1,0 +1,81 @@
+@using FSH.Starter.Blazor.Modules.Services
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject PluginManager PluginMgr
+@* @inject WebAssemblyHostBuilder _builder *@
+@inject ILogger _logger
+
+@if (!PluginMgr.IsInitialized)
+{
+    <div class="loading-overlay">
+        <div class="loading-card">
+            <!-- Pretty Animated SVG Spinner -->
+            <svg class="spinner-svg" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+            
+            <h2>Loading Application</h2>
+            <p class="status-note">@_currentStatusMessage</p>
+            
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="alert-error">@_errorMessage</div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string _currentStatusMessage = "Initializing system...";
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await PluginMgr.InitializeStartupPluginsAsync(status =>
+            {
+                _currentStatusMessage = status;
+                StateHasChanged(); // Refresh UI to display new step
+            });
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to initialize: {ex.Message}";
+        }
+    }
+}
+
+<style>
+    .loading-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #0f172a; display: flex; align-items: center; justify-content: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; z-index: 9999;
+    }
+    .loading-card {
+        background: #1e293b; padding: 2.5rem; border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; color: #f8fafc; width: 380px;
+    }
+    .spinner-svg {
+        animation: rotate 2s linear infinite; width: 50px; height: 50px; margin-bottom: 1rem;
+    }
+    .spinner-svg .path {
+        stroke: #38bdf8; stroke-linecap: round;
+        animation: dash 1.5s ease-in-out infinite;
+    }
+    .status-note { font-size: 0.9rem; color: #94a3b8; margin-top: 0.5rem; min-height: 1.5em; }
+    .alert-error { color: #f87171; background: rgba(248,113,113,0.1); padding: 0.5rem; border-radius: 6px; margin-top: 1rem; }
+    
+    @@keyframes rotate { 100% { transform: rotate(360deg); } }
+    @@keyframes dash {
+        0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+        50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+        100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+    }
+</style>

@@ -1,57 +1,61 @@
 ﻿@using System.Reflection
+@using FSH.Starter.Blazor.Client.Components
+@using FSH.Starter.Blazor.Modules.Services
+@using FSH.Starter.BlazorShared.Layout.Loading
 @using FSH.Starter.BlazorShared.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Sections
 @using Microsoft.Extensions.Localization
 @using MudBlazor;
 
 @inject ILayoutService LayoutSrv ;
+@inject PluginManager PluginMgr
+    <LoadingScreen>
 
+        @if (additionalAssemblies.Count > 0)
+        {
+            <PluginStyleInjector />
+            
+            <CascadingAuthenticationState>
+                <Router AppAssembly="@typeof(App).Assembly" 
+                        AdditionalAssemblies="@additionalAssemblies">
+                    @* OnNavigateAsync="OnNavigateAsync"  *@
 
-<CascadingAuthenticationState>
-  @* <MudList T="string">
-    @foreach (var item in additionalAssemblies.Select(a => a.FullName).ToList())
-    {
-      <MudListItem>
-        <MudText Typo="Typo.h6" Class="pa-4" Text="">@item</MudText>
-      </MudListItem>
-    }
-  </MudList> *@
+                    <Found Context="routeData">
+                        @if (routeData is not null)
+                        {
+                            <CascadingValue Value="@routeData" Name="AppRouteData">
+                                <AuthorizeRouteView RouteData="@routeData"
+                                                    DefaultLayout="@LayoutSrv.CurrentLayout.GetType()">
+                                    @* DefaultLayout2="@typeof(LoadingLayout)" *@
+                                    <NotAuthorized>
+                                        @if (@context.User.Identity?.IsAuthenticated is true)
+                                        {
+                                            <p>You are not authorized to be here.</p>
+                                        }
+                                        else
+                                        {
+                                            <Login/>
+                                        }
+                                    </NotAuthorized>
+                                </AuthorizeRouteView>
+                            </CascadingValue>
 
-  <Router AppAssembly="@typeof(Program).Assembly" 
-          AdditionalAssemblies="@additionalAssemblies">
-          @* OnNavigateAsync="OnNavigateAsync"  *@
+                        }
+                        else
+                        {
+                            <p>Loading...</p>
+                        }
+                        @* <SectionOutlet SectionName="scripts" /> *@
+                    </Found>
+                    <NotFound>
+                        <LayoutView Layout="@typeof(NotFound)">
+                            <NotFound />
+                        </LayoutView>
+                    </NotFound>
+                </Router>
+            </CascadingAuthenticationState>
+        }
+       
+    </LoadingScreen>
 
-    <Found Context="routeData">
-      @if (routeData is not null)
-      {
-        <CascadingValue Value="@routeData" Name="AppRouteData">
-          <AuthorizeRouteView RouteData="@routeData"
-                              DefaultLayout="@LayoutSrv.CurrentLayout.GetType()">
-            <NotAuthorized>
-              @if (@context.User.Identity?.IsAuthenticated is true)
-              {
-                <p>You are not authorized to be here.</p>
-              }
-              else
-              {
-                <Login />
-              }
-            </NotAuthorized>
-          </AuthorizeRouteView>
-        </CascadingValue>
-
-      }
-      else
-      {
-        <p>Loading...</p>
-      }
-      <SectionOutlet SectionName="scripts" />
-    </Found>
-    <NotFound>
-      <LayoutView Layout="@typeof(NotFound)">
-        <NotFound />
-      </LayoutView>
-    </NotFound>
-  </Router>
-</CascadingAuthenticationState>
 

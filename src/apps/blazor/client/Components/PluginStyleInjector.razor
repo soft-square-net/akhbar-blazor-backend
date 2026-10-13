@@ -1,0 +1,21 @@
+@* Components/PluginStyleInjector.razor *@
+@inject PluginManager PluginMgr
+@implements IDisposable
+@using FSH.Starter.Blazor.Modules.Services
+@using Microsoft.AspNetCore.Components.Sections
+@using Nextended.Core.Extensions
+
+<HeadContent>
+@if (PluginMgr != null && PluginMgr.Plugins?.Any() == true)
+{
+    @foreach (var plugin in PluginMgr.Plugins.Where(p => p.IsEnabled && !p.AssemblyData.IsEmpty()))
+    {
+        <link rel="stylesheet" href="@plugin.CssBundlePath"/>
+    }
+}
+</HeadContent>
+
+@code {
+    protected override void OnInitialized() => PluginMgr.OnPluginsChanged += StateHasChanged;
+    public void Dispose() => PluginMgr.OnPluginsChanged -= StateHasChanged;
+}

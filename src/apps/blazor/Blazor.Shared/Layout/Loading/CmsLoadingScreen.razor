@@ -1,0 +1,55 @@
+@if (IsVisible)
+{
+    <div class="cms-loader-overlay">
+        <div class="cms-loader-container">
+            <!-- Animated SVG Core Layout -->
+            <svg class="cms-plugin-svg" xmlns="http://w3.org" viewBox="0 0 200 200" width="120" height="120">
+                <!-- Outer Ring: Represents the core system frame -->
+                <circle class="core-ring" cx="100" cy="100" r="85" fill="none" stroke="#E2E8F0" stroke-width="4" />
+                
+                <!-- Orbiting Data Sparks: Represents streaming configurations -->
+                <circle class="data-spark spark-1" cx="100" cy="15" r="5" fill="#3B82F6" />
+                <circle class="data-spark spark-2" cx="185" cy="100" r="5" fill="#10B981" />
+                <circle class="data-spark spark-3" cx="100" cy="185" r="5" fill="#8B5CF6" />
+                
+                <!-- Central CMS Core Node -->
+                <rect class="cms-core" x="75" y="75" width="50" height="50" rx="10" fill="#1E293B" />
+                <text x="100" y="106" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" fill="#FFFFFF" text-anchor="middle">CMS</text>
+                
+                <!-- Floating Puzzle/Plugin Piece sliding into position -->
+                <g class="plugin-piece">
+                    <path d="M 90,35 
+                             H 102 
+                             A 8,8 0 0,1 110,43 
+                             A 8,8 0 0,1 118,35 
+                             H 130 
+                             V 55 
+                             A 8,8 0 0,0 122,63 
+                             A 8,8 0 0,0 130,71 
+                             V 75 
+                             H 90 
+                             Z" 
+                          fill="#3B82F6" opacity="0.9" />
+                    <!-- Inside puzzle design accent -->
+                    <circle cx="110" cy="55" r="3" fill="#FFFFFF" />
+                </g>
+            </svg>
+
+            <!-- Loading Status Indicators -->
+            <h3 class="cms-loader-title">@Title</h3>
+            <p class="cms-loader-subtitle">@StatusMessage</p>
+            
+            <!-- Progress bar backing -->
+            <div class="cms-progress-track">
+                <div class="cms-progress-bar" style="width: @Progress%;"></div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; } = true;
+    [Parameter] public string Title { get; set; } = "Initializing System Modules";
+    [Parameter] public string StatusMessage { get; set; } = "Discovering and verifying CMS application plugins...";
+    [Parameter] public int Progress { get; set; } = 30; // Percentage value (0 - 100)
+}

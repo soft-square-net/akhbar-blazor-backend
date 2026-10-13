@@ -8,5 +8,7 @@ public static class SchemaNames
     public const string ElsaStore = "elsastore";
     public const string ElsaManagment = "elsamanagment";
     public const string Keyword = "keyword";
+    public const string Plugin = "plugin";
+    
 
 }

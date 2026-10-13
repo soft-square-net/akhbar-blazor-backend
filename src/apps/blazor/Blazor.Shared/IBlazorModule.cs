@@ -26,4 +26,6 @@ public interface IBlazorModule
     Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder);
     Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app);
     void SetStartupComponent<T>(T component) where T:ComponentBase;
+    
 }
+
