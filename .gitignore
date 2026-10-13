@@ -464,3 +464,4 @@ $RECYCLE.BIN/
 /src/apps/blazor/client/wwwroot/css/FSH.Starter.Blazor.Modules.FSHeroLayout-FSHeroLayout.Blazor-Layout-FSHMainLayout.css
 *.js
 *.css
+/src/apps/blazor/client/wwwroot/Plugins
