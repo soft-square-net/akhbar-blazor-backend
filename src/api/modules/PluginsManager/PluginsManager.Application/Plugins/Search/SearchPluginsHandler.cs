@@ -21,7 +21,7 @@ public sealed class SearchBrandsHandler(
         // var items = await repository.ListAsync(spec, cancellationToken).ConfigureAwait(false);
         // var totalCount = await repository.CountAsync(spec, cancellationToken).ConfigureAwait(false);
 
-        var items = new List<PluginModelDto>(){ 
+        var items = new List<PluginModelDto>(){
                         new (){
                         Id=Guid.NewGuid().ToString(),
                         Name="Document.Blazor",
@@ -56,10 +56,11 @@ public sealed class SearchBrandsHandler(
                         Id=Guid.NewGuid().ToString(),
                         Name="MudBlazorBlocks.Blazor",
                         //AssemblyName="FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor",
+                        AssemblyData = await LoadAssemlby("FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor", cancellationToken) ,
                         PluginFileName = "FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor",
                         DllUrl = "https://www.fsh.starter.blazor.modules/",
-                        IsEnabled =  false,
-                        IsStartup = false,
+                        IsEnabled =  true,
+                        IsStartup = true,
                         IsPubished = false,
                     },
                     new (){
@@ -78,11 +79,11 @@ public sealed class SearchBrandsHandler(
         return new PagedList<PluginModelDto>(items, request!.PageNumber, request!.PageSize, totalCount);
     }
 
-    private async Task<Byte[]> LoadAssemlby(string PluginFileName, CancellationToken cancellationToken )
+    private async Task<Byte[]> LoadAssemlby(string PluginFileName, CancellationToken cancellationToken)
     {
         // 1. Resolve the path relative to the execution root (bin/ebug or Published directory)
         string baseDir = AppContext.BaseDirectory;
-            
+
         // 2. Combine the paths to target rootfolder/assets/plugins/
         string pluginPath = Path.Combine(baseDir, "assets", "plugins", $"{PluginFileName}.dll");
 
