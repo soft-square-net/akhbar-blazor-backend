@@ -19,9 +19,9 @@ var username = builder.AddParameter("pg-username", "admin");
 var password = builder.AddParameter("pg-password", "admin");
 
 var database = builder.AddPostgres("db", username, password, port: 5432);
-    if(loadPgreAdmin) database.WithPgAdmin(); 
-    database.WithDataVolume()
-    .AddDatabase("akhbarblazor"); // /*.AddDatabase("fullstackhero");*/
+if (loadPgreAdmin) database.WithPgAdmin();
+database.WithDataVolume()
+.AddDatabase("akhbarblazor"); // /*.AddDatabase("fullstackhero");*/
 // Ahmed Galal
 // Note: Ensure that the database name matches the one used in the API project configuration.
 // /*var cache = builder.AddRedis("redis", port: 6379);*/
@@ -125,21 +125,37 @@ var minioApiEndpoint = minio.GetEndpoint("minoioapi");
 #endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          * BLAZOR WASM HOST
+//                                          * Hosting Apps
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #region Blazor WASM with ASP.NET Core Hosted Template
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                          * BLAZOR WASM HOST
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var blazor = builder.AddProject<Projects.Client>("blazor")
-    // .WithHttpEndpoint(port: 5100)
-    // .WithHttpsEndpoint(port: 7100)
-    .WithEndpoint(endpointName: "https", callback: static endpoint =>
-    {
-        // Sets the actual port the Blazor WASM app runs on
-        endpoint.TargetPort = 7100;
-        // Sets the port for the Aspire proxy (optional, can be same as TargetPort)
-        endpoint.Port = 7300;
-    }); // Use your desired fixed port;
+//   var blazor = builder.AddProject<Projects.Client>("blazor")
+//       // .WithHttpEndpoint(port: 5100)
+//       // .WithHttpsEndpoint(port: 7100)
+//       .WithEndpoint(endpointName: "https", callback: static endpoint =>
+//       {
+//           // Sets the actual port the Blazor WASM app runs on
+//           endpoint.TargetPort = 7100;
+//           // Sets the port for the Aspire proxy (optional, can be same as TargetPort)
+//           endpoint.Port = 7300;
+//       }); // Use your desired fixed port;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                          * BLAZORIZER 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var blazor = builder.AddProject<Projects.Blazorizer>("blazorizer")
+     .WithEndpoint(endpointName: "https", callback: static endpoint =>
+       {
+           // Sets the actual port the Blazor WASM app runs on
+           endpoint.TargetPort = 7100;
+           // Sets the port for the Aspire proxy (optional, can be same as TargetPort)
+           endpoint.Port = 7300;
+       });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          WEB API HOST
@@ -161,8 +177,8 @@ var api = builder.AddProject<Projects.Server>("webapi")
     .WithEnvironment("Storage__S3__ForcePathStyle", "true")
     .WithEnvironment("Storage__S3__PublicBaseUrl", ReferenceExpression.Create($"{minioApiEndpoint}/{MinioBucket}"));
 
-    blazor.WaitFor(api)
-    .WithReference(api);
+blazor.WaitFor(api)
+.WithReference(api);
 
 #endregion
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36811.4 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{F3DF5AC5-8CDC-46D4-969D-1245A6880215}"
 EndProject
@@ -85,11 +85,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorShared", "apps\blazor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Modules", "apps\blazor\modules\Blazor.Modules\Blazor.Modules.csproj", "{679ACE1B-7D7C-42DB-992D-5CE0F03FD9C0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectTemplates", "ProjectTemplates", "{C635E88F-2DDC-434F-8745-917A35D2B89E}"
-	ProjectSection(SolutionItems) = preProject
-		apps\blazor\Directory.Packages.props = apps\blazor\Directory.Packages.props
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FSHeroLayout", "FSHeroLayout", "{C749E82E-1118-437B-A041-CE03176831EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{05DAB378-0BE9-4A7D-9B11-52C45F265725}"
@@ -156,6 +151,22 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsManager.Application", "api\modules\PluginsManager\PluginsManager.Application\PluginsManager.Application.csproj", "{C34AEAB2-C234-4529-AEB8-C986751CB13A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsManager.Domain", "api\modules\PluginsManager\PluginsManager.Domain\PluginsManager.Domain.csproj", "{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{6B423E04-1887-4C06-9998-A4D34379BAF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Admin", "Admin", "{4A739B69-7848-4DC8-A443-2B6E21A676DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazorizer", "Blazorizer", "{DE582D98-D75F-4361-B238-8CE621DB5AB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazorizer", "apps\blazorizer\Blazorizer\Blazorizer.csproj", "{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorModularEngine.Core", "apps\blazorizer\BlazorModularEngine.Core\BlazorModularEngine.Core.csproj", "{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{49B8FE57-AA98-411C-A74F-C1F911119935}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Admin", "Admin", "{FB007A7B-FCAE-4C7F-8871-6A6F139BF2B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminDashboard", "apps\blazorizer\Plugins\Admin\AdminDashboard\AdminDashboard.csproj", "{592F8C66-A0DA-9C41-0830-A7460F869B10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -647,6 +658,42 @@ Global
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}.Release|x64.Build.0 = Release|Any CPU
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}.Release|x86.ActiveCfg = Release|Any CPU
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}.Release|x86.Build.0 = Release|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Debug|x64.Build.0 = Debug|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Debug|x86.Build.0 = Debug|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Release|x64.ActiveCfg = Release|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Release|x64.Build.0 = Release|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Release|x86.ActiveCfg = Release|Any CPU
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F}.Release|x86.Build.0 = Release|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Debug|x64.Build.0 = Debug|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Debug|x86.Build.0 = Debug|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Release|x64.ActiveCfg = Release|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Release|x64.Build.0 = Release|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Release|x86.ActiveCfg = Release|Any CPU
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094}.Release|x86.Build.0 = Release|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Debug|x64.Build.0 = Debug|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Debug|x86.Build.0 = Debug|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Release|x64.ActiveCfg = Release|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Release|x64.Build.0 = Release|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Release|x86.ActiveCfg = Release|Any CPU
+		{592F8C66-A0DA-9C41-0830-A7460F869B10}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -714,6 +761,13 @@ Global
 		{E8DAFFED-4033-4EA1-9A8B-EDCD57EDB060} = {E4AA786D-BBB1-4EF6-963B-872CB220D147}
 		{C34AEAB2-C234-4529-AEB8-C986751CB13A} = {E4AA786D-BBB1-4EF6-963B-872CB220D147}
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B} = {E4AA786D-BBB1-4EF6-963B-872CB220D147}
+		{6B423E04-1887-4C06-9998-A4D34379BAF9} = {2B1F75CE-07A6-4C19-A2E3-F9E062CFDDFB}
+		{4A739B69-7848-4DC8-A443-2B6E21A676DE} = {6B423E04-1887-4C06-9998-A4D34379BAF9}
+		{F2C1457B-41B9-EF6C-532D-F2E19AFD9D9F} = {DE582D98-D75F-4361-B238-8CE621DB5AB9}
+		{BABA3677-A44A-956A-0B8B-BCA0F0C6F094} = {DE582D98-D75F-4361-B238-8CE621DB5AB9}
+		{49B8FE57-AA98-411C-A74F-C1F911119935} = {DE582D98-D75F-4361-B238-8CE621DB5AB9}
+		{FB007A7B-FCAE-4C7F-8871-6A6F139BF2B9} = {49B8FE57-AA98-411C-A74F-C1F911119935}
+		{592F8C66-A0DA-9C41-0830-A7460F869B10} = {FB007A7B-FCAE-4C7F-8871-6A6F139BF2B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EA8248C2-3877-4AF7-8777-A17E7881E030}

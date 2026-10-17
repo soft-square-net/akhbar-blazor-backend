@@ -1,0 +1,9 @@
+﻿@using BlazorModularEngine.Core.UI
+@inject PluginSlotRegistry SlotRegistry
+
+<div class="sidebar-plugins">
+  @foreach (var componentType in SlotRegistry.GetComponentsForSlot("sidebar-menu"))
+  {
+    <DynamicComponent Type="@componentType" />
+  }
+</div>
