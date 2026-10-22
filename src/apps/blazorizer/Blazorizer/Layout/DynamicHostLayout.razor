@@ -1,5 +1,14 @@
-<h3>DynamicHostLayout</h3>
+@using BlazorModularEngine.Core.UI.Interfaces
+@inherits LayoutComponentBase
+@inject ILayoutManager LayoutManager
 
-@code {
-    
+@* This dynamically swaps the wrapper layout based on the active plugin *@
+<DynamicComponent Type="@LayoutManager.CurrentLayout.LayoutComponentType" Parameters="@(new Dictionary<string, object> { { "Body", Body } })" />
+@code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await  base.OnInitializedAsync();
+    }
+
 }

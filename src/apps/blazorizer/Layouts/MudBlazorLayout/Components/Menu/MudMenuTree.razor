@@ -1,0 +1,22 @@
+﻿@using BlazorModularEngine.Core.Models
+@foreach (var item in Items.OrderBy(x => x.Order))
+{
+  @if (item.HasChildren)
+  {
+    <MudNavGroup Title="@item.Title" Icon="@item.Icon" Expanded="false">
+      @* Recursive call to render nested children *@
+      <MudMenuTree Items="@item.Children" />
+    </MudNavGroup>
+  }
+  else
+  {
+    <MudNavLink Href="@item.Href" Icon="@item.Icon" Match="NavLinkMatch.Prefix">
+      @item.Title
+    </MudNavLink>
+  }
+}
+
+@code {
+  [Parameter, EditorRequired]
+  public IEnumerable<MenuItemModel> Items { get; set; } = Enumerable.Empty<MenuItemModel>();
+}

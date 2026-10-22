@@ -1,5 +1,6 @@
 ﻿
 using BlazorModularEngine.Core.Hooks;
+using BlazorModularEngine.Core.Models;
 using BlazorModularEngine.Core.UI;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,4 +19,5 @@ public interface IBlazorModule
     void RegisterUI(PluginSlotRegistry slotRegistry);
     Task InitializeAsync(IServiceProvider serviceProvider);
     Type GetRootComponentType();
+    IEnumerable<MenuItemModel> GetMenuItems() => Enumerable.Empty<MenuItemModel>();
 }

@@ -1,0 +1,57 @@
+﻿
+
+@using AdminDashboard.Services.Interfaces
+@using BlazorModularEngine.Core.Common.Plugins;
+@using Microsoft.AspNetCore.Components.Rendering;
+
+@inherits PluginComponentBase
+@namespace AdminDashboard.Components
+<h3>AdminDashboard</h3>
+
+<div class="admin-dashboard">
+    <div class="p-6 bg-white rounded-xl shadow-md border border-slate-100 space-y-6">
+         <div class="flex justify-between items-center border-b pb-4">
+            <h2 class="text-lg font-semibold text-gray-800">Admin Dashboard from Razor Pages</h2>
+            <span class="text-sm text-gray-500">v1.0.0 Active</span>
+            
+</div>
+
+    </div>
+  @if (_isLoading)
+  {
+    <div class="py-8 text-center text-slate-500 font-medium">
+        Loading admin statistics...
+    </div>
+  }
+  else
+  {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+        <p class="text-sm text-slate-500 font-medium">Active Users</p>
+        <h3 class="text-3xl font-extrabold text-slate-900 mt-1">@_users.ToString("N0")</h3>
+    </div>
+    <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+        <p class="text-sm text-slate-500 font-medium">Total Revenue</p>
+        <h3 class="text-3xl font-extrabold text-emerald-600 mt-1">@_revenue.ToString("C2")</h3>
+    </div>
+    </div>
+  }
+</div>
+
+@code {
+    private IAdminStatsService? _statsService;
+    private int _users = 0;
+    private decimal _revenue = 0;
+    private bool _isLoading = true;
+
+     protected override async Task OnInitializedAsync()
+    {
+        _statsService = GetService<IAdminStatsService>();
+        if (_statsService != null)
+        {
+            _users = await _statsService.GetActiveUsersCountAsync();
+            _revenue = await _statsService.GetTotalRevenueAsync();
+        }
+        _isLoading = false;
+    }
+}

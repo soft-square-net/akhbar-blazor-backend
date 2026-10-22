@@ -1,0 +1,162 @@
+﻿@using BlazorModularEngine.Core.UI.Interfaces
+@using MudBlazorLayout.Components.Menu
+@using Shared.Enums
+@inject IMenuRegistry MenuRegistry
+<MudAppBar Color="Color.Surface" Elevation="0">
+  <MudTooltip Text="Toggle Drawer">
+    <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
+                   OnClick="@((e) => DrawerToggle())" />
+  </MudTooltip>
+  <MudButton Variant="Variant.Text" Color="Color.Transparent" Href="/" DropShadow="false">
+    @PageTitle
+  </MudButton>
+  <MudSpacer />
+  <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="true">
+    <MudButton Variant="Variant.Filled" DropShadow="false" Color="Color.Primary"
+               Href="https://opencollective.com/fullstackhero" Target="_blank" StartIcon="@Icons.Material.Filled.Favorite">
+      Sponsor
+    </MudButton>
+    <MudToggleIconButton @bind-Toggled="@_isDarkMode" Icon="@Icons.Material.Filled.WbSunny"
+                         Color="@Color.Warning" title="off" Class="d-flex ml-auto" ToggledIcon="@Icons.Material.Filled.DarkMode"
+                         ToggledColor="@Color.Surface" toggledTitle="on" style="left:8px!important" @onclick="@ToggleDarkMode" />
+
+    <MudToggleIconButton @bind-Toggled="@_isFullscreen" Icon="@Icons.Material.Filled.Fullscreen"
+                         Color="@Color.Warning" title="LTR" Class="d-flex ml-auto" ToggledIcon="@Icons.Material.Filled.FullscreenExit"
+                         ToggledColor="@Color.Surface" toggledTitle="Min" style="left:8px!important" @onclick="@ToggleFullscreen" />
+    <MudToggleIconButton @bind-Toggled="@_isEnglish" Icon="@Icons.Material.Filled.Language"
+                         Color="@Color.Warning" title="EN" Class="d-flex ml-auto" ToggledIcon="@Icons.Material.Filled.FormatListNumberedRtl"
+                         ToggledColor="@Color.Surface" toggledTitle="AR" style="left:8px!important" @onclick="@ToggleLanguage" />
+
+   
+  </MudHidden>
+  
+  <MudMenu DropShadow="false" PopoverClass="mud-elevation-25" AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
+    <ActivatorContent>
+      <MudIconButton OnClick="@context.ToggleAsync" Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" />
+    </ActivatorContent>
+    <ChildContent>
+      <div class="py-2" style="min-width: 220px">
+        <MudMenuItem OnClick="Profile">
+          <div class="d-flex">
+            <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.Person" />
+            <MudText>Account</MudText>
+          </div>
+        </MudMenuItem>
+        <MudMenuItem Href="/dashboard">
+          <div class="d-flex">
+            <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.Dashboard" />
+            <MudText>Dashboard</MudText>
+          </div>
+        </MudMenuItem>
+        <div class="mt-4 mx-4">
+          <MudButton Color="Color.Error" FullWidth="true" StartIcon="@Icons.Material.Filled.Logout" DropShadow="false"
+                     Variant="Variant.Filled" OnClick="LogoutAsync">
+            Logout
+          </MudButton>
+        </div>
+      </div>
+    </ChildContent>
+  </MudMenu>
+</MudAppBar>
+<MudDrawer @bind-Open="_drawerOpen" outlined ClipMode="DrawerClipMode.Never">
+ @*  <FSHNavMenu /> *@
+  <MudMenuTree Items="@MenuRegistry.GetItemsForRegion("sidebar")" />
+</MudDrawer>
+
+<MudMainContent>
+  <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-6">
+    @ChildContent
+    <MudScrollToTop TopOffset="400" Style="z-index:2000;">
+      <MudFab StartIcon="@Icons.Material.Filled.KeyboardArrowUp" Color="Color.Primary" />
+    </MudScrollToTop>
+  </MudContainer>
+</MudMainContent>
+
+@code {
+  [CascadingParameter(Name = "PageTitle")] public string PageTitle { get; set; }
+
+  [Parameter]
+  public RenderFragment ChildContent { get; set; } = default!;
+  [Parameter]
+  public EventCallback<bool> OnDarkModeToggle { get; set; }
+  [Parameter]
+  public EventCallback<bool> OnRightToLeftToggle { get; set; }
+  [Inject] public IJSRuntime JS { get; set; } = default!;
+
+  private bool _drawerOpen;
+  private bool _isDarkMode;
+  private bool _isFullscreen;
+  private bool _isEnglish;
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (await ClientPreferences.GetPreference() is ClientPreference preferences)
+    {
+      _drawerOpen = preferences.IsDrawerOpen;
+      _isDarkMode = preferences.IsDarkMode;
+    }
+    PageTitle = "FullstackHero 2026";
+  }
+
+  public async Task ToggleDarkMode()
+  {
+    _isDarkMode = !_isDarkMode;
+    await OnDarkModeToggle.InvokeAsync(_isDarkMode);
+  }
+
+  private async Task DrawerToggle()
+  {
+    _drawerOpen = await ClientPreferences.ToggleDrawerAsync();
+  }
+  private async Task LogoutAsync()
+  {
+    var parameters = new DialogParameters
+        {
+                { nameof(Components.Dialogs.Logout.ContentText), "Do you want to logout from the system?"},
+                { nameof(Components.Dialogs.Logout.ButtonText), "Logout"},
+                { nameof(Components.Dialogs.Logout.Color), Color.Error}
+            };
+
+    var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+    await DialogService.ShowAsync<Components.Dialogs.Logout>("Logout", parameters, options);
+  }
+
+  private void Profile()
+  {
+    Navigation.NavigateTo("/identity/account");
+  }
+
+  private async Task ToggleFullscreen()
+  {
+    await JS.InvokeVoidAsync("toggleFullScreen");
+    _isFullscreen = !_isFullscreen;
+    StateHasChanged();
+  }
+
+  private async Task ToggleLanguage()
+  {
+    CurrentCulture = CurrentCulture.StartsWith("en", StringComparison.InvariantCultureIgnoreCase) ? FSHLang.arEg.Value : FSHLang.enUS.Value;
+    _isEnglish = CurrentCulture.StartsWith("en", StringComparison.InvariantCultureIgnoreCase);
+    StateHasChanged();
+  }
+  private string CurrentCulture
+  {
+    get => System.Globalization.CultureInfo.CurrentCulture.Name;
+    set
+    {
+      if (System.Globalization.CultureInfo.CurrentCulture.Name != value)
+      {
+        _ = ChangeCulture(value);
+      }
+    }
+  }
+
+  private async Task ChangeCulture(string culture)
+  {
+    // Save choice to local storage
+    await JS.InvokeVoidAsync("localStorage.setItem", "blazorCulture", culture);
+
+    // Force reload the app to let Program.cs apply the thread state updates
+    Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+  }
+}

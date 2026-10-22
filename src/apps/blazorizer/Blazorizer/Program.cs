@@ -1,22 +1,27 @@
 using System.Globalization;
+using System.Text.Json;
 using AdminDashboard;
+using Blazored.LocalStorage;
 using Blazorizer;
 using BlazorModularEngine.Core.Hooks;
 using BlazorModularEngine.Core.Models;
 using BlazorModularEngine.Core.Services;
+using BlazorModularEngine.Core.Services.Interfaces;
 using BlazorModularEngine.Core.UI;
+using BlazorModularEngine.Core.UI.Interfaces;
+using BlazorModularEngine.Core.UI.Layouts;
+using BlazorModularEngine.Core.UI.Menu;
 using BlazorModularEngine.Core.UI.Theme;
 using FSH.Starter.Blazor.Infrastructure.Api;
+using FSH.Starter.Blazor.Infrastructure.Auth;
 using FSH.Starter.Blazor.Infrastructure.Auth.Jwt;
+using FSH.Starter.Blazor.Infrastructure.Localization;
+using FSH.Starter.Blazor.Infrastructure.Notifications;
+using FSH.Starter.Blazor.Infrastructure.Notifications;
 using FSH.Starter.Blazor.Infrastructure.Preferences;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-
-using Blazored.LocalStorage;
-using System.Text.Json;
-using FSH.Starter.Blazor.Infrastructure.Localization;
-using FSH.Starter.Blazor.Infrastructure.Auth;
-using FSH.Starter.Blazor.Infrastructure.Notifications;
+using MudBlazorLayout;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -36,7 +41,10 @@ builder.Services.AddSingleton<ModuleCacheStore>();
 // 2. Theme & Layout Engine Services
 builder.Services.AddSingleton<ThemeRegistry>();
 builder.Services.AddSingleton<ThemeManager>();
-
+builder.Services.AddSingleton<ILayoutManager,LayoutManager>();
+builder.Services.AddSingleton<ILayoutModule, MudBlazorLayoutModule>();
+builder.Services.AddSingleton<IModulesLoader, ModulesLoader>();
+builder.Services.AddSingleton<IMenuRegistry, MenuRegistry>();
 // 3. Loader Engine for WASM runtime assembly streaming
 builder.Services.AddScoped<BlazorLoaderEngine>();
 
@@ -58,11 +66,17 @@ builder.Services.AddHttpClient("FullStackHero.API", client =>
    .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("FullStackHero.API"));
 builder.Services.AddTransient<IClientPreferenceManager, ClientPreferenceManager>();
 builder.Services.AddTransient<IPreference, ClientPreference>();
-// builder.Services.AddNotifications();
+builder.Services.AddNotifications();
+builder.Services.ConfigureMudBlazorLayout();
+
 
 ////   FSH   Services           ////////////////////
 
 var host = builder.Build();
+
+/////////////////////////////////////////////////////
+
+
 
 var cacheStore = host.Services.GetRequiredService<ModuleCacheStore>();
 cacheStore.StoreMetadata(new[]
@@ -73,6 +87,13 @@ cacheStore.StoreMetadata(new[]
                     Version = "1.0.0",
                     IsStartupModule = true,
                     AssemblyUrl = "_content/AdminDashboardPlugin/AdminDashboardPlugin.dll"
+                },
+                new ModuleMetadata
+                {
+                    ModuleName = "MudBlazorLayout",
+                    Version = "1.0.0",
+                    IsStartupModule = true,
+                    AssemblyUrl = "_content/MudBlazorLayoutPlugin/MudBlazorLayoutPlugin.dll"
                 }
             });
 
@@ -80,15 +101,23 @@ cacheStore.StoreMetadata(new[]
 var loaderEngine = host.Services.GetRequiredService<BlazorLoaderEngine>();
 var hookManager = host.Services.GetRequiredService<PluginHookManager>();
 var slotRegistry = host.Services.GetRequiredService<PluginSlotRegistry>();
+var layoutManager = host.Services.GetRequiredService<ILayoutManager>();
 
-var adminModule = new AdminDashboardModule();
 var dynamicRegistry = host.Services.GetRequiredService<DynamicServiceRegistry>();
 var runtimeAdapter = new RuntimeServiceCollectionAdapter(builder.Services, dynamicRegistry, true);
-adminModule.ConfigureServices(runtimeAdapter);
 
+var adminModule = new AdminDashboardModule();
+adminModule.ConfigureServices(runtimeAdapter);
 adminModule.RegisterHooks(hookManager);
 adminModule.RegisterUI(slotRegistry);
 
 cacheStore.StoreInstance("AdminDashboard", adminModule);
+
+var mudLayoutModule = new MudBlazorLayoutModule();
+mudLayoutModule.RegisterHooks(hookManager);
+mudLayoutModule.RegisterUI(slotRegistry);
+cacheStore.StoreInstance("MudBlazorLayout", mudLayoutModule);
+
+await layoutManager.SetActiveLayoutAsync(mudLayoutModule.LayoutId);
 
 await host.RunAsync();

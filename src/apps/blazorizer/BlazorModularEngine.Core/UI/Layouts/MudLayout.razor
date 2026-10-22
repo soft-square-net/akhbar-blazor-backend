@@ -1,5 +1,11 @@
-<h3>MudLayout</h3>
+@inherits  ThemeLayoutBase
 
 @code {
-    
+    protected async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await InjectStylesheet("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+        await InjectStylesheet("_content/MudBlazor/MudBlazor.min.css");
+    }
+
 }

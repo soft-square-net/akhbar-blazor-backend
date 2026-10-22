@@ -8,9 +8,11 @@ using AdminDashboard.Services;
 using AdminDashboard.Services.Interfaces;
 using BlazorModularEngine.Core.Common.Interfaces;
 using BlazorModularEngine.Core.Hooks;
+using BlazorModularEngine.Core.Models;
 using BlazorModularEngine.Core.UI;
 using BlazorModularEngine.Core.UI.Theme;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
 
 namespace AdminDashboard;
 
@@ -37,7 +39,7 @@ public class AdminDashboardModule : IBlazorModule
     public void RegisterUI(PluginSlotRegistry slotRegistry)
     {
         // Register navigation link into sidebar slot
-        slotRegistry.RegisterComponent("theme-sidebar", typeof(AdminSidebarNavComponent));
+        slotRegistry.RegisterComponent("theme-sidebar", typeof(AdminSidebarNav));
     }
 
     public Task InitializeAsync(IServiceProvider serviceProvider)
@@ -68,5 +70,48 @@ public class AdminDashboardModule : IBlazorModule
     }
 
     // Helper method expected by host loader to get root component type
-    public Type GetRootComponentType() => typeof(AdminDashboardComponent);
+    public Type GetRootComponentType() => typeof(AdminDashboardLayout);
+
+    public IEnumerable<MenuItemModel> GetMenuItems()
+    {
+        yield return new MenuItemModel
+        {
+            Title = "Management",
+            Icon = Icons.Material.Filled.Business,
+            Region = "sidebar",
+            Order = 10,
+            Children = new List<MenuItemModel>
+            {
+                new MenuItemModel
+                {
+                    Title = "Human Resources",
+                    Icon = Icons.Material.Filled.People,
+                    Children = new List<MenuItemModel>
+                    {
+                        new MenuItemModel { Title = "Employees", Href = "/hr/employees", Icon = Icons.Material.Filled.Badge },
+                        new MenuItemModel
+                        {
+                            Title = "Payroll & Benefits",
+                            Icon = Icons.Material.Filled.AttachMoney,
+                            Children = new List<MenuItemModel>
+                            {
+                                new MenuItemModel { Title = "Salaries", Href = "/hr/payroll/salaries", Icon = Icons.Material.Filled.Money },
+                                new MenuItemModel { Title = "Insurance", Href = "/hr/payroll/insurance", Icon = Icons.Material.Filled.Security }
+                            }
+                        }
+                    }
+                },
+                new MenuItemModel
+                {
+                    Title = "Inventory",
+                    Icon = Icons.Material.Filled.Warehouse,
+                    Children = new List<MenuItemModel>
+                    {
+                        new MenuItemModel { Title = "Warehouses", Href = "/inventory/warehouses", Icon = Icons.Material.Filled.House },
+                        new MenuItemModel { Title = "Stock Items", Href = "/inventory/items", Icon = Icons.Material.Filled.Inventory }
+                    }
+                }
+            }
+        };
+    }
 }
