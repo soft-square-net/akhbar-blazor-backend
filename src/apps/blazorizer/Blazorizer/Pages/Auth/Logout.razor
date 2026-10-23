@@ -1,4 +1,4 @@
-﻿@* @page "/logout"
+﻿@page "/logout"
 @using FSH.Starter.Blazor.Infrastructure.Notifications
 @using FSH.Starter.Blazor.Infrastructure.Notifications.Users
 @attribute [AllowAnonymous]
@@ -14,6 +14,6 @@
     var _user = (await AuthState).User;
     await AuthService.LogoutAsync();
     await Notifications.PublishAsync(new UserLoggedOut(_user, $"Notification: User {_user.Identity?.Name} Logged Out"));
-    Toast.Add("Logged out", Severity.Error);
+    // Toast.Add("Logged out", Severity.Error);
   }
-} *@
+}

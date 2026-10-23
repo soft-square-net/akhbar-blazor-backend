@@ -59,8 +59,9 @@
   </MudMenu>
 </MudAppBar>
 <MudDrawer @bind-Open="_drawerOpen" outlined ClipMode="DrawerClipMode.Never">
- @*  <FSHNavMenu /> *@
+  @*  <FSHNavMenu /> *@
   <MudMenuTree Items="@MenuRegistry.GetItemsForRegion("sidebar")" />
+  @*   <MudBlazorizerSidebar /> *@
 </MudDrawer>
 
 <MudMainContent>

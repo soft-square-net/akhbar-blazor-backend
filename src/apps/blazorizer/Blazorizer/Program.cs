@@ -38,15 +38,7 @@ builder.Services.AddSingleton<PluginSlotRegistry>();
 builder.Services.AddSingleton<DynamicServiceRegistry>();
 builder.Services.AddSingleton<ModuleCacheStore>();
 
-// 2. Theme & Layout Engine Services
-builder.Services.AddSingleton<ThemeRegistry>();
-builder.Services.AddSingleton<ThemeManager>();
-builder.Services.AddSingleton<ILayoutManager,LayoutManager>();
-builder.Services.AddSingleton<ILayoutModule, MudBlazorLayoutModule>();
-builder.Services.AddSingleton<IModulesLoader, ModulesLoader>();
-builder.Services.AddSingleton<IMenuRegistry, MenuRegistry>();
-// 3. Loader Engine for WASM runtime assembly streaming
-builder.Services.AddScoped<BlazorLoaderEngine>();
+
 
 ////   FSH   Services           ////////////////////
 builder.Services.AddBlazoredLocalStorage();
