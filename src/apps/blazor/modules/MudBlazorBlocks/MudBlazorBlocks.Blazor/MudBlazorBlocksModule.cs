@@ -36,13 +36,13 @@ public class MudBlazorBlocksModule : BlazorModuleBase
         _enabled = true;
         _loaded = true;
         _initialized = true;
-        await base.InitializeAsync();
+        await base.InitializeAsync(); 
     }
 
-
-
-    public override Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
+    public override async Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
     {
+        await base.ConfigureModule(services, builder);
+
         builder.Configuration.AddJsonFile($"{Constants._content}/MudBlazorBlocksModuleSettings.json", optional: true, reloadOnChange: true);
         services.Configure<MudBlazorBlocksSettings>(builder.Configuration.GetSection(MudBlazorBlocksSettings.SectionName));
         _logger.LogInformation("Configuring MudBlazorBlocks Blazor Module...");
@@ -53,10 +53,8 @@ public class MudBlazorBlocksModule : BlazorModuleBase
 
         // Register Custom InputsType, the base inputs are registered already
         InputRegistry.RegisterComponent("date", typeof(DateInput));
-        services.AddScoped<IRemoteValidationService, RemoteValidationService>();
-        
-        
-        return base.ConfigureModule(services, builder);
+
+        services.AddSingleton<IRemoteValidationService, RemoteValidationService>();
     }
 
     public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)

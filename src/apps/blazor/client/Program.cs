@@ -53,7 +53,7 @@ using FSH.Starter.Blazor.Modules.Services;
     
     
     await app.UseFSHLocalization();
-    await app.UseModules();
+    // await app.UseModules();
     await app.UsePluginsAsync();
     
     

@@ -7,11 +7,12 @@
 @implements IDisposable
 @inject IRemoteValidationService RemoteValidationService
 
+
 @code {
-    private ValidationMessageStore? messageStore;
-    private CancellationTokenSource? cts;
-    private int activeValidationCount = 0;
-    
+  private ValidationMessageStore? messageStore;
+  private CancellationTokenSource? cts;
+  private int activeValidationCount = 0;
+  // [Inject]  public IRemoteValidationService RemoteValidationService { get; set; } = default!;
     [CascadingParameter]
     private EditContext? CurrentEditContext { get; set; }
 

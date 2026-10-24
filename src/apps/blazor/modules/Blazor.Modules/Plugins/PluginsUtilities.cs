@@ -50,6 +50,10 @@ public static class PluginsUtilities
                     // load Modules from RunTime Root Directory
                     modulesAssembly = Assembly.Load($"{plugin.PluginFileName}.dll");
                 }
+                else
+                {
+                    modulesAssembly = Assembly.Load(plugin.AssemblyData);
+                }
 
                 // cache it in  RegisteredModules to load it Later
                 ModulesConstants.RegisteredModules.Add(plugin.PluginFileName, modulesAssembly);

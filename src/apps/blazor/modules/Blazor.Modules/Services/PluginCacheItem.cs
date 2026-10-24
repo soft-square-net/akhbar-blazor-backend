@@ -1,4 +1,4 @@
-using Elsa.Features.Services;
+using FSH.Starter.BlazorShared;
 using Shared.FSHPlugin;
 
 namespace FSH.Starter.Blazor.Modules.Services;
@@ -16,7 +16,7 @@ public class PluginCacheItem
     public int weight { get; set; }
     
     // Runtime properties
-    public IModule? Instance { get; set; }
+    public IBlazorModule? Instance { get; set; }
     public string PluginFullName { get; set; } = default!;
     public byte[] AssemblyData { get; set; } = default!;
 

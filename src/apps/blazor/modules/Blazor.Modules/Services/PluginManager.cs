@@ -1,7 +1,6 @@
 // Services/PluginManager.cs
 using System.Reflection;
 using System.Net.Http.Json;
-using Elsa.Features.Services;
 using FSH.Starter.Blazor.Modules.Plugins;
 using FSH.Starter.Blazor.Modules.Plugins.Hooks.Base;
 using FSH.Starter.BlazorShared;

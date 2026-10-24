@@ -18,7 +18,8 @@ public partial class App
         _logger = logger;
         _modulesManager = modulesManager;
         _modules = configuration.GetSection("Modules").Get<ICollection<ModulesConfiguration>>();
-        additionalAssemblies = new List<Assembly>(); //_modulesManager.ModulesAssemblies.Values.ToList();
+        // additionalAssemblies = new List<Assembly>();
+        additionalAssemblies = _modulesManager.ModulesAssemblies.Values.ToList();
         logger.LogInformation("Registered Modules Assemblies: {Assemblies}", string.Join(", ", additionalAssemblies.Select(a => a.FullName)));
     }
 
