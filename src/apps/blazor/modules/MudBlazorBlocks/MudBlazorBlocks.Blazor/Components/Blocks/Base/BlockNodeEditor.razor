@@ -120,11 +120,11 @@
             Name = "Email Action Node",
             Inputs = new List<BlockNodeInput>
             {
-                new() { Id = "in_1", Label = "Recipient Email", Type = "text", Value = "user@example.com" },
-                new() { Id = "in_2", Label = "Retry Count", Type = "number", Value = 3 },
-                new() { Id = "in_3", Label = "Priority Level", Type = "select", Value = "High", Options = new() { "Low", "Medium", "High" } },
-                new() { Id = "in_4", Label = "Is Active", Type = "checkbox", Value = true },
-                new() { Id = "in_5", Label = "Custom Payload", Type = "textarea", Value = "{\"key\": \"value\"}" }
+                new() { Id = "in_1", Label = "Recipient Email", Type = Abstraction.BlockNode.Inputs.FieldType.Text, Value = "user@example.com" },
+                new() { Id = "in_2", Label = "Retry Count", Type = Abstraction.BlockNode.Inputs.FieldType.Number, Value = 3 },
+                new() { Id = "in_3", Label = "Priority Level", Type = Abstraction.BlockNode.Inputs.FieldType.Select, Value = "High", Options = new() { "Low", "Medium", "High" } },
+                new() { Id = "in_4", Label = "Is Active", Type = Abstraction.BlockNode.Inputs.FieldType.Checkbox, Value = true },
+                new() { Id = "in_5", Label = "Custom Payload", Type = Abstraction.BlockNode.Inputs.FieldType.Textarea, Value = "{\"key\": \"value\"}" }
             }
         };
 

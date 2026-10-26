@@ -5,11 +5,7 @@ namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNod
 
 public class BlockNodeInput
 {
-    public string Id { get; set; } = string.Empty;
     public string Name { get; set; }
-    public string Label { get; set; } = string.Empty;
-    // public BlockNodeInputType Type { get; set; }
-    public string Type { get; set; } = "text"; // text, number, checkbox, select, textarea
 
     public object? Value { get; set; }
     
@@ -35,21 +31,67 @@ public class BlockNodeInput
     [JsonIgnore]
     public bool IsValid => ValidationErrors.Count == 0;
     
-    public List<string>? Options { get; set; } // Used when Type == "select"
-    
+
+
+
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Label { get; set; } = "New Field";
+    public string FieldKey { get; set; } = "field_key";
+    public FieldType Type { get; set; } = FieldType.Text;
+    public string DefaultValue { get; set; } = string.Empty;
+    public string Placeholder { get; set; } = string.Empty;
+
+    // Validation Rules
+    public bool IsRequired { get; set; }
+    public int? MinLength { get; set; }
+    public int? MaxLength { get; set; }
+    public string? RegexPattern { get; set; }
+    public string ErrorMessage { get; set; } = "Invalid field value";
+
+    // Options for Select / Radio fields
+    public List<string> Options { get; set; } = new();
+
+    // Conditional Visibility Rule
+    public string? VisibleWhenFieldKey { get; set; }
+    public string? VisibleEqualsValue { get; set; }
+
     public BlockNodeInput Clone()
     {
         return new BlockNodeInput
         {
-            Id = this.Id,
-            Label = this.Label,
-            Type = this.Type,
+            Id = Guid.NewGuid().ToString(),
+            Label = Label,
+            FieldKey = FieldKey,
+            Type = Type,
+            DefaultValue = DefaultValue,
+            Placeholder = Placeholder,
+            IsRequired = IsRequired,
+            MinLength = MinLength,
+            MaxLength = MaxLength,
+            RegexPattern = RegexPattern,
+            ErrorMessage = ErrorMessage,
+            Options = new List<string>(Options),
+            VisibleWhenFieldKey = VisibleWhenFieldKey,
+            VisibleEqualsValue = VisibleEqualsValue,
             Value = this.Value,
-            Options = this.Options != null ? new List<string>(this.Options) : null,
             Validation = this.Validation,
             VisibilityRule = this.VisibilityRule,
             ValidationErrors = new List<string>()
         };
+
+        
     }
+}
+
+public enum FieldType
+{
+    Text,
+    Number,
+    Checkbox,
+    Select,
+    Date,
+    ContainerSection,
+    Textarea,
+    Json
 }
 

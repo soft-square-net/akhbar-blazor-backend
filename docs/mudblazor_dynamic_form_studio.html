@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MudBlazor Dynamic Form Studio</title>
+    <!-- Tailwind CSS for Layout Utility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Roboto Font & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- FontAwesome for additional Blazor-style icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mud: {
+                            primary: '#594AE2',
+                            secondary: '#FF4081',
+                            darkBg: '#121212',
+                            darkPaper: '#1E1E1E',
+                            darkDrawer: '#1A1A1A',
+                            darkBorder: '#2D2D2D',
+                            lightBg: '#F5F5F5',
+                            lightPaper: '#FFFFFF',
+                            lightBorder: '#E0E0E0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            user-select: none;
+        }
+        /* MudBlazor elevation & styling mimics */
+        .mud-elevation-1 {
+            box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+        }
+        .mud-elevation-4 {
+            box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+        }
+        .drag-over-zone {
+            background-color: rgba(89, 74, 226, 0.08) !important;
+            border: 2px dashed #594AE2 !important;
+        }
+        .drag-source {
+            opacity: 0.4;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(150, 150, 150, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(150, 150, 150, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-mud-lightBg text-gray-800 dark:bg-mud-darkBg dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION BAR (MudAppBar) -->
+    <header class="h-16 bg-mud-primary text-white flex items-center justify-between px-4 mud-elevation-4 z-20 shrink-0">
+        <div class="flex items-center space-x-3">
+            <span class="material-icons text-2xl">dynamic_form</span>
+            <div>
+                <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+                    MudBlazor Dynamic Form Studio
+                    <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-normal">WASM C# Engine</span>
+                </h1>
+            </div>
+        </div>
+
+        <!-- Mode Toggle & Global Actions -->
+        <div class="flex items-center space-x-2">
+            <!-- Mode Switcher Tabs -->
+            <div class="bg-black/20 p-1 rounded-lg flex items-center space-x-1 mr-4">
+                <button id="btn-mode-editor" onclick="switchViewMode('editor')" class="px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all bg-white text-mud-primary shadow">
+                    <span class="material-icons text-sm">design_services</span> Visual Builder
+                </button>
+                <button id="btn-mode-preview" onclick="switchViewMode('preview')" class="px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all text-white hover:bg-white/10">
+                    <span class="material-icons text-sm">visibility</span> Live Preview
+                </button>
+            </div>
+
+            <button onclick="loadDemoTemplate()" class="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-xs font-medium flex items-center gap-1 transition">
+                <span class="material-icons text-sm">auto_fix_high</span> Load Demo
+            </button>
+            <button onclick="openJsonModal('export')" class="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-xs font-medium flex items-center gap-1 transition">
+                <span class="material-icons text-sm">code</span> Schema JSON
+            </button>
+            <button onclick="clearCanvas()" class="px-3 py-1.5 rounded bg-red-500/80 hover:bg-red-600 text-xs font-medium flex items-center gap-1 transition">
+                <span class="material-icons text-sm">delete_outline</span> Clear
+            </button>
+            <div class="h-6 w-[1px] bg-white/30 mx-1"></div>
+            <!-- Theme Toggle Button -->
+            <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-white/10 text-white transition" title="Toggle Light/Dark Theme">
+                <span id="theme-icon" class="material-icons text-xl">dark_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- VIEW 1: VISUAL EDITOR -->
+        <div id="view-editor" class="flex w-full h-full overflow-hidden">
+
+            <!-- LEFT TOOL PALETTE (MudDrawer) -->
+            <aside class="w-72 bg-mud-lightPaper dark:bg-mud-darkDrawer border-r border-mud-lightBorder dark:border-mud-darkBorder flex flex-col shrink-0">
+                <div class="p-3 border-b border-mud-lightBorder dark:border-mud-darkBorder bg-gray-50 dark:bg-black/20">
+                    <h2 class="font-semibold text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="material-icons text-sm text-mud-primary">widgets</span> Component Palette
+                    </h2>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-3 space-y-4">
+                    <!-- Containers & Layout -->
+                    <div>
+                        <div class="text-[11px] font-bold text-gray-400 uppercase mb-2 px-1">Layout Containers</div>
+                        <div class="space-y-2">
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'section')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex items-center gap-3 shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary text-lg">view_quilt</span>
+                                <div>
+                                    <div class="text-xs font-semibold">Section / Card</div>
+                                    <div class="text-[10px] text-gray-500">Container panel</div>
+                                </div>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'grid2')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex items-center gap-3 shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary text-lg">view_column</span>
+                                <div>
+                                    <div class="text-xs font-semibold">2-Column Grid Row</div>
+                                    <div class="text-[10px] text-gray-500">Side-by-side flex layout</div>
+                                </div>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'group')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex items-center gap-3 shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary text-lg">folder_open</span>
+                                <div>
+                                    <div class="text-xs font-semibold">Field Group</div>
+                                    <div class="text-[10px] text-gray-500">Recursive nested group</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Controls -->
+                    <div>
+                        <div class="text-[11px] font-bold text-gray-400 uppercase mb-2 px-1">Form Controls</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'text')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary mb-1">short_text</span>
+                                <span class="text-xs font-medium">Text Input</span>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'number')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary mb-1">pin</span>
+                                <span class="text-xs font-medium">Number Input</span>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'select')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary mb-1">arrow_drop_down_circle</span>
+                                <span class="text-xs font-medium">Select Dropdown</span>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'checkbox')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary mb-1">check_box</span>
+                                <span class="text-xs font-medium">Checkbox</span>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'datepicker')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary mb-1">calendar_today</span>
+                                <span class="text-xs font-medium">Date Picker</span>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'switch')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow transition">
+                                <span class="material-icons text-mud-primary mb-1">toggle_on</span>
+                                <span class="text-xs font-medium">Switch Toggle</span>
+                            </div>
+                            <div draggable="true" ondragstart="handlePaletteDragStart(event, 'textarea')" class="p-2.5 bg-white dark:bg-mud-darkPaper rounded-lg border border-mud-lightBorder dark:border-mud-darkBorder hover:border-mud-primary cursor-grab flex flex-col items-center justify-center text-center shadow-sm hover:shadow font-medium col-span-2 transition">
+                                <span class="material-icons text-mud-primary mb-1">notes</span>
+                                <span class="text-xs">Text Area</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Field Templates Section -->
+                    <div>
+                        <div class="text-[11px] font-bold text-gray-400 uppercase mb-2 px-1 flex justify-between items-center">
+                            <span>Saved Custom Templates</span>
+                            <span id="custom-templates-count" class="text-[10px] bg-mud-primary/20 text-mud-primary px-1.5 py-0.5 rounded-full font-semibold">0</span>
+                        </div>
+                        <div id="custom-templates-list" class="space-y-2">
+                            <div class="text-xs text-gray-400 italic p-2 text-center border border-dashed border-gray-300 dark:border-gray-700 rounded">
+                                Save elements as custom templates to drag them again later.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CENTER WORKSPACE / TREE CANVAS -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-100 dark:bg-mud-darkBg" id="main-canvas-wrapper">
+                <div class="max-w-4xl mx-auto space-y-4">
+
+                    <!-- Canvas Header Info -->
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Root Form Canvas</span>
+                            <span id="node-counter-badge" class="bg-gray-200 dark:bg-mud-darkPaper text-xs font-semibold px-2 py-0.5 rounded text-gray-600 dark:text-gray-300">0 Items</span>
+                        </div>
+                        <span class="text-xs text-gray-400">Drag components into root canvas or nested container elements</span>
+                    </div>
+
+                    <!-- Root Drop Canvas Zone -->
+                    <div id="root-canvas"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, 'root')"
+                         class="min-h-[500px] p-4 rounded-xl bg-white dark:bg-mud-darkPaper border-2 border-dashed border-gray-300 dark:border-mud-darkBorder transition-all flex flex-col gap-3">
+                        
+                        <!-- Empty Canvas State -->
+                        <div id="empty-canvas-state" class="m-auto text-center py-16 pointer-events-none">
+                            <span class="material-icons text-6xl text-gray-300 dark:text-gray-600 mb-3">add_to_photos</span>
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400">Your Form Canvas is Empty</h3>
+                            <p class="text-xs text-gray-400 mt-1 max-w-xs">Drag and drop fields or container blocks from the left sidebar panel to begin building.</p>
+                        </div>
+
+                        <!-- Dynamic Nodes Rendered Here -->
+                    </div>
+                </div>
+            </main>
+
+            <!-- RIGHT FIELD INSPECTOR & RULES BUILDER -->
+            <aside class="w-80 bg-mud-lightPaper dark:bg-mud-darkDrawer border-l border-mud-lightBorder dark:border-mud-darkBorder flex flex-col shrink-0">
+                <div class="p-3 border-b border-mud-lightBorder dark:border-mud-darkBorder bg-gray-50 dark:bg-black/20 flex items-center justify-between">
+                    <h2 class="font-semibold text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="material-icons text-sm text-mud-primary">tune</span> Field Inspector
+                    </h2>
+                    <span id="selected-type-badge" class="hidden text-[10px] bg-mud-primary text-white font-bold px-2 py-0.5 rounded uppercase">TEXT</span>
+                </div>
+
+                <div id="inspector-content" class="flex-1 overflow-y-auto p-4 space-y-5">
+                    <!-- Unselected State -->
+                    <div id="inspector-unselected" class="text-center py-20 text-gray-400">
+                        <span class="material-icons text-4xl mb-2 text-gray-300 dark:text-gray-600">touch_app</span>
+                        <p class="text-xs">Select any field node on the canvas to configure properties, validation, and conditional rules.</p>
+                    </div>
+
+                    <!-- Inspector Form Panel -->
+                    <form id="inspector-form" onsubmit="event.preventDefault();" class="hidden space-y-5">
+
+                        <!-- Tab Headers -->
+                        <div class="flex border-b border-gray-200 dark:border-gray-700 text-xs">
+                            <button type="button" onclick="switchInspectorTab('props')" id="tab-btn-props" class="flex-1 py-2 font-semibold border-b-2 border-mud-primary text-mud-primary">Properties</button>
+                            <button type="button" onclick="switchInspectorTab('rules')" id="tab-btn-rules" class="flex-1 py-2 font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Validation</button>
+                            <button type="button" onclick="switchInspectorTab('vis')" id="tab-btn-vis" class="flex-1 py-2 font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Visibility</button>
+                        </div>
+
+                        <!-- TAB 1: PROPERTIES -->
+                        <div id="inspector-tab-props" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Field Label</label>
+                                <input type="text" id="prop-label" oninput="updateSelectedFieldProperty('label', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-1 focus:ring-mud-primary focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Field Key (Binding ID)</label>
+                                <input type="text" id="prop-key" onchange="updateSelectedFieldProperty('key', this.value)" class="w-full text-xs p-2 font-mono rounded border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-1 focus:ring-mud-primary focus:outline-none">
+                            </div>
+
+                            <div id="prop-container-placeholder">
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Placeholder Text</label>
+                                <input type="text" id="prop-placeholder" oninput="updateSelectedFieldProperty('placeholder', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-1 focus:ring-mud-primary focus:outline-none">
+                            </div>
+
+                            <div id="prop-container-helper">
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Helper Text</label>
+                                <input type="text" id="prop-helper" oninput="updateSelectedFieldProperty('helperText', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-1 focus:ring-mud-primary focus:outline-none">
+                            </div>
+
+                            <!-- Options (For Select Dropdowns) -->
+                            <div id="prop-container-options" class="hidden">
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Select Options (Comma separated)</label>
+                                <textarea id="prop-options" oninput="updateSelectedFieldOptions(this.value)" rows="3" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-1 focus:ring-mud-primary focus:outline-none" placeholder="Option 1, Option 2, Option 3"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: VALIDATION -->
+                        <div id="inspector-tab-rules" class="hidden space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Required Field</span>
+                                <input type="checkbox" id="rule-required" onchange="updateValidationRule('required', this.checked)" class="w-4 h-4 accent-mud-primary rounded cursor-pointer">
+                            </div>
+
+                            <div id="rule-container-length" class="space-y-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Min Length / Value</label>
+                                    <input type="number" id="rule-min" oninput="updateValidationRule('min', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Max Length / Value</label>
+                                    <input type="number" id="rule-max" oninput="updateValidationRule('max', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent">
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Regex Pattern Validation</label>
+                                <input type="text" id="rule-pattern" oninput="updateValidationRule('pattern', this.value)" placeholder="e.g. ^[0-9]{5}$" class="w-full text-xs p-2 font-mono rounded border border-gray-300 dark:border-gray-700 bg-transparent">
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mt-2 mb-1">Custom Error Message</label>
+                                <input type="text" id="rule-error-msg" oninput="updateValidationRule('errorMessage', this.value)" placeholder="Invalid field value" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent">
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: CONDITIONAL VISIBILITY -->
+                        <div id="inspector-tab-vis" class="hidden space-y-3">
+                            <p class="text-[11px] text-gray-400">Dynamically show or hide this field based on another field's runtime input value.</p>
+                            
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Trigger Field Key</label>
+                                <select id="vis-target-key" onchange="updateVisibilityRule('targetKey', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-mud-darkPaper">
+                                    <option value="">-- Select Field --</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Comparison Operator</label>
+                                <select id="vis-operator" onchange="updateVisibilityRule('operator', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-mud-darkPaper">
+                                    <option value="equals">Equals (==)</option>
+                                    <option value="not_equals">Not Equals (!=)</option>
+                                    <option value="contains">Contains</option>
+                                    <option value="is_empty">Is Empty</option>
+                                    <option value="is_not_empty">Is Not Empty</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Comparison Target Value</label>
+                                <input type="text" id="vis-value" oninput="updateVisibilityRule('value', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Action</label>
+                                <select id="vis-action" onchange="updateVisibilityRule('action', this.value)" class="w-full text-xs p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-mud-darkPaper">
+                                    <option value="show">SHOW when condition is true</option>
+                                    <option value="hide">HIDE when condition is true</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- VIEW 2: LIVE INTERACTIVE FORM PREVIEW -->
+        <div id="view-preview" class="hidden flex-1 overflow-y-auto p-8 bg-gray-100 dark:bg-mud-darkBg">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <!-- Preview Top Info Banner -->
+                <div class="bg-mud-primary/10 border border-mud-primary/30 rounded-xl p-4 flex items-center justify-between text-mud-primary">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons">play_circle_outline</span>
+                        <div>
+                            <h3 class="font-bold text-sm">MudBlazor Runtime Renderer Preview</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Testing dynamic visibility rules, C# validation engine models, and input state.</p>
+                        </div>
+                    </div>
+                    <button onclick="switchViewMode('editor')" class="px-3 py-1.5 bg-mud-primary text-white text-xs font-semibold rounded-lg hover:bg-mud-primary/90 transition">
+                        Back to Editor
+                    </button>
+                </div>
+
+                <!-- Form Card Render Area -->
+                <div class="bg-white dark:bg-mud-darkPaper p-6 rounded-xl mud-elevation-4 space-y-6">
+                    <form id="runtime-form" onsubmit="handleRuntimeSubmit(event)" class="space-y-6">
+                        <!-- Dynamic Runtime Form Fields Injected Here -->
+                        <div id="runtime-fields-container" class="space-y-4"></div>
+
+                        <!-- Form Action Buttons -->
+                        <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+                            <button type="button" onclick="resetRuntimeForm()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-xs font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                                Reset Form
+                            </button>
+                            <button type="submit" class="px-5 py-2 bg-mud-primary text-white text-xs font-semibold rounded-lg hover:bg-mud-primary/90 shadow transition flex items-center gap-1.5">
+                                <span class="material-icons text-sm">send</span> Submit Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Live Runtime Form Values Inspector -->
+                <div class="bg-white dark:bg-mud-darkPaper p-4 rounded-xl border border-mud-lightBorder dark:border-mud-darkBorder">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1">
+                        <span class="material-icons text-sm text-mud-primary">data_object</span> Live Form State Data
+                    </h4>
+                    <pre id="runtime-data-preview" class="bg-gray-900 text-green-400 text-xs p-3 rounded font-mono overflow-x-auto">{}</pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCHEMA JSON MODAL -->
+    <div id="json-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-mud-darkPaper rounded-xl max-w-2xl w-full flex flex-col max-h-[85vh] shadow-2xl border border-mud-lightBorder dark:border-mud-darkBorder">
+            <div class="p-4 border-b border-mud-lightBorder dark:border-mud-darkBorder flex items-center justify-between">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <span class="material-icons text-mud-primary">code</span> Dynamic Form Schema JSON
+                </h3>
+                <button onclick="closeJsonModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="p-4 flex-1 overflow-hidden flex flex-col">
+                <p class="text-xs text-gray-500 mb-2">Import or edit the MudBlazor recursive JSON definition below:</p>
+                <textarea id="json-textarea" class="w-full flex-1 p-3 bg-gray-900 text-green-400 font-mono text-xs rounded border border-gray-700 focus:outline-none focus:ring-1 focus:ring-mud-primary" rows="12"></textarea>
+            </div>
+            <div class="p-4 border-t border-mud-lightBorder dark:border-mud-darkBorder flex justify-end gap-2">
+                <button onclick="copyJsonToClipboard()" class="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition flex items-center gap-1">
+                    <span class="material-icons text-sm">content_copy</span> Copy JSON
+                </button>
+                <button onclick="importJsonSchema()" class="px-4 py-1.5 bg-mud-primary text-white rounded text-xs font-semibold hover:bg-mud-primary/90 transition flex items-center gap-1">
+                    <span class="material-icons text-sm">file_upload</span> Apply Schema
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST FEEDBACK -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-xl border border-gray-700 transition-all transform translate-y-20 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <span class="material-icons text-mud-primary text-sm" id="toast-icon">info</span>
+        <span id="toast-msg">Notification message</span>
+    </div>
+
+    <!-- BLAZOR WASM SIMULATION & DATA ENGINE SCRIPT -->
+    <script>
+        /* ==========================================================================
+           C# BLAZOR WASM DATA MODELS SIMULATION & DOM ENGINE
+           ========================================================================== */
+
+        // Primary Form State (Tree Snapshot of FormElements)
+        let formTree = [];
+        let selectedNodeId = null;
+        let draggedType = null;
+        let customTemplates = [];
+        let runtimeFormState = {};
+
+        // Unique ID Generator
+        function generateId() {
+            return 'node_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        /* --------------------------------------------------------------------------
+           INITIALIZATION & DEMO DATA LOAD
+           -------------------------------------------------------------------------- */
+        window.onload = function () {
+            loadDemoTemplate();
+        };
+
+        function loadDemoTemplate() {
+            formTree = [
+                {
+                    id: generateId(),
+                    type: 'section',
+                    label: 'Customer Onboarding Details',
+                    key: 'sec_customer_info',
+                    children: [
+                        {
+                            id: generateId(),
+                            type: 'grid2',
+                            label: 'Name Row',
+                            key: 'grid_name',
+                            children: [
+                                {
+                                    id: generateId(),
+                                    type: 'text',
+                                    label: 'First Name',
+                                    key: 'firstName',
+                                    placeholder: 'e.g. John',
+                                    helperText: 'Enter legal given name',
+                                    validation: { required: true, min: 2, max: 30 }
+                                },
+                                {
+                                    id: generateId(),
+                                    type: 'text',
+                                    label: 'Last Name',
+                                    key: 'lastName',
+                                    placeholder: 'e.g. Doe',
+                                    validation: { required: true }
+                                }
+                            ]
+                        },
+                        {
+                            id: generateId(),
+                            type: 'select',
+                            label: 'Account Type',
+                            key: 'accountType',
+                            options: ['Personal', 'Business', 'Enterprise'],
+                            placeholder: 'Select type...',
+                            validation: { required: true }
+                        },
+                        {
+                            id: generateId(),
+                            type: 'text',
+                            label: 'Company Registration Number',
+                            key: 'companyRegNo',
+                            placeholder: 'REG-XXXXX',
+                            helperText: 'Shown only for Business or Enterprise accounts',
+                            visibilityRule: {
+                                targetKey: 'accountType',
+                                operator: 'not_equals',
+                                value: 'Personal',
+                                action: 'show'
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: generateId(),
+                    type: 'section',
+                    label: 'Contact & Billing Options',
+                    key: 'sec_billing',
+                    children: [
+                        {
+                            id: generateId(),
+                            type: 'switch',
+                            label: 'Enable Custom Billing Address',
+                            key: 'enableCustomBilling',
+                            helperText: 'Toggle to specify different billing location'
+                        },
+                        {
+                            id: generateId(),
+                            type: 'textarea',
+                            label: 'Billing Address Details',
+                            key: 'billingAddress',
+                            placeholder: 'Street, Suite, City, Zip Code',
+                            visibilityRule: {
+                                targetKey: 'enableCustomBilling',
+                                operator: 'equals',
+                                value: 'true',
+                                action: 'show'
+                            }
+                        }
+                    ]
+                }
+            ];
+
+            renderCanvasTree();
+            showToast("Demo customer onboarding form loaded.");
+        }
+
+        /* --------------------------------------------------------------------------
+           TREE SEARCH & MANIPULATION HELPERS
+           -------------------------------------------------------------------------- */
+        function findNodeAndParent(id, nodes = formTree, parent = null) {
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === id) {
+                    return { node: nodes[i], parent: parent, index: i, siblings: nodes };
+                }
+                if (nodes[i].children) {
+                    const found = findNodeAndParent(id, nodes[i].children, nodes[i]);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        function getAllFieldsList(nodes = formTree) {
+            let list = [];
+            for (let node of nodes) {
+                if (node.type !== 'section' && node.type !== 'grid2' && node.type !== 'group') {
+                    list.push(node);
+                }
+                if (node.children) {
+                    list = list.concat(getAllFieldsList(node.children));
+                }
+            }
+            return list;
+        }
+
+        /* --------------------------------------------------------------------------
+           DRAG AND DROP HANDLERS
+           -------------------------------------------------------------------------- */
+        function handlePaletteDragStart(e, type) {
+            draggedType = type;
+            e.dataTransfer.setData('text/plain', type);
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.add('drag-over-zone');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.remove('drag-over-zone');
+        }
+
+        function handleDrop(e, targetId) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Remove highlighting
+            const dropZones = document.querySelectorAll('.drag-over-zone');
+            dropZones.forEach(zone => zone.classList.remove('drag-over-zone'));
+
+            if (!draggedType) return;
+
+            // Create new node instance
+            const newNode = createNewNode(draggedType);
+
+            if (targetId === 'root') {
+                formTree.push(newNode);
+            } else {
+                const target = findNodeAndParent(targetId);
+                if (target && target.node.children) {
+                    target.node.children.push(newNode);
+                }
+            }
+
+            draggedType = null;
+            renderCanvasTree();
+            selectNode(newNode.id);
+            showToast(`Added new ${newNode.type} element.`);
+        }
+
+        function createNewNode(type) {
+            const baseId = generateId();
+            const isContainer = (type === 'section' || type === 'grid2' || type === 'group');
+
+            const newNode = {
+                id: baseId,
+                type: type,
+                label: type.charAt(0).toUpperCase() + type.slice(1) + ' Field',
+                key: type + '_' + baseId.substr(5, 4),
+                placeholder: '',
+                helperText: '',
+                options: type === 'select' ? ['Option 1', 'Option 2', 'Option 3'] : [],
+                validation: { required: false, min: null, max: null, pattern: '', errorMessage: '' },
+                visibilityRule: { targetKey: '', operator: 'equals', value: '', action: 'show' }
+            };
+
+            if (isContainer) {
+                newNode.children = [];
+                if (type === 'section') newNode.label = 'Card Section';
+                if (type === 'grid2') newNode.label = '2-Column Grid Row';
+                if (type === 'group') newNode.label = 'Field Group';
+            }
+
+            return newNode;
+        }
+
+        /* --------------------------------------------------------------------------
+           RENDER CANVAS TREE NODES
+           -------------------------------------------------------------------------- */
+        function renderCanvasTree() {
+            const canvas = document.getElementById('root-canvas');
+            const emptyState = document.getElementById('empty-canvas-state');
+            const badge = document.getElementById('node-counter-badge');
+
+            // Count total nodes
+            const allNodesCount = (nodes = formTree) => {
+                return nodes.reduce((acc, curr) => acc + 1 + (curr.children ? allNodesCount(curr.children) : 0), 0);
+            };
+            badge.innerText = `${allNodesCount()} Items`;
+
+            // Clear Canvas (keep empty state node template)
+            canvas.querySelectorAll('.canvas-node-element').forEach(el => el.remove());
+
+            if (formTree.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                formTree.forEach(node => {
+                    canvas.appendChild(renderNodeUI(node));
+                });
+            }
+        }
+
+        function renderNodeUI(node, level = 0) {
+            const wrapper = document.createElement('div');
+            const isSelected = selectedNodeId === node.id;
+            const isContainer = (node.type === 'section' || node.type === 'grid2' || node.type === 'group');
+
+            wrapper.className = `canvas-node-element group relative p-3 rounded-lg border-2 border-solid transition-all text-xs bg-white dark:bg-mud-darkPaper ${
+                isSelected ? 'border-mud-primary shadow-md ring-1 ring-mud-primary' : 'border-gray-200 dark:border-mud-darkBorder hover:border-gray-300'
+            }`;
+
+            wrapper.onclick = (e) => {
+                e.stopPropagation();
+                selectNode(node.id);
+            };
+
+            // Icon by component type
+            const icons = {
+                section: 'view_quilt',
+                grid2: 'view_column',
+                group: 'folder_open',
+                text: 'short_text',
+                number: 'pin',
+                select: 'arrow_drop_down_circle',
+                checkbox: 'check_box',
+                datepicker: 'calendar_today',
+                switch: 'toggle_on',
+                textarea: 'notes'
+            };
+
+            // Render Node Controls Header
+            let headerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="material-icons text-mud-primary text-base">${icons[node.type] || 'widgets'}</span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">${node.label}</span>
+                        <span class="font-mono text-[10px] text-gray-400 bg-gray-100 dark:bg-black/30 px-1.5 py-0.5 rounded">${node.key}</span>
+                        ${node.validation?.required ? '<span class="text-red-500 font-bold">*</span>' : ''}
+                    </div>
+                    <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                        <button onclick="moveNodeUp(event, '${node.id}')" title="Move Up" class="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded text-gray-500"><span class="material-icons text-sm">arrow_upward</span></button>
+                        <button onclick="moveNodeDown(event, '${node.id}')" title="Move Down" class="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded text-gray-500"><span class="material-icons text-sm">arrow_downward</span></button>
+                        <button onclick="saveAsTemplate(event, '${node.id}')" title="Save as Custom Template" class="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded text-mud-primary"><span class="material-icons text-sm">bookmark_add</span></button>
+                        <button onclick="deleteNode(event, '${node.id}')" title="Delete" class="p-1 hover:bg-red-100 text-red-500 rounded"><span class="material-icons text-sm">delete</span></button>
+                    </div>
+                </div>
+            `;
+
+            // If layout container, render drop zone & child container elements recursively
+            if (isContainer) {
+                let gridColsClass = node.type === 'grid2' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-3';
+                
+                let containerBody = `
+                    <div id="container-${node.id}"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, '${node.id}')"
+                         class="${gridColsClass} min-h-[70px] p-2 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-black/10">
+                `;
+
+                if (node.children && node.children.length > 0) {
+                    // Append HTML dynamically
+                    wrapper.innerHTML = headerHTML;
+                    const bodyDiv = document.createElement('div');
+                    bodyDiv.className = `${gridColsClass} min-h-[70px] p-2 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-black/10`;
+                    
+                    bodyDiv.ondragover = handleDragOver;
+                    bodyDiv.ondragleave = handleDragLeave;
+                    bodyDiv.ondrop = (e) => handleDrop(e, node.id);
+
+                    node.children.forEach(child => {
+                        bodyDiv.appendChild(renderNodeUI(child, level + 1));
+                    });
+                    wrapper.appendChild(bodyDiv);
+                } else {
+                    containerBody += `<div class="col-span-full text-center text-[10px] text-gray-400 py-3 pointer-events-none">Drop child fields into this container zone</div></div>`;
+                    wrapper.innerHTML = headerHTML + containerBody;
+                }
+            } else {
+                // Leaf input preview simulation
+                let previewInput = `<div class="text-[11px] text-gray-400 italic">Preview: [${node.type.toUpperCase()}] ${node.placeholder ? ' - ' + node.placeholder : ''}</div>`;
+                wrapper.innerHTML = headerHTML + previewInput;
+            }
+
+            return wrapper;
+        }
+
+        /* --------------------------------------------------------------------------
+           INSPECTOR & SELECTION HANDLERS
+           -------------------------------------------------------------------------- */
+        function selectNode(id) {
+            selectedNodeId = id;
+            const item = findNodeAndParent(id);
+            if (!item) return;
+
+            const node = item.node;
+            renderCanvasTree(); // Refresh canvas border selection styles
+
+            // Show inspector controls
+            document.getElementById('inspector-unselected').classList.add('hidden');
+            document.getElementById('inspector-form').classList.remove('hidden');
+
+            const badge = document.getElementById('selected-type-badge');
+            badge.classList.remove('hidden');
+            badge.innerText = node.type;
+
+            // Populate form input values
+            document.getElementById('prop-label').value = node.label || '';
+            document.getElementById('prop-key').value = node.key || '';
+            document.getElementById('prop-placeholder').value = node.placeholder || '';
+            document.getElementById('prop-helper').value = node.helperText || '';
+
+            // Options field visibility
+            const optionsContainer = document.getElementById('prop-container-options');
+            if (node.type === 'select') {
+                optionsContainer.classList.remove('hidden');
+                document.getElementById('prop-options').value = node.options ? node.options.join(', ') : '';
+            } else {
+                optionsContainer.classList.add('hidden');
+            }
+
+            // Populate Validation Rules
+            document.getElementById('rule-required').checked = !!node.validation?.required;
+            document.getElementById('rule-min').value = node.validation?.min ?? '';
+            document.getElementById('rule-max').value = node.validation?.max ?? '';
+            document.getElementById('rule-pattern').value = node.validation?.pattern || '';
+            document.getElementById('rule-error-msg').value = node.validation?.errorMessage || '';
+
+            // Populate Target Dropdown for Visibility Rules
+            const visTargetSelect = document.getElementById('vis-target-key');
+            visTargetSelect.innerHTML = '<option value="">-- None / Always Visible --</option>';
+            const allFields = getAllFieldsList().filter(f => f.id !== node.id);
+            allFields.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.key;
+                opt.innerText = `${f.label} (${f.key})`;
+                if (node.visibilityRule?.targetKey === f.key) opt.selected = true;
+                visTargetSelect.appendChild(opt);
+            });
+
+            document.getElementById('vis-operator').value = node.visibilityRule?.operator || 'equals';
+            document.getElementById('vis-value').value = node.visibilityRule?.value || '';
+            document.getElementById('vis-action').value = node.visibilityRule?.action || 'show';
+        }
+
+        function switchInspectorTab(tab) {
+            ['props', 'rules', 'vis'].forEach(t => {
+                document.getElementById(`inspector-tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = 'flex-1 py-2 font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200';
+            });
+
+            document.getElementById(`inspector-tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tab}`).className = 'flex-1 py-2 font-semibold border-b-2 border-mud-primary text-mud-primary';
+        }
+
+        function updateSelectedFieldProperty(prop, value) {
+            if (!selectedNodeId) return;
+            const item = findNodeAndParent(selectedNodeId);
+            if (item) {
+                item.node[prop] = value;
+                renderCanvasTree();
+            }
+        }
+
+        function updateSelectedFieldOptions(val) {
+            if (!selectedNodeId) return;
+            const item = findNodeAndParent(selectedNodeId);
+            if (item && item.node.type === 'select') {
+                item.node.options = val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            }
+        }
+
+        function updateValidationRule(ruleKey, value) {
+            if (!selectedNodeId) return;
+            const item = findNodeAndParent(selectedNodeId);
+            if (item) {
+                if (!item.node.validation) item.node.validation = {};
+                item.node.validation[ruleKey] = value;
+            }
+        }
+
+        function updateVisibilityRule(ruleKey, value) {
+            if (!selectedNodeId) return;
+            const item = findNodeAndParent(selectedNodeId);
+            if (item) {
+                if (!item.node.visibilityRule) item.node.visibilityRule = {};
+                item.node.visibilityRule[ruleKey] = value;
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+           TREE REORDERING & ACTIONS
+           -------------------------------------------------------------------------- */
+        function moveNodeUp(e, id) {
+            e.stopPropagation();
+            const item = findNodeAndParent(id);
+            if (item && item.index > 0) {
+                const temp = item.siblings[item.index];
+                item.siblings[item.index] = item.siblings[item.index - 1];
+                item.siblings[item.index - 1] = temp;
+                renderCanvasTree();
+            }
+        }
+
+        function moveNodeDown(e, id) {
+            e.stopPropagation();
+            const item = findNodeAndParent(id);
+            if (item && item.index < item.siblings.length - 1) {
+                const temp = item.siblings[item.index];
+                item.siblings[item.index] = item.siblings[item.index + 1];
+                item.siblings[item.index + 1] = temp;
+                renderCanvasTree();
+            }
+        }
+
+        function deleteNode(e, id) {
+            e.stopPropagation();
+            const item = findNodeAndParent(id);
+            if (item) {
+                item.siblings.splice(item.index, 1);
+                if (selectedNodeId === id) {
+                    selectedNodeId = null;
+                    document.getElementById('inspector-unselected').classList.remove('hidden');
+                    document.getElementById('inspector-form').classList.add('hidden');
+                }
+                renderCanvasTree();
+                showToast("Field deleted from canvas.");
+            }
+        }
+
+        function saveAsTemplate(e, id) {
+            e.stopPropagation();
+            const item = findNodeAndParent(id);
+            if (!item) return;
+
+            // Deep clone node definition
+            const clonedNode = JSON.parse(JSON.stringify(item.node));
+            clonedNode.id = generateId();
+
+            customTemplates.push(clonedNode);
+            renderCustomTemplates();
+            showToast("Saved custom template to sidebar.");
+        }
+
+        function renderCustomTemplates() {
+            const listContainer = document.getElementById('custom-templates-list');
+            const countBadge = document.getElementById('custom-templates-count');
+            countBadge.innerText = customTemplates.length;
+
+            if (customTemplates.length === 0) {
+                listContainer.innerHTML = `<div class="text-xs text-gray-400 italic p-2 text-center border border-dashed border-gray-300 dark:border-gray-700 rounded">Save elements as custom templates to drag them again later.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            customTemplates.forEach((tpl, idx) => {
+                const div = document.createElement('div');
+                div.draggable = true;
+                div.ondragstart = (e) => {
+                    draggedType = tpl.type;
+                    e.dataTransfer.setData('text/plain', tpl.type);
+                };
+                div.className = 'p-2 bg-mud-primary/10 rounded border border-mud-primary/30 flex items-center justify-between cursor-grab hover:bg-mud-primary/20 transition text-xs';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="material-icons text-mud-primary text-sm">bookmark</span>
+                        <span class="font-medium truncate max-w-[140px]">${tpl.label}</span>
+                    </div>
+                    <button onclick="removeCustomTemplate(${idx})" class="text-gray-400 hover:text-red-500"><span class="material-icons text-xs">close</span></button>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function removeCustomTemplate(idx) {
+            customTemplates.splice(idx, 1);
+            renderCustomTemplates();
+        }
+
+        function clearCanvas() {
+            if (confirm("Are you sure you want to clear the form canvas?")) {
+                formTree = [];
+                selectedNodeId = null;
+                document.getElementById('inspector-unselected').classList.remove('hidden');
+                document.getElementById('inspector-form').classList.add('hidden');
+                renderCanvasTree();
+                showToast("Canvas cleared.");
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+           VIEW MODES & RUNTIME FORM PREVIEW ENGINE
+           -------------------------------------------------------------------------- */
+        function switchViewMode(mode) {
+            const btnEditor = document.getElementById('btn-mode-editor');
+            const btnPreview = document.getElementById('btn-mode-preview');
+            const viewEditor = document.getElementById('view-editor');
+            const viewPreview = document.getElementById('view-preview');
+
+            if (mode === 'editor') {
+                btnEditor.className = 'px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all bg-white text-mud-primary shadow';
+                btnPreview.className = 'px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all text-white hover:bg-white/10';
+                viewEditor.classList.remove('hidden');
+                viewPreview.classList.add('hidden');
+            } else {
+                btnPreview.className = 'px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all bg-white text-mud-primary shadow';
+                btnEditor.className = 'px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all text-white hover:bg-white/10';
+                viewEditor.classList.add('hidden');
+                viewPreview.classList.remove('hidden');
+                
+                // Initialize Form Runtime Engine
+                initializeRuntimeForm();
+            }
+        }
+
+        function initializeRuntimeForm() {
+            runtimeFormState = {};
+            const container = document.getElementById('runtime-fields-container');
+            container.innerHTML = '';
+
+            if (formTree.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs">Form tree is empty. Add elements in Visual Builder first.</div>`;
+                updateRuntimePreviewJSON();
+                return;
+            }
+
+            formTree.forEach(node => {
+                container.appendChild(renderRuntimeElement(node));
+            });
+
+            evaluateConditionalVisibility();
+            updateRuntimePreviewJSON();
+        }
+
+        function renderRuntimeElement(node) {
+            const wrapper = document.createElement('div');
+            wrapper.id = `runtime-node-${node.key}`;
+            wrapper.setAttribute('data-field-key', node.key);
+
+            // Container Render Handling
+            if (node.type === 'section') {
+                wrapper.className = 'bg-gray-50 dark:bg-black/20 p-4 rounded-xl border border-mud-lightBorder dark:border-mud-darkBorder space-y-4';
+                wrapper.innerHTML = `<h3 class="font-bold text-sm text-mud-primary border-b border-mud-lightBorder dark:border-mud-darkBorder pb-2">${node.label}</h3>`;
+                const childContainer = document.createElement('div');
+                childContainer.className = 'space-y-4';
+                (node.children || []).forEach(child => childContainer.appendChild(renderRuntimeElement(child)));
+                wrapper.appendChild(childContainer);
+                return wrapper;
+            }
+
+            if (node.type === 'grid2') {
+                wrapper.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+                (node.children || []).forEach(child => wrapper.appendChild(renderRuntimeElement(child)));
+                return wrapper;
+            }
+
+            if (node.type === 'group') {
+                wrapper.className = 'space-y-4 p-3 border-l-2 border-mud-primary bg-mud-primary/5 rounded-r-lg';
+                (node.children || []).forEach(child => wrapper.appendChild(renderRuntimeElement(child)));
+                return wrapper;
+            }
+
+            // Input Control Rendering
+            wrapper.className = 'space-y-1.5';
+            
+            let labelHTML = `<label class="block text-xs font-medium text-gray-700 dark:text-gray-300">${node.label} ${node.validation?.required ? '<span class="text-red-500">*</span>' : ''}</label>`;
+            let inputControlHTML = '';
+
+            switch (node.type) {
+                case 'text':
+                    inputControlHTML = `<input type="text" data-key="${node.key}" placeholder="${node.placeholder || ''}" oninput="handleRuntimeInputChange('${node.key}', this.value)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-mud-primary focus:outline-none transition">`;
+                    break;
+                case 'number':
+                    inputControlHTML = `<input type="number" data-key="${node.key}" placeholder="${node.placeholder || ''}" oninput="handleRuntimeInputChange('${node.key}', this.value)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-mud-primary focus:outline-none transition">`;
+                    break;
+                case 'textarea':
+                    inputControlHTML = `<textarea data-key="${node.key}" placeholder="${node.placeholder || ''}" rows="3" oninput="handleRuntimeInputChange('${node.key}', this.value)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-mud-primary focus:outline-none transition"></textarea>`;
+                    break;
+                case 'select':
+                    let optionsStr = (node.options || []).map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    inputControlHTML = `
+                        <select data-key="${node.key}" onchange="handleRuntimeInputChange('${node.key}', this.value)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-mud-darkPaper focus:ring-2 focus:ring-mud-primary focus:outline-none transition">
+                            <option value="">${node.placeholder || '-- Select option --'}</option>
+                            ${optionsStr}
+                        </select>`;
+                    break;
+                case 'checkbox':
+                    inputControlHTML = `
+                        <label class="flex items-center gap-2 cursor-pointer pt-1">
+                            <input type="checkbox" data-key="${node.key}" onchange="handleRuntimeInputChange('${node.key}', this.checked)" class="w-4 h-4 accent-mud-primary rounded cursor-pointer">
+                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">${node.label}</span>
+                        </label>`;
+                    labelHTML = ''; // Checked label embedded inside input
+                    break;
+                case 'switch':
+                    inputControlHTML = `
+                        <label class="flex items-center gap-2 cursor-pointer pt-1">
+                            <input type="checkbox" data-key="${node.key}" onchange="handleRuntimeInputChange('${node.key}', this.checked)" class="sr-only peer">
+                            <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-mud-primary relative"></div>
+                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">${node.label}</span>
+                        </label>`;
+                    labelHTML = '';
+                    break;
+                case 'datepicker':
+                    inputControlHTML = `<input type="date" data-key="${node.key}" onchange="handleRuntimeInputChange('${node.key}', this.value)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-mud-primary focus:outline-none transition">`;
+                    break;
+            }
+
+            let helperHTML = node.helperText ? `<p class="text-[10px] text-gray-400 mt-1">${node.helperText}</p>` : '';
+            let errorContainerHTML = `<p id="error-${node.key}" class="text-[10px] text-red-500 hidden mt-1"></p>`;
+
+            wrapper.innerHTML = labelHTML + inputControlHTML + helperHTML + errorContainerHTML;
+            return wrapper;
+        }
+
+        function handleRuntimeInputChange(key, val) {
+            runtimeFormState[key] = val;
+            evaluateConditionalVisibility();
+            updateRuntimePreviewJSON();
+        }
+
+        function evaluateConditionalVisibility() {
+            const allFields = getAllFieldsList();
+            
+            allFields.forEach(node => {
+                const rule = node.visibilityRule;
+                if (!rule || !rule.targetKey) return;
+
+                const targetVal = runtimeFormState[rule.targetKey];
+                const element = document.getElementById(`runtime-node-${node.key}`);
+                if (!element) return;
+
+                let isMatch = false;
+
+                switch (rule.operator) {
+                    case 'equals':
+                        isMatch = String(targetVal) === String(rule.value);
+                        break;
+                    case 'not_equals':
+                        isMatch = String(targetVal) !== String(rule.value);
+                        break;
+                    case 'contains':
+                        isMatch = String(targetVal || '').includes(String(rule.value));
+                        break;
+                    case 'is_empty':
+                        isMatch = targetVal === undefined || targetVal === null || targetVal === '';
+                        break;
+                    case 'is_not_empty':
+                        isMatch = targetVal !== undefined && targetVal !== null && targetVal !== '';
+                        break;
+                }
+
+                // Action show/hide determination
+                let shouldShow = (rule.action === 'show') ? isMatch : !isMatch;
+
+                if (shouldShow) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+        }
+
+        function updateRuntimePreviewJSON() {
+            document.getElementById('runtime-data-preview').innerText = JSON.stringify(runtimeFormState, null, 2);
+        }
+
+        function resetRuntimeForm() {
+            runtimeFormState = {};
+            initializeRuntimeForm();
+            showToast("Form input state reset.");
+        }
+
+        function handleRuntimeSubmit(e) {
+            e.preventDefault();
+            const allFields = getAllFieldsList();
+            let isValid = true;
+
+            allFields.forEach(node => {
+                const element = document.getElementById(`runtime-node-${node.key}`);
+                const errorEl = document.getElementById(`error-${node.key}`);
+                
+                // Skip validation if hidden
+                if (!element || element.classList.contains('hidden')) return;
+
+                const val = runtimeFormState[node.key];
+                const rules = node.validation || {};
+                let errorMsg = '';
+
+                // Required Check
+                if (rules.required && (val === undefined || val === null || val === '' || val === false)) {
+                    errorMsg = rules.errorMessage || 'This field is required.';
+                }
+                // Min length/value check
+                else if (rules.min !== null && rules.min !== undefined && rules.min !== '' && val) {
+                    if (node.type === 'number' && Number(val) < Number(rules.min)) {
+                        errorMsg = rules.errorMessage || `Minimum value is ${rules.min}.`;
+                    } else if (String(val).length < Number(rules.min)) {
+                        errorMsg = rules.errorMessage || `Minimum length is ${rules.min} characters.`;
+                    }
+                }
+                // Max length/value check
+                else if (rules.max !== null && rules.max !== undefined && rules.max !== '' && val) {
+                    if (node.type === 'number' && Number(val) > Number(rules.max)) {
+                        errorMsg = rules.errorMessage || `Maximum value is ${rules.max}.`;
+                    } else if (String(val).length > Number(rules.max)) {
+                        errorMsg = rules.errorMessage || `Maximum length is ${rules.max} characters.`;
+                    }
+                }
+                // Regex Pattern Check
+                else if (rules.pattern && val) {
+                    const reg = new RegExp(rules.pattern);
+                    if (!reg.test(String(val))) {
+                        errorMsg = rules.errorMessage || 'Invalid field pattern format.';
+                    }
+                }
+
+                if (errorMsg) {
+                    isValid = false;
+                    if (errorEl) {
+                        errorEl.innerText = errorMsg;
+                        errorEl.classList.remove('hidden');
+                    }
+                } else if (errorEl) {
+                    errorEl.classList.add('hidden');
+                }
+            });
+
+            if (isValid) {
+                showToast("Form validation passed & submitted successfully!");
+            } else {
+                showToast("Validation failed. Please check highlighted errors.");
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+           JSON MODAL & IMPORT / EXPORT ENGINE
+           -------------------------------------------------------------------------- */
+        function openJsonModal(type) {
+            const modal = document.getElementById('json-modal');
+            const textarea = document.getElementById('json-textarea');
+            textarea.value = JSON.stringify(formTree, null, 2);
+            modal.classList.remove('hidden');
+        }
+
+        function closeJsonModal() {
+            document.getElementById('json-modal').classList.add('hidden');
+        }
+
+        function copyJsonToClipboard() {
+            const textarea = document.getElementById('json-textarea');
+            textarea.select();
+            document.execCommand('copy');
+            showToast("Schema JSON copied to clipboard.");
+        }
+
+        function importJsonSchema() {
+            try {
+                const textarea = document.getElementById('json-textarea');
+                const parsed = JSON.parse(textarea.value);
+                if (Array.isArray(parsed)) {
+                    formTree = parsed;
+                    selectedNodeId = null;
+                    renderCanvasTree();
+                    closeJsonModal();
+                    showToast("Form Schema imported successfully.");
+                } else {
+                    alert("Invalid JSON schema structure: Expected root array.");
+                }
+            } catch (err) {
+                alert("JSON Parsing Error: " + err.message);
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+           THEME TOGGLE & TOAST HELPERS
+           -------------------------------------------------------------------------- */
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.innerText = 'dark_mode';
+            } else {
+                html.classList.add('dark');
+                icon.innerText = 'light_mode';
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>

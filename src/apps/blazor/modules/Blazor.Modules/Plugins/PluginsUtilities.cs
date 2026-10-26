@@ -45,14 +45,16 @@ public static class PluginsUtilities
             try
             {
                 // If Not Published then it exist on server Root Load it
-                if (!plugin.IsPubished) 
+                if (plugin.IsPubished) 
                 {
-                    // load Modules from RunTime Root Directory
-                    modulesAssembly = Assembly.Load($"{plugin.PluginFileName}.dll");
+                    // load the assembly from published dll in backend if plugin.IsStartup = true 
+                    // TODO: Load the Assembly from the backend API or from a remote source if needed in app LzyLoading
+                    modulesAssembly = Assembly.Load(plugin.AssemblyData);
                 }
                 else
                 {
-                    modulesAssembly = Assembly.Load(plugin.AssemblyData);
+                    // load Modules from RunTime Root Directory
+                    modulesAssembly = Assembly.Load($"{plugin.PluginFileName}.dll");
                 }
 
                 // cache it in  RegisteredModules to load it Later

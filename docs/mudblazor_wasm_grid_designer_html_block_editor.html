@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MudBlazor WASM Grid Designer & HTML Block Editor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mud: {
+                            primary: '#594AE2',
+                            'primary-hover': '#4535C5',
+                            secondary: '#FF4081',
+                            surface: '#FFFFFF',
+                            background: '#F5F5F7',
+                            appbar: '#594AE2',
+                            border: '#E0E0E0',
+                            text: '#424242',
+                            dark: '#1E1E2D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F5F5F7;
+            color: #424242;
+        }
+
+        /* 12-Column Responsive CSS Grid Engine with Dense Auto Packing */
+        .grid-container-12 {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            grid-auto-flow: dense; /* Prevents item overlapping and fills gaps */
+            grid-auto-rows: minmax(65px, auto);
+            gap: 12px;
+            width: 100%;
+            min-height: 70px;
+        }
+
+        /* Block Wrapper Styles */
+        .grid-block-wrapper {
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            overflow: hidden; /* Contains floating content & handles */
+        }
+
+        .grid-block-wrapper:hover {
+            border-color: #594AE2;
+            box-shadow: 0 4px 12px rgba(89, 74, 226, 0.12);
+        }
+
+        .grid-block-wrapper.selected {
+            border: 2px solid #594AE2 !important;
+            box-shadow: 0 0 0 3px rgba(89, 74, 226, 0.25) !important;
+        }
+
+        .grid-block-wrapper.dragging {
+            opacity: 0.35;
+            border: 1.5px dashed #594AE2 !important;
+        }
+
+        .grid-block-wrapper.drop-target-over {
+            border: 2px solid #10B981 !important;
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        /* 1) FLOATING / ABSOLUTE TOOLBAR OVERLAY - NO LAYOUT SHIFT OR HEIGHT RESIZE */
+        .block-toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            padding: 4px 8px;
+            background: rgba(241, 245, 249, 0.95);
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid #CBD5E1;
+            border-radius: 7px 7px 0 0;
+            z-index: 20; /* High z-index to overlap block content */
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-100%);
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.15s ease, 
+                        visibility 0.15s ease;
+            pointer-events: none;
+        }
+
+        /* Slide in and overlap on block hover, focus, or selection */
+        .grid-block-wrapper:hover > .block-toolbar,
+        .grid-block-wrapper.selected > .block-toolbar,
+        .grid-block-wrapper:focus-within > .block-toolbar {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Content Body */
+        .block-content-body {
+            flex: 1 1 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* Mouse Resize Handles */
+        .resize-handle {
+            position: absolute;
+            z-index: 25;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .grid-block-wrapper:hover > .resize-handle,
+        .grid-block-wrapper.selected > .resize-handle {
+            opacity: 1;
+        }
+
+        .handle-r {
+            top: 0; right: -4px; width: 10px; height: 100%;
+            cursor: ew-resize;
+        }
+        .handle-r::after {
+            content: ''; position: absolute; top: 30%; right: 4px; width: 3px; height: 40%;
+            background: #594AE2; border-radius: 2px;
+        }
+
+        .handle-b {
+            bottom: -4px; left: 0; width: 100%; height: 10px;
+            cursor: ns-resize;
+        }
+        .handle-b::after {
+            content: ''; position: absolute; bottom: 4px; left: 30%; width: 40%; height: 3px;
+            background: #594AE2; border-radius: 2px;
+        }
+
+        .handle-se {
+            bottom: 0px; right: 0px; width: 14px; height: 14px;
+            cursor: nwse-resize;
+            background: #594AE2;
+            border-radius: 3px 0 6px 0;
+            box-shadow: -1px -1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Resizing Overlay Indicator */
+        .resize-indicator {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 30, 45, 0.92);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            z-index: 35;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            white-space: nowrap;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F1F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C7C7D0;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A0A0B0;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-mud-background">
+
+    <!-- Top MudBlazor App Bar -->
+    <header class="bg-mud-appbar text-white px-6 py-3 shadow-md flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-white/20 p-2 rounded-lg text-white">
+                <i class="fa-solid fa-cubes text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-none">Blazor WASM Grid Block Designer</h1>
+                <p class="text-xs text-white/80 mt-0.5">Absolute Overlay Toolbars & Auto-Scaling Container Heights</p>
+            </div>
+        </div>
+        
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-2">
+            <div class="hidden md:flex items-center space-x-1.5 bg-white/10 p-1 rounded-lg mr-2">
+                <button class="btn-top-add px-2.5 py-1 text-xs font-medium bg-white/20 hover:bg-white/30 rounded transition text-white" data-type="Container">
+                    <i class="fa-solid fa-plus text-[10px] mr-1"></i> Container
+                </button>
+                <button class="btn-top-add px-2.5 py-1 text-xs font-medium bg-white/20 hover:bg-white/30 rounded transition text-white" data-type="Heading">
+                    <i class="fa-solid fa-plus text-[10px] mr-1"></i> Heading
+                </button>
+                <button class="btn-top-add px-2.5 py-1 text-xs font-medium bg-white/20 hover:bg-white/30 rounded transition text-white" data-type="Paragraph">
+                    <i class="fa-solid fa-plus text-[10px] mr-1"></i> Text
+                </button>
+                <button class="btn-top-add px-2.5 py-1 text-xs font-medium bg-white/20 hover:bg-white/30 rounded transition text-white" data-type="Image">
+                    <i class="fa-solid fa-plus text-[10px] mr-1"></i> Image
+                </button>
+            </div>
+
+            <button id="btn-clear" class="px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 rounded-md transition flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+            <button id="btn-export" class="px-4 py-1.5 text-xs font-semibold bg-mud-secondary hover:bg-pink-600 text-white rounded-md shadow transition flex items-center gap-2">
+                <i class="fa-solid fa-code"></i> Export HTML
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Left Tool Palette Sidebar -->
+        <aside class="w-64 bg-white border-r border-mud-border flex flex-col shrink-0 shadow-sm z-20">
+            <div class="p-4 border-b border-mud-border">
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Block Library</h2>
+                <p class="text-xs text-gray-400 mt-1">Drag items or click '+' to append</p>
+            </div>
+
+            <div class="p-4 space-y-3 overflow-y-auto flex-1">
+                <!-- Container -->
+                <div class="palette-item cursor-grab active:cursor-grabbing p-3 bg-indigo-50/60 border border-indigo-100 hover:border-mud-primary rounded-lg flex items-center gap-3 transition group"
+                     draggable="true" data-type="Container">
+                    <div class="w-8 h-8 rounded bg-mud-primary text-white flex items-center justify-center text-sm shadow-sm group-hover:scale-105 transition">
+                        <i class="fa-solid fa-border-all"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold text-gray-800">Container</div>
+                        <div class="text-[11px] text-gray-500">Auto-Scaling Grid</div>
+                    </div>
+                </div>
+
+                <!-- Heading -->
+                <div class="palette-item cursor-grab active:cursor-grabbing p-3 bg-white border border-gray-200 hover:border-mud-primary rounded-lg flex items-center gap-3 transition group shadow-sm"
+                     draggable="true" data-type="Heading">
+                    <div class="w-8 h-8 rounded bg-blue-500 text-white flex items-center justify-center text-sm shadow-sm group-hover:scale-105 transition">
+                        <i class="fa-solid fa-heading"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold text-gray-800">Heading</div>
+                        <div class="text-[11px] text-gray-500">Titles (H1, H2, H3)</div>
+                    </div>
+                </div>
+
+                <!-- Paragraph -->
+                <div class="palette-item cursor-grab active:cursor-grabbing p-3 bg-white border border-gray-200 hover:border-mud-primary rounded-lg flex items-center gap-3 transition group shadow-sm"
+                     draggable="true" data-type="Paragraph">
+                    <div class="w-8 h-8 rounded bg-emerald-500 text-white flex items-center justify-center text-sm shadow-sm group-hover:scale-105 transition">
+                        <i class="fa-solid fa-paragraph"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold text-gray-800">Paragraph</div>
+                        <div class="text-[11px] text-gray-500">Text block</div>
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div class="palette-item cursor-grab active:cursor-grabbing p-3 bg-white border border-gray-200 hover:border-mud-primary rounded-lg flex items-center gap-3 transition group shadow-sm"
+                     draggable="true" data-type="Image">
+                    <div class="w-8 h-8 rounded bg-amber-500 text-white flex items-center justify-center text-sm shadow-sm group-hover:scale-105 transition">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold text-gray-800">Image</div>
+                        <div class="text-[11px] text-gray-500">Media block</div>
+                    </div>
+                </div>
+
+                <!-- Custom HTML -->
+                <div class="palette-item cursor-grab active:cursor-grabbing p-3 bg-white border border-gray-200 hover:border-mud-primary rounded-lg flex items-center gap-3 transition group shadow-sm"
+                     draggable="true" data-type="CustomHtml">
+                    <div class="w-8 h-8 rounded bg-purple-500 text-white flex items-center justify-center text-sm shadow-sm group-hover:scale-105 transition">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold text-gray-800">Custom HTML</div>
+                        <div class="text-[11px] text-gray-500">Raw HTML / Controls</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Add Helpers -->
+            <div class="p-4 border-t border-mud-border bg-gray-50/50">
+                <span class="text-xs font-semibold text-gray-500">Quick Append:</span>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <button class="btn-quick-add text-xs py-1.5 px-2 bg-white border border-gray-300 hover:bg-gray-100 rounded text-gray-700 font-medium" data-type="Heading">+ Title</button>
+                    <button class="btn-quick-add text-xs py-1.5 px-2 bg-white border border-gray-300 hover:bg-gray-100 rounded text-gray-700 font-medium" data-type="Paragraph">+ Text</button>
+                    <button class="btn-quick-add text-xs py-1.5 px-2 bg-white border border-gray-300 hover:bg-gray-100 rounded text-gray-700 font-medium" data-type="Image">+ Image</button>
+                    <button class="btn-quick-add text-xs py-1.5 px-2 bg-mud-primary text-white hover:bg-mud-primary-hover rounded font-medium" data-type="Container">+ Grid</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Canvas Area -->
+        <main class="flex-1 overflow-auto p-6 bg-mud-background flex flex-col items-center">
+            <div id="designer-canvas" class="w-full max-w-6xl bg-white rounded-xl shadow-md border border-mud-border p-6 min-h-[650px] flex flex-col transition-all">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-400 inline-block"></span>
+                        <span class="text-xs font-medium text-gray-400 ml-2">Root Canvas (Floating Toolbars & Dynamic Auto RowSpans)</span>
+                    </div>
+                    <div id="canvas-stats" class="text-xs text-gray-400 font-mono">Blocks: 0</div>
+                </div>
+
+                <!-- Root Grid Region -->
+                <div id="root-grid" class="grid-container-12 flex-1 relative bg-slate-50/50 p-3 rounded-lg border border-dashed border-gray-200">
+                    <!-- Blocks dynamically rendered -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Right MudBlazor Property Inspector Sidebar -->
+        <aside class="w-80 bg-white border-l border-mud-border flex flex-col shrink-0 shadow-sm z-20">
+            <div class="p-4 border-b border-mud-border flex items-center justify-between bg-gray-50/50">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-sliders text-mud-primary"></i>
+                    <h2 class="text-sm font-bold text-gray-800">Property Inspector</h2>
+                </div>
+                <span id="selected-type-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-200 text-gray-600 uppercase">None</span>
+            </div>
+
+            <!-- Inspector Form Content -->
+            <div id="inspector-content" class="p-5 space-y-5 overflow-y-auto flex-1">
+                <div class="text-center py-12 text-gray-400 text-sm">
+                    <i class="fa-regular fa-hand-pointer text-3xl mb-2 block text-gray-300"></i>
+                    Select any block on the canvas to inspect and edit spans, content, or styling.
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Export Code Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="px-6 py-4 bg-mud-dark text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-code text-mud-secondary"></i>
+                    <h3 class="font-bold text-base">Generated Responsive CSS Grid HTML</h3>
+                </div>
+                <button id="btn-close-modal" class="text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 bg-gray-900 text-gray-100 font-mono text-xs">
+                <pre><code id="export-code-block" class="whitespace-pre-wrap break-all"></code></pre>
+            </div>
+            <div class="px-6 py-3 bg-gray-100 border-t border-gray-200 flex justify-between items-center">
+                <span class="text-xs text-gray-500">Pure inline-styled CSS Grid code ready for web output.</span>
+                <button id="btn-copy-code" class="px-4 py-2 bg-mud-primary hover:bg-mud-primary-hover text-white font-medium rounded-md text-xs transition flex items-center gap-2">
+                    <i class="fa-regular fa-copy"></i> Copy HTML
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // --- RECURSIVE DATA MODEL ---
+        class GridBlockItem {
+            constructor(type = 'Paragraph', colSpan = 6, rowSpan = 1, content = '') {
+                this.id = 'block_' + Math.random().toString(36).substr(2, 9);
+                this.type = type; // Container, Heading, Paragraph, Image, CustomHtml
+                this.colSpan = colSpan;
+                this.rowSpan = rowSpan;
+                this.content = content || this.getDefaultContent(type);
+                this.tagName = type === 'Heading' ? 'h2' : 'p';
+                this.imageUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80';
+                this.customCss = '';
+                this.children = []; // For recursive containers
+            }
+
+            getDefaultContent(type) {
+                switch (type) {
+                    case 'Heading': return 'WYSIWYG CSS Grid Block';
+                    case 'Paragraph': return 'Toolbars float on top of blocks on hover/focus without causing layout shift or height expansion!';
+                    case 'CustomHtml': return '<button style="background:#594AE2; color:white; padding:8px 16px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Custom Action Button</button>';
+                    default: return '';
+                }
+            }
+
+            renderToHtml() {
+                const style = `grid-column: span ${this.colSpan}; grid-row: span ${this.rowSpan}; ${this.customCss}`.trim();
+
+                if (this.type === 'Container') {
+                    const inner = this.children.map(c => c.renderToHtml()).join('\n  ');
+                    return `<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-flow: dense; gap: 12px; ${style}">\n  ${inner}\n</div>`;
+                }
+
+                switch (this.type) {
+                    case 'Heading':
+                        return `<${this.tagName} style="margin:0; ${style}">${this.content}</${this.tagName}>`;
+                    case 'Paragraph':
+                        return `<p style="margin:0; ${style}">${this.content}</p>`;
+                    case 'Image':
+                        return `<img src="${this.imageUrl}" alt="Grid Image" style="width:100%; height:100%; object-fit:cover; border-radius:6px; ${style}" />`;
+                    case 'CustomHtml':
+                        return `<div style="${style}">${this.content}</div>`;
+                    default:
+                        return '';
+                }
+            }
+        }
+
+        // --- GLOBAL APP STATE ---
+        const AppState = {
+            rootContainer: new GridBlockItem('Container', 12, 1),
+            selectedBlock: null,
+            draggedBlock: null,
+            resizingData: null,
+
+            findBlockById(id, current = this.rootContainer) {
+                if (current.id === id) return { item: current, parent: null };
+                for (let child of current.children) {
+                    if (child.id === id) return { item: child, parent: current };
+                    if (child.type === 'Container') {
+                        const found = this.findBlockById(id, child);
+                        if (found.item) return found;
+                    }
+                }
+                return { item: null, parent: null };
+            },
+
+            removeBlock(id) {
+                const { item, parent } = this.findBlockById(id);
+                if (item && parent) {
+                    const index = parent.children.indexOf(item);
+                    if (index > -1) {
+                        parent.children.splice(index, 1);
+                        if (this.selectedBlock?.id === id) {
+                            this.selectedBlock = null;
+                        }
+                        this.recalculateAllContainerRowSpans();
+                        return true;
+                    }
+                }
+                return false;
+            },
+
+            // 2) RECURSIVE ROWSPAN AUTO-CALCULATION BASED ON CHILD LAYOUT
+            recalculateContainerRowSpan(container) {
+                if (!container || container.type !== 'Container') return;
+
+                // Recursively calculate child containers bottom-up
+                container.children.forEach(child => {
+                    if (child.type === 'Container') {
+                        this.recalculateContainerRowSpan(child);
+                    }
+                });
+
+                if (container.children.length === 0) {
+                    container.rowSpan = 1;
+                    return;
+                }
+
+                // Simulate 12-column grid placement matching grid-auto-flow: dense
+                let currentCol = 0;
+                let estimatedRows = 0;
+                let maxRowInCurrentLine = 0;
+
+                container.children.forEach(child => {
+                    const childCols = Math.min(12, Math.max(1, child.colSpan || 1));
+                    const childRows = Math.max(1, child.rowSpan || 1);
+
+                    if (currentCol + childCols > 12) {
+                        // Wraps to next row track
+                        estimatedRows += maxRowInCurrentLine;
+                        currentCol = childCols;
+                        maxRowInCurrentLine = childRows;
+                    } else {
+                        currentCol += childCols;
+                        maxRowInCurrentLine = Math.max(maxRowInCurrentLine, childRows);
+                    }
+                });
+
+                estimatedRows += maxRowInCurrentLine;
+                container.rowSpan = Math.max(1, estimatedRows);
+            },
+
+            recalculateAllContainerRowSpans() {
+                this.recalculateContainerRowSpan(this.rootContainer);
+            }
+        };
+
+        // Initialize Demo Data
+        function initDemoData() {
+            AppState.rootContainer.children = [];
+            
+            const header = new GridBlockItem('Heading', 12, 1, 'Absolute Overlay Toolbars & Auto-Scaling RowSpans');
+            header.tagName = 'h1';
+            AppState.rootContainer.children.push(header);
+
+            const gridSection = new GridBlockItem('Container', 12, 1); // RowSpan auto-calculated
+            
+            const subHeading = new GridBlockItem('Heading', 7, 1, 'Dynamic Container Resizing & Zero Shift');
+            subHeading.tagName = 'h3';
+            
+            const paragraph = new GridBlockItem('Paragraph', 7, 2, 'Toolbars now float directly over block content using absolute positioning. Hovering or selecting a block will never cause layout shifts or height expansion!');
+            const imgBlock = new GridBlockItem('Image', 5, 3);
+
+            gridSection.children.push(subHeading, paragraph, imgBlock);
+            AppState.rootContainer.children.push(gridSection);
+
+            const customBlock = new GridBlockItem('CustomHtml', 12, 1);
+            AppState.rootContainer.children.push(customBlock);
+
+            AppState.selectedBlock = header;
+            AppState.recalculateAllContainerRowSpans();
+        }
+
+        // --- CANVAS RENDER ENGINE ---
+        function renderCanvas() {
+            AppState.recalculateAllContainerRowSpans();
+
+            const rootGridEl = document.getElementById('root-grid');
+            rootGridEl.innerHTML = '';
+
+            AppState.rootContainer.children.forEach(child => {
+                rootGridEl.appendChild(createBlockDomElement(child, AppState.rootContainer));
+            });
+
+            document.getElementById('canvas-stats').innerText = `Blocks: ${countBlocks(AppState.rootContainer)}`;
+            renderInspector();
+        }
+
+        function countBlocks(container) {
+            let count = container.children.length;
+            container.children.forEach(c => {
+                if (c.type === 'Container') count += countBlocks(c);
+            });
+            return count;
+        }
+
+        function createBlockDomElement(block, parentBlock) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `grid-block-wrapper ${AppState.selectedBlock?.id === block.id ? 'selected' : ''}`;
+            wrapper.style.gridColumn = `span ${block.colSpan}`;
+            wrapper.style.gridRow = `span ${block.rowSpan}`;
+            wrapper.dataset.id = block.id;
+            wrapper.tabIndex = 0;
+            wrapper.draggable = true;
+
+            // 1) FLOATING OVERLAY TOOLBAR (Absolute Top 0, Zero Height Impact)
+            const toolbar = document.createElement('div');
+            toolbar.className = 'block-toolbar';
+            
+            const typeIcons = {
+                Container: 'fa-border-all text-mud-primary',
+                Heading: 'fa-heading text-blue-500',
+                Paragraph: 'fa-paragraph text-emerald-500',
+                Image: 'fa-image text-amber-500',
+                CustomHtml: 'fa-code text-purple-500'
+            };
+
+            toolbar.innerHTML = `
+                <div class="flex items-center gap-1.5 cursor-grab drag-handle flex-1 min-w-0">
+                    <i class="fa-solid fa-grip-vertical text-gray-400 hover:text-gray-600"></i>
+                    <i class="fa-solid ${typeIcons[block.type] || 'fa-cube'}"></i>
+                    <span class="font-bold text-[11px] text-gray-700 truncate">${block.type}</span>
+                    <span class="text-[10px] text-gray-400 font-mono">(${block.colSpan}x${block.rowSpan})</span>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                    ${block.type === 'Container' ? `<button class="btn-add-child p-1 hover:text-mud-primary transition text-gray-600" title="Add Child Block"><i class="fa-solid fa-plus text-xs"></i></button>` : ''}
+                    <button class="btn-delete p-1 hover:text-red-500 transition text-gray-600" title="Delete Block"><i class="fa-regular fa-trash-can text-xs"></i></button>
+                </div>
+            `;
+
+            // Content Body
+            const body = document.createElement('div');
+            body.className = 'block-content-body p-3 relative pointer-events-none';
+
+            if (block.type === 'Container') {
+                body.className = 'block-content-body p-2 relative';
+                const innerGrid = document.createElement('div');
+                innerGrid.className = 'grid-container-12 border border-dashed border-indigo-200 rounded p-2 bg-indigo-50/20 h-full';
+                innerGrid.dataset.containerId = block.id;
+
+                if (block.children.length === 0) {
+                    innerGrid.innerHTML = `<div class="col-span-12 flex items-center justify-center text-xs text-indigo-400 font-medium py-6 pointer-events-none">Empty Container Grid (Hover & click '+' to add blocks)</div>`;
+                } else {
+                    block.children.forEach(child => {
+                        innerGrid.appendChild(createBlockDomElement(child, block));
+                    });
+                }
+                body.appendChild(innerGrid);
+            } else if (block.type === 'Heading') {
+                const tag = block.tagName || 'h2';
+                const el = document.createElement(tag);
+                el.className = 'font-bold text-gray-800 tracking-tight leading-snug';
+                el.innerText = block.content;
+                body.appendChild(el);
+            } else if (block.type === 'Paragraph') {
+                const p = document.createElement('p');
+                p.className = 'text-sm text-gray-600 leading-relaxed';
+                p.innerText = block.content;
+                body.appendChild(p);
+            } else if (block.type === 'Image') {
+                const img = document.createElement('img');
+                img.src = block.imageUrl;
+                img.className = 'w-full h-full object-cover rounded shadow-sm max-h-[220px]';
+                body.appendChild(img);
+            } else if (block.type === 'CustomHtml') {
+                body.innerHTML = block.content;
+            }
+
+            wrapper.appendChild(toolbar);
+            wrapper.appendChild(body);
+
+            // Resize Handles
+            const handleR = document.createElement('div');
+            handleR.className = 'resize-handle handle-r';
+            handleR.dataset.dir = 'r';
+
+            const handleB = document.createElement('div');
+            handleB.className = 'resize-handle handle-b';
+            handleB.dataset.dir = 'b';
+
+            const handleSE = document.createElement('div');
+            handleSE.className = 'resize-handle handle-se';
+            handleSE.dataset.dir = 'se';
+
+            wrapper.appendChild(handleR);
+            wrapper.appendChild(handleB);
+            wrapper.appendChild(handleSE);
+
+            // --- EVENT HANDLERS ---
+            wrapper.addEventListener('click', (e) => {
+                e.stopPropagation();
+                AppState.selectedBlock = block;
+                renderCanvas();
+            });
+
+            toolbar.querySelector('.btn-delete')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                AppState.removeBlock(block.id);
+                renderCanvas();
+            });
+
+            toolbar.querySelector('.btn-add-child')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const newChild = new GridBlockItem('Paragraph', 12, 1);
+                block.children.push(newChild);
+                AppState.selectedBlock = newChild;
+                AppState.recalculateAllContainerRowSpans();
+                renderCanvas();
+            });
+
+            wrapper.addEventListener('dragstart', (e) => {
+                e.stopPropagation();
+                AppState.draggedBlock = block;
+                wrapper.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', block.id);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            wrapper.addEventListener('dragend', () => {
+                wrapper.classList.remove('dragging');
+                AppState.draggedBlock = null;
+                document.querySelectorAll('.drop-target-over').forEach(el => el.classList.remove('drop-target-over'));
+            });
+
+            wrapper.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!AppState.draggedBlock || AppState.draggedBlock.id === block.id) return;
+                wrapper.classList.add('drop-target-over');
+            });
+
+            wrapper.addEventListener('dragleave', (e) => {
+                e.stopPropagation();
+                wrapper.classList.remove('drop-target-over');
+            });
+
+            wrapper.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                wrapper.classList.remove('drop-target-over');
+
+                const dragged = AppState.draggedBlock;
+                if (!dragged || dragged.id === block.id) return;
+
+                const { parent: oldParent } = AppState.findBlockById(dragged.id);
+                if (oldParent) {
+                    const oldIndex = oldParent.children.indexOf(dragged);
+                    if (oldIndex > -1) oldParent.children.splice(oldIndex, 1);
+                }
+
+                const targetParent = parentBlock;
+                const targetIndex = targetParent.children.indexOf(block);
+                targetParent.children.splice(targetIndex, 0, dragged);
+
+                AppState.recalculateAllContainerRowSpans();
+                renderCanvas();
+            });
+
+            // Mouse Resizing Handler
+            const initResize = (dir, e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const gridContainer = wrapper.parentElement;
+                const gridRect = gridContainer.getBoundingClientRect();
+                const colWidthPx = gridRect.width / 12;
+                const rowHeightPx = 65;
+
+                AppState.resizingData = {
+                    block,
+                    dir,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    startColSpan: block.colSpan,
+                    startRowSpan: block.rowSpan,
+                    colWidthPx,
+                    rowHeightPx,
+                    wrapper
+                };
+
+                const indicator = document.createElement('div');
+                indicator.className = 'resize-indicator';
+                indicator.id = 'active-resize-indicator';
+                indicator.innerText = `${block.colSpan} Col x ${block.rowSpan} Row`;
+                wrapper.appendChild(indicator);
+
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            };
+
+            handleR.addEventListener('mousedown', (e) => initResize('r', e));
+            handleB.addEventListener('mousedown', (e) => initResize('b', e));
+            handleSE.addEventListener('mousedown', (e) => initResize('se', e));
+
+            return wrapper;
+        }
+
+        function handleMouseMove(e) {
+            if (!AppState.resizingData) return;
+
+            const { block, dir, startX, startY, startColSpan, startRowSpan, colWidthPx, rowHeightPx, wrapper } = AppState.resizingData;
+
+            if (dir === 'r' || dir === 'se') {
+                const deltaX = e.clientX - startX;
+                const colsChange = Math.round(deltaX / colWidthPx);
+                block.colSpan = Math.max(1, Math.min(12, startColSpan + colsChange));
+            }
+
+            if (dir === 'b' || dir === 'se') {
+                const deltaY = e.clientY - startY;
+                const rowsChange = Math.round(deltaY / rowHeightPx);
+                block.rowSpan = Math.max(1, Math.min(10, startRowSpan + rowsChange));
+            }
+
+            wrapper.style.gridColumn = `span ${block.colSpan}`;
+            wrapper.style.gridRow = `span ${block.rowSpan}`;
+
+            const badge = wrapper.querySelector('.drag-handle .font-mono');
+            if (badge) badge.innerText = `(${block.colSpan}x${block.rowSpan})`;
+
+            const indicator = document.getElementById('active-resize-indicator');
+            if (indicator) indicator.innerText = `${block.colSpan} Col x ${block.rowSpan} Row`;
+
+            AppState.recalculateAllContainerRowSpans();
+        }
+
+        function handleMouseUp() {
+            if (AppState.resizingData) {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+                AppState.resizingData = null;
+                renderCanvas();
+            }
+        }
+
+        // --- PROPERTY INSPECTOR ---
+        function renderInspector() {
+            const container = document.getElementById('inspector-content');
+            const badge = document.getElementById('selected-type-badge');
+            const item = AppState.selectedBlock;
+
+            if (!item) {
+                badge.innerText = 'None';
+                badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-gray-200 text-gray-600 uppercase';
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400 text-sm">
+                        <i class="fa-regular fa-hand-pointer text-3xl mb-2 block text-gray-300"></i>
+                        Select any block on the canvas to inspect properties.
+                    </div>`;
+                return;
+            }
+
+            badge.innerText = item.type;
+            badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-mud-primary uppercase';
+
+            container.innerHTML = `
+                <div>
+                    <div class="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+                        <label>Column Span (1 - 12)</label>
+                        <span class="text-mud-primary font-mono font-bold">${item.colSpan} Cols</span>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <input type="range" id="input-colspan-range" min="1" max="12" value="${item.colSpan}" class="w-full accent-mud-primary cursor-pointer">
+                        <input type="number" id="input-colspan-num" min="1" max="12" value="${item.colSpan}" class="w-14 text-xs p-1 border border-gray-300 rounded text-center">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+                        <label>Row Span (1 - 10)</label>
+                        <span class="text-mud-primary font-mono font-bold">${item.rowSpan} Rows</span>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <input type="range" id="input-rowspan-range" min="1" max="10" value="${item.rowSpan}" class="w-full accent-mud-primary cursor-pointer">
+                        <input type="number" id="input-rowspan-num" min="1" max="10" value="${item.rowSpan}" class="w-14 text-xs p-1 border border-gray-300 rounded text-center">
+                    </div>
+                </div>
+
+                ${item.type === 'Heading' ? `
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Heading Tag</label>
+                    <select id="input-tag" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-mud-primary focus:outline-none">
+                        <option value="h1" ${item.tagName === 'h1' ? 'selected' : ''}>H1 Title</option>
+                        <option value="h2" ${item.tagName === 'h2' ? 'selected' : ''}>H2 Subtitle</option>
+                        <option value="h3" ${item.tagName === 'h3' ? 'selected' : ''}>H3 Section Header</option>
+                    </select>
+                </div>
+                ` : ''}
+
+                ${item.type === 'Heading' || item.type === 'Paragraph' || item.type === 'CustomHtml' ? `
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Text Content</label>
+                    <textarea id="input-content" rows="4" class="w-full text-xs p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-mud-primary focus:outline-none font-sans">${item.content}</textarea>
+                </div>
+                ` : ''}
+
+                ${item.type === 'Image' ? `
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Image URL</label>
+                    <input type="text" id="input-imageurl" value="${item.imageUrl}" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-mud-primary focus:outline-none">
+                </div>
+                ` : ''}
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Custom CSS Styles</label>
+                    <input type="text" id="input-css" value="${item.customCss}" placeholder="e.g. color: #2563eb; background: #fff;" class="w-full text-xs p-2 border border-gray-300 rounded-md font-mono focus:ring-2 focus:ring-mud-primary focus:outline-none">
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 flex justify-between">
+                    <button id="btn-inspector-delete" class="text-xs px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 font-semibold rounded transition flex items-center gap-1">
+                        <i class="fa-regular fa-trash-can"></i> Delete Block
+                    </button>
+                </div>
+            `;
+
+            const updateColSpan = (val) => {
+                item.colSpan = Math.max(1, Math.min(12, parseInt(val) || 1));
+                AppState.recalculateAllContainerRowSpans();
+                renderCanvas();
+            };
+
+            const updateRowSpan = (val) => {
+                item.rowSpan = Math.max(1, Math.min(10, parseInt(val) || 1));
+                AppState.recalculateAllContainerRowSpans();
+                renderCanvas();
+            };
+
+            document.getElementById('input-colspan-range')?.addEventListener('input', (e) => updateColSpan(e.target.value));
+            document.getElementById('input-colspan-num')?.addEventListener('change', (e) => updateColSpan(e.target.value));
+
+            document.getElementById('input-rowspan-range')?.addEventListener('input', (e) => updateRowSpan(e.target.value));
+            document.getElementById('input-rowspan-num')?.addEventListener('change', (e) => updateRowSpan(e.target.value));
+
+            document.getElementById('input-tag')?.addEventListener('change', (e) => {
+                item.tagName = e.target.value;
+                renderCanvas();
+            });
+
+            document.getElementById('input-content')?.addEventListener('input', (e) => {
+                item.content = e.target.value;
+                renderCanvas();
+            });
+
+            document.getElementById('input-imageurl')?.addEventListener('change', (e) => {
+                item.imageUrl = e.target.value;
+                renderCanvas();
+            });
+
+            document.getElementById('input-css')?.addEventListener('input', (e) => {
+                item.customCss = e.target.value;
+                renderCanvas();
+            });
+
+            document.getElementById('btn-inspector-delete')?.addEventListener('click', () => {
+                AppState.removeBlock(item.id);
+                renderCanvas();
+            });
+        }
+
+        // --- PALETTE & BUTTON HANDLERS ---
+        function setupAddInteractions() {
+            document.querySelectorAll('.palette-item').forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    const type = item.dataset.type;
+                    const newBlock = new GridBlockItem(type, type === 'Container' ? 12 : 6, 1);
+                    AppState.draggedBlock = newBlock;
+                    e.dataTransfer.setData('text/plain', newBlock.id);
+                });
+            });
+
+            const addNewBlockToTarget = (type) => {
+                const newBlock = new GridBlockItem(type, type === 'Container' ? 12 : 6, 1);
+                if (AppState.selectedBlock && AppState.selectedBlock.type === 'Container') {
+                    AppState.selectedBlock.children.push(newBlock);
+                } else {
+                    AppState.rootContainer.children.push(newBlock);
+                }
+                AppState.selectedBlock = newBlock;
+                AppState.recalculateAllContainerRowSpans();
+                renderCanvas();
+            };
+
+            document.querySelectorAll('.btn-quick-add, .btn-top-add').forEach(btn => {
+                btn.addEventListener('click', () => addNewBlockToTarget(btn.dataset.type));
+            });
+
+            const rootGridEl = document.getElementById('root-grid');
+            rootGridEl.addEventListener('dragover', (e) => e.preventDefault());
+
+            rootGridEl.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (e.target !== rootGridEl) return;
+
+                const dragged = AppState.draggedBlock;
+                if (!dragged) return;
+
+                const { item } = AppState.findBlockById(dragged.id);
+                if (!item) {
+                    AppState.rootContainer.children.push(dragged);
+                    AppState.selectedBlock = dragged;
+                }
+                AppState.recalculateAllContainerRowSpans();
+                renderCanvas();
+            });
+        }
+
+        // --- EXPORT HTML MODAL ---
+        function setupExportModal() {
+            const modal = document.getElementById('export-modal');
+            const codeBlock = document.getElementById('export-code-block');
+
+            document.getElementById('btn-export').addEventListener('click', () => {
+                AppState.recalculateAllContainerRowSpans();
+                const generatedHtml = AppState.rootContainer.children.map(c => c.renderToHtml()).join('\n\n');
+                const fullTemplate = `<div class="wysiwyg-grid-layout" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-flow: dense; gap: 16px; width: 100%;">\n${generatedHtml}\n</div>`;
+                
+                codeBlock.innerText = fullTemplate;
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            });
+
+            document.getElementById('btn-close-modal').addEventListener('click', () => {
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 200);
+            });
+
+            document.getElementById('btn-copy-code').addEventListener('click', () => {
+                const code = codeBlock.innerText;
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                const btn = document.getElementById('btn-copy-code');
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fa-regular fa-copy"></i> Copy HTML`;
+                }, 2000);
+            });
+        }
+
+        // Initialize Window
+        window.onload = function() {
+            initDemoData();
+            renderCanvas();
+            setupAddInteractions();
+            setupExportModal();
+
+            document.getElementById('btn-clear').addEventListener('click', () => {
+                initDemoData();
+                renderCanvas();
+            });
+        };
+    </script>
+</body>
+</html>

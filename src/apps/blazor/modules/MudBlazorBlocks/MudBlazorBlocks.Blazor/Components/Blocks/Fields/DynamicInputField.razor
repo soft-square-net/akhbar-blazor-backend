@@ -23,7 +23,7 @@
 
     private bool IsVisible => ParentNode == null || BlockNodeVisibilityEvaluator.IsFieldVisible(Input, ParentNode);
 
-    private Type GetComponentType() => InputRegistry.GetInputComponent(Input.Type ?? "text");
+    private Type GetComponentType() => InputRegistry.GetInputComponent(nameof(Input.Type) ?? "text");
 
 
     private Dictionary<string, object> GetParameters()

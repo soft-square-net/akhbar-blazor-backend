@@ -1,0 +1,115 @@
+﻿@page "/tailwind-grid-editor"
+
+@inject IJSRuntime JS;
+
+<h3>TailwindGridEditor</h3>
+<h1 class="text-3xl font-bold text-blue-600">
+  Tailwind Script Injected by Code!
+</h1>
+
+<button class="bg-emerald-500 text-white px-4 py-2 rounded-lg mt-4" @onclick="HandleClick">
+  Interactive Button
+</button>
+
+@code {
+
+  private void HandleClick()
+  {
+    Console.WriteLine("Button clicked successfully without RenderTree errors!");
+  }
+
+  override protected async Task OnAfterRenderAsync(bool firstRender)
+  {
+    await base.OnAfterRenderAsync(firstRender);
+    if (firstRender)
+    {
+      // Inject Tailwind CDN and Config dynamically
+      await JS.InvokeVoidAsync("eval", @"
+                if (!document.getElementById('page-tailwind-cdn')) {
+                    const script = document.createElement('script');
+                    script.id = 'page-tailwind-cdn';
+                    script.src = 'https://cdn.tailwindcss.com';
+                    document.head.appendChild(script);
+                }
+            ");
+
+      await JS.InvokeVoidAsync("eval", @"
+                if (!document.getElementById('page-tailwind-config')) {
+                    const configScript = document.createElement('script');
+                    configScript.id = 'page-tailwind-config';
+                    configScript.textContent = `
+                        tailwind.config = {
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        mud: {
+                                            primary: '#594AE2',
+                                            'primary-hover': '#4535C5',
+                                            secondary: '#FF4081',
+                                            surface: '#FFFFFF',
+                                            background: '#F5F5F7',
+                                            appbar: '#594AE2',
+                                            border: '#E0E0E0',
+                                            text: '#424242',
+                                            dark: '#1E1E2D'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    `;
+                    document.head.appendChild(configScript);
+                }
+            ");
+      StateHasChanged();
+    }
+  }
+  // protected async Task OnAfterRenderAsync(bool firstRender)
+  // {
+  //   await base.OnAfterRenderAsync(firstRender);
+  //   // firstRender ensures this runs only once when the component mounts in the DOM
+  //   if (firstRender && !_isLoaded)
+  //   {
+  //     if (isProcessing) return;
+  //     _isLoaded = true;
+  //     isProcessing = true;
+  //     // Inject Tailwind CDN and Config dynamically
+  //     await JS.InvokeVoidAsync("eval", @"
+  //               if (!document.getElementById('page-tailwind-cdn')) {
+  //                   const script = document.createElement('script');
+  //                   script.id = 'page-tailwind-cdn';
+  //                   script.src = 'https://cdn.tailwindcss.com';
+  //                   document.head.appendChild(script);
+
+  //                   const configScript = document.createElement('script');
+  //                   configScript.id = 'page-tailwind-config';
+  //                   configScript.textContent = `
+  //                       tailwind.config = {
+  //                           theme: {
+  //                               extend: {
+  //                                   colors: {
+  //                                       mud: {
+  //                                           primary: '#594AE2',
+  //                                           'primary-hover': '#4535C5',
+  //                                           secondary: '#FF4081',
+  //                                           surface: '#FFFFFF',
+  //                                           background: '#F5F5F7',
+  //                                           appbar: '#594AE2',
+  //                                           border: '#E0E0E0',
+  //                                           text: '#424242',
+  //                                           dark: '#1E1E2D'
+  //                                       }
+  //                                   }
+  //                               }
+  //                           }
+  //                       }
+  //                   `;
+  //                   document.head.appendChild(configScript);
+  //               }
+  //           ");
+
+  //     isProcessing = false;
+  //     StateHasChanged();
+  //   }
+  // }
+}

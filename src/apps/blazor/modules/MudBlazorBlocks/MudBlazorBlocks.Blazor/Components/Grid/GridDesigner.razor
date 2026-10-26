@@ -1,0 +1,135 @@
+﻿@page "/grid-designer"
+@inject GridEditorState EditorState
+@implements IDisposable
+
+<MudLayout>
+  <MudAppBar Elevation="1">
+    <MudText Typo="Typo.h6">MudBlazor Block Grid Designer</MudText>
+    <MudSpacer />
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="OpenPreviewModal">Export HTML</MudButton>
+  </MudAppBar>
+
+  <MudMainContent>
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+      <MudGrid>
+        <!-- Tool Palette & Root Add Buttons -->
+        <MudItem xs="12">
+          <MudPaper Class="pa-3 d-flex gap-2">
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ViewQuilt" OnClick='() => AddRootBlock(BlockType.Container)'>Add Container</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Title" OnClick='() => AddRootBlock(BlockType.Heading)'>Add Heading</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.TextFields" OnClick='() => AddRootBlock(BlockType.Text)'>Add Text</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Image" OnClick='() => AddRootBlock(BlockType.Image)'>Add Image</MudButton>
+          </MudPaper>
+        </MudItem>
+
+        <!-- Main Designer Grid Canvas -->
+        <MudItem xs="9">
+          <MudPaper Class="pa-4 min-vh-75" @onmousemove="OnCanvasMouseMove" @onmouseup="OnCanvasMouseUp">
+            <div class="nested-grid" @ref="_canvasRef">
+              @foreach (var block in RootContainer.Children)
+              {
+                <GridBlock @ref="_blockComponents[block.Id]" Block="block" ParentBlock="RootContainer" />
+              }
+            </div>
+          </MudPaper>
+        </MudItem>
+
+        <!-- MudBlazor Property Inspector Panel -->
+        <MudItem xs="3">
+          <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" Class="mb-3">Block Inspector</MudText>
+            @if (EditorState.SelectedItem != null)
+            {
+              var item = EditorState.SelectedItem;
+              <MudNumericField T="int" Label="Col Span (1-12)" @bind-Value="item.ColSpan" Min="1" Max="12" Class="mb-3" />
+              <MudNumericField T="int" Label="Row Span" @bind-Value="item.RowSpan" Min="1" Max="20" Class="mb-3" />
+
+              @if (item.Type == BlockType.Text || item.Type == BlockType.Heading)
+              {
+                <MudTextField Label="Content" @bind-Value="item.Content" Lines="3" Class="mb-3" />
+              }
+              @if (item.Type == BlockType.Image)
+              {
+                <MudTextField Label="Image URL" @bind-Value="item.ImageUrl" Class="mb-3" />
+              }
+              <MudTextField Label="Custom CSS" @bind-Value="item.CustomCss" Class="mb-3" />
+            }
+            else
+            {
+              <MudText Color="Color.Secondary">Select a block on the grid to inspect properties.</MudText>
+            }
+          </MudPaper>
+        </MudItem>
+      </MudGrid>
+    </MudContainer>
+  </MudMainContent>
+</MudLayout>
+
+<!-- Generated HTML Dialog -->
+<MudDialog @bind-IsVisible="_showPreview">
+  <TitleContent>Generated HTML Output</TitleContent>
+  <DialogContent>
+    <MudTextField T="string" Value="@GeneratedHtml" Lines="15" ReadOnly="true" Variant="Variant.Outlined" />
+  </DialogContent>
+  <DialogActions>
+    <MudButton OnClick="() => _showPreview = false">Close</MudButton>
+  </DialogActions>
+</MudDialog>
+
+@code {
+  private ElementReference _canvasRef;
+  private bool _showPreview;
+  private string GeneratedHtml = "";
+
+  public GridBlockItem RootContainer { get; set; } = new()
+  {
+    Type = BlockType.Container,
+    Children = new List<GridBlockItem>
+        {
+            new GridBlockItem { Type = BlockType.Heading, Content = "Welcome to Block Editor", ColSpan = 12 },
+            new GridBlockItem { Type = BlockType.Text, Content = "Drag handles or resize columns using mouse handles.", ColSpan = 6 },
+            new GridBlockItem { Type = BlockType.Image, ColSpan = 6 }
+        }
+  };
+
+  private Dictionary<string, GridBlock> _blockComponents = new();
+
+  protected override void OnInitialized()
+  {
+    EditorState.OnStateChanged += StateHasChanged;
+  }
+
+  private void AddRootBlock(BlockType type)
+  {
+    RootContainer.Children.Add(new GridBlockItem { Type = type, ColSpan = 12 });
+    StateHasChanged();
+  }
+
+  private void OnCanvasMouseMove(MouseEventArgs e)
+  {
+    foreach (var comp in _blockComponents.Values)
+    {
+      // Grid width approximation or measure via JSInterop if exact pixel accuracy is required
+      comp.OnMouseMove(e, gridWidthPx: 800);
+    }
+  }
+
+  private void OnCanvasMouseUp()
+  {
+    foreach (var comp in _blockComponents.Values)
+    {
+      comp.StopResize();
+    }
+  }
+
+  private void OpenPreviewModal()
+  {
+    GeneratedHtml = RootContainer.RenderToHtml();
+    _showPreview = true;
+  }
+
+  public void Dispose()
+  {
+    EditorState.OnStateChanged -= StateHasChanged;
+  }
+}

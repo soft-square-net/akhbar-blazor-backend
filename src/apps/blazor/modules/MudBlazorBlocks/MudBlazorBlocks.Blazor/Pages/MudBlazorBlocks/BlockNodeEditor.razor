@@ -2,6 +2,7 @@
 @page "/block-editor"
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FieldType = FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.FieldType;
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.EditForm
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Fields
 
@@ -94,14 +95,14 @@
                 new() { 
                     Id = "in_1", 
                     Label = "Username", 
-                    Type = "text", 
+                    Type = FieldType.Text, 
                     Value = "default_user",
                     Validation = new() { IsRequired = true }
                 },
                 new() { 
                     Id = "in_2", 
                     Label = "Retry Threshold", 
-                    Type = "number", 
+                    Type = FieldType.Number, 
                     Value = 5 
                 }
             }

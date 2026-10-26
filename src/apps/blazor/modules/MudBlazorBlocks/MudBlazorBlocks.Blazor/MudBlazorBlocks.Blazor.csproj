@@ -18,6 +18,10 @@
     <None Remove="Abstraction\TreeNode\TreeNodeUtility.jpg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Components\VisualEditor\FormVisualEditor.html" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -54,6 +58,7 @@
   <ItemGroup>
     <Folder Include="Abstraction\BlockNode\Studio\" />
     <Folder Include="Components\Blocks\Dialogs\" />
+    <Folder Include="Components\TailwindEditor\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +67,9 @@
     </Content>
     <Content Update="Components\Blocks\EditForm\BlockNodeValidationManager.razorBak">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="wwwroot\FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.lib.module555.js">
+      <SubType>Code</SubType>
     </Content>
   </ItemGroup>
 

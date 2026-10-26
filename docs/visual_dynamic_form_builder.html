@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MudBlazor Dynamic Form Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mud: {
+              primary: '#594AE2',
+              'primary-hover': '#4334d1',
+              secondary: '#FF4081',
+              surface: '#7E6FFF',
+              darkBg: '#121212',
+              darkPaper: '#1E1E1E',
+              darkSurface: '#272727',
+              darkBorder: '#383838'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel CDN -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(156, 163, 175, 0.7);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-mud-darkBg text-gray-900 dark:text-gray-100 font-sans transition-colors duration-200">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+    // --- UTILITY HELPERS ---
+    const generateId = () => 'field_' + Math.random().toString(36).substring(2, 9);
+
+    const FIELD_TYPES = [
+      { type: 'text', label: 'Text Input', icon: 'type', category: 'Basic' },
+      { type: 'number', label: 'Number Input', icon: 'hash', category: 'Basic' },
+      { type: 'textarea', label: 'Text Area', icon: 'align-left', category: 'Basic' },
+      { type: 'select', label: 'Select Dropdown', icon: 'chevron-down', category: 'Basic' },
+      { type: 'checkbox', label: 'Checkbox', icon: 'check-square', category: 'Basic' },
+      { type: 'date', label: 'Date Picker', icon: 'calendar', category: 'Basic' },
+      { type: 'section', label: 'Section Container', icon: 'layout', category: 'Containers', isContainer: true },
+      { type: 'group', label: 'Field Group', icon: 'box', category: 'Containers', isContainer: true }
+    ];
+
+    const PRESET_TEMPLATES = {
+      employeeOnboarding: [
+        {
+          id: 'sec_personal',
+          type: 'section',
+          label: 'Personal Details',
+          key: 'personalDetails',
+          children: [
+            { id: 'f_fullname', type: 'text', label: 'Full Name', key: 'fullName', required: true, placeholder: 'e.g. John Doe' },
+            { id: 'f_email', type: 'text', label: 'Work Email', key: 'email', required: true, pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$', customError: 'Invalid email address' },
+            { id: 'f_emp_type', type: 'select', label: 'Employment Type', key: 'empType', options: ['Full-Time', 'Part-Time', 'Contractor'], defaultValue: 'Full-Time' }
+          ]
+        },
+        {
+          id: 'sec_address',
+          type: 'group',
+          label: 'Address Info (Field Group Container)',
+          key: 'addressGroup',
+          children: [
+            { id: 'f_street', type: 'text', label: 'Street Address', key: 'street', required: true },
+            { id: 'f_city', type: 'text', label: 'City', key: 'city', required: true },
+            { id: 'f_country', type: 'select', label: 'Country', key: 'country', options: ['USA', 'Canada', 'UK', 'Egypt', 'Germany'], defaultValue: 'USA' }
+          ]
+        },
+        {
+          id: 'sec_emergency',
+          type: 'section',
+          label: 'Emergency Contacts & Medical',
+          key: 'emergencySec',
+          children: [
+            { id: 'f_has_emergency', type: 'checkbox', label: 'Include Emergency Contact Details?', key: 'hasEmergencyContact', defaultValue: true },
+            {
+              id: 'f_contact_name',
+              type: 'text',
+              label: 'Emergency Contact Person',
+              key: 'emergencyContactName',
+              required: true,
+              condition: { fieldKey: 'hasEmergencyContact', operator: 'equals', value: 'true' }
+            },
+            {
+              id: 'f_contact_phone',
+              type: 'text',
+              label: 'Emergency Phone Number',
+              key: 'emergencyContactPhone',
+              condition: { fieldKey: 'hasEmergencyContact', operator: 'equals', value: 'true' }
+            }
+          ]
+        }
+      ]
+    };
+
+    // Helper: Clone recursive field tree with new unique IDs
+    const cloneFieldTree = (node) => {
+      const newNode = {
+        ...node,
+        id: generateId(),
+        key: node.key + '_' + Math.floor(Math.random() * 1000)
+      };
+      if (node.children) {
+        newNode.children = node.children.map(cloneFieldTree);
+      }
+      return newNode;
+    };
+
+    // Helper: Find & mutate recursive tree
+    const updateNodeInTree = (nodes, id, updateFn) => {
+      return nodes.map(node => {
+        if (node.id === id) {
+          return updateFn(node);
+        }
+        if (node.children) {
+          return { ...node, children: updateNodeInTree(node.children, id, updateFn) };
+        }
+        return node;
+      });
+    };
+
+    const deleteNodeFromTree = (nodes, id) => {
+      return nodes.filter(node => node.id !== id).map(node => {
+        if (node.children) {
+          return { ...node, children: deleteNodeFromTree(node.children, id) };
+        }
+        return node;
+      });
+    };
+
+    const findNodeById = (nodes, id) => {
+      for (const node of nodes) {
+        if (node.id === id) return node;
+        if (node.children) {
+          const found = findNodeById(node.children, id);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    // Helper: Get all field keys (for conditional dropdowns)
+    const getAllFieldKeys = (nodes, excludeId) => {
+      let keys = [];
+      for (const n of nodes) {
+        if (n.id !== excludeId && n.key) {
+          keys.push(n.key);
+        }
+        if (n.children) {
+          keys = keys.concat(getAllFieldKeys(n.children, excludeId));
+        }
+      }
+      return keys;
+    };
+
+    // SVG Icons Map
+    const Icon = ({ name, className = "w-4 h-4" }) => {
+      const iconMap = {
+        'type': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>,
+        'hash': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>,
+        'align-left': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h10M4 18h14"/></svg>,
+        'chevron-down': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>,
+        'check-square': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>,
+        'calendar': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>,
+        'layout': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>,
+        'box': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>,
+        'arrow-up': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"/></svg>,
+        'arrow-down': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>,
+        'trash': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>,
+        'plus': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>,
+        'bookmark': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>,
+        'settings': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
+        'sun': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>,
+        'moon': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>,
+        'play': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+        'code': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>,
+        'download': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>,
+        'upload': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>,
+        'grip': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16"/></svg>
+      };
+      return iconMap[name] || <span className="w-4 h-4 inline-block bg-gray-400 rounded-full" />;
+    };
+
+    // Main Dynamic Form Builder Application
+    function App() {
+      const [isDarkMode, setIsDarkMode] = useState(false);
+      const [activeTab, setActiveTab] = useState('builder'); // 'builder' | 'tester' | 'json'
+      const [formTree, setFormTree] = useState(PRESET_TEMPLATES.employeeOnboarding);
+      const [selectedFieldId, setSelectedFieldId] = useState(null);
+      const [savedCustomTemplates, setSavedCustomTemplates] = useState([]);
+      const [draggedItem, setDraggedItem] = useState(null);
+      const [dragTarget, setDragTarget] = useState(null);
+      const [jsonInput, setJsonInput] = useState('');
+      const [showJsonModal, setShowJsonModal] = useState(false);
+
+      // Toggle Dark Mode
+      const toggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
+        document.documentElement.classList.toggle('dark');
+      };
+
+      // Find Currently Selected Field
+      const selectedField = useMemo(() => {
+        if (!selectedFieldId) return null;
+        return findNodeById(formTree, selectedFieldId);
+      }, [formTree, selectedFieldId]);
+
+      // Add New Field or Container
+      const handleAddField = (fieldTypeObj, targetParentId = null) => {
+        const isCustom = fieldTypeObj.isCustom;
+        let newField;
+
+        if (isCustom) {
+          // Clone complete template tree
+          newField = cloneFieldTree(fieldTypeObj.template);
+        } else {
+          const typeInfo = FIELD_TYPES.find(f => f.type === fieldTypeObj.type);
+          newField = {
+            id: generateId(),
+            type: fieldTypeObj.type,
+            label: `New ${typeInfo ? typeInfo.label : 'Field'}`,
+            key: `field_${Math.floor(Math.random() * 10000)}`,
+            required: false,
+            placeholder: '',
+            defaultValue: fieldTypeObj.type === 'checkbox' ? false : '',
+            options: fieldTypeObj.type === 'select' ? ['Option 1', 'Option 2', 'Option 3'] : undefined,
+            children: typeInfo?.isContainer ? [] : undefined
+          };
+        }
+
+        if (!targetParentId) {
+          setFormTree(prev => [...prev, newField]);
+        } else {
+          setFormTree(prev => updateNodeInTree(prev, targetParentId, node => ({
+            ...node,
+            children: [...(node.children || []), newField]
+          })));
+        }
+        setSelectedFieldId(newField.id);
+      };
+
+      // Save Selected Field (and sub-children) as Custom Reusable Component to Sidebar Drawer
+      const handleSaveAsCustomField = (field) => {
+        const customTemplate = {
+          id: 'custom_' + generateId(),
+          name: field.label || 'Custom Component',
+          icon: field.children ? 'box' : 'bookmark',
+          template: JSON.parse(JSON.stringify(field)) // Deep clone snapshot
+        };
+        setSavedCustomTemplates(prev => [...prev, customTemplate]);
+      };
+
+      // Node Level & Order Reordering (Strict Sibling Level Scope)
+      const moveSiblingNode = (targetId, direction) => {
+        const moveInArray = (arr) => {
+          const idx = arr.findIndex(item => item.id === targetId);
+          if (idx === -1) return false;
+
+          const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+          if (targetIdx < 0 || targetIdx >= arr.length) return true; // bound reached
+
+          const updated = [...arr];
+          const temp = updated[idx];
+          updated[idx] = updated[targetIdx];
+          updated[targetIdx] = temp;
+          return updated;
+        };
+
+        const recursiveReorder = (nodes) => {
+          const moved = moveInArray(nodes);
+          if (Array.isArray(moved)) return moved;
+
+          return nodes.map(node => {
+            if (node.children) {
+              const childMoved = moveInArray(node.children);
+              if (Array.isArray(childMoved)) {
+                return { ...node, children: childMoved };
+              }
+              return { ...node, children: recursiveReorder(node.children) };
+            }
+            return node;
+          });
+        };
+
+        setFormTree(prev => recursiveReorder(prev));
+      };
+
+      // Drag & Drop Handlers
+      const handleDragStart = (e, item) => {
+        e.stopPropagation();
+        setDraggedItem(item);
+        e.dataTransfer.setData('text/plain', JSON.stringify(item));
+      };
+
+      const handleDrop = (e, targetParentId = null) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragTarget(null);
+
+        if (!draggedItem) return;
+
+        if (draggedItem.isNew) {
+          handleAddField(draggedItem, targetParentId);
+        } else if (draggedItem.id) {
+          // Move existing node from old parent to target parent
+          const nodeToMove = findNodeById(formTree, draggedItem.id);
+          if (!nodeToMove || nodeToMove.id === targetParentId) return;
+
+          // Prevent dropping parent into its own children
+          if (targetParentId && findNodeById([nodeToMove], targetParentId)) return;
+
+          const cleanedTree = deleteNodeFromTree(formTree, draggedItem.id);
+
+          if (!targetParentId) {
+            setFormTree([...cleanedTree, nodeToMove]);
+          } else {
+            setFormTree(updateNodeInTree(cleanedTree, targetParentId, node => ({
+              ...node,
+              children: [...(node.children || []), nodeToMove]
+            })));
+          }
+        }
+        setDraggedItem(null);
+      };
+
+      // Export/Import JSON Config
+      const handleExportJson = () => {
+        setJsonInput(JSON.stringify(formTree, null, 2));
+        setShowJsonModal(true);
+      };
+
+      const handleImportJson = () => {
+        try {
+          const parsed = JSON.parse(jsonInput);
+          if (Array.isArray(parsed)) {
+            setFormTree(parsed);
+            setShowJsonModal(false);
+            setSelectedFieldId(null);
+          } else {
+            alert('JSON must be an array of field nodes.');
+          }
+        } catch (err) {
+          alert('Invalid JSON structure format.');
+        }
+      };
+
+      return (
+        <div className="flex flex-col h-screen overflow-hidden">
+          {/* APP BAR HEADER */}
+          <header className="h-16 bg-mud-primary text-white flex items-center justify-between px-6 shadow-md z-20 flex-shrink-0">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-white/10 rounded-lg">
+                <Icon name="layout" className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="font-bold text-lg leading-tight">MudBlazor Form Engine</h1>
+                <p className="text-xs text-indigo-200">Dynamic Builder & Recursive Visual Inspector</p>
+              </div>
+            </div>
+
+            {/* TAB NAVIGATION */}
+            <div className="flex bg-black/20 p-1 rounded-xl">
+              <button
+                onClick={() => setActiveTab('builder')}
+                className={`flex items-center space-x-2 px-4 py-1.5 rounded-lg text-sm font-medium transition ${activeTab === 'builder' ? 'bg-white text-mud-primary shadow' : 'text-indigo-100 hover:text-white'}`}
+              >
+                <Icon name="layout" className="w-4 h-4" />
+                <span>Visual Canvas</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('tester')}
+                className={`flex items-center space-x-2 px-4 py-1.5 rounded-lg text-sm font-medium transition ${activeTab === 'tester' ? 'bg-white text-mud-primary shadow' : 'text-indigo-100 hover:text-white'}`}
+              >
+                <Icon name="play" className="w-4 h-4" />
+                <span>Form Sandbox</span>
+              </button>
+            </div>
+
+            {/* HEADER ACTIONS */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setFormTree(PRESET_TEMPLATES.employeeOnboarding)}
+                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition"
+                title="Load Employee Onboarding Preset"
+              >
+                <Icon name="bookmark" className="w-4 h-4" />
+                <span>Preset Demo</span>
+              </button>
+              <button
+                onClick={handleExportJson}
+                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition"
+              >
+                <Icon name="code" className="w-4 h-4" />
+                <span>JSON Schema</span>
+              </button>
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition"
+                title="Toggle Dark Mode"
+              >
+                <Icon name={isDarkMode ? 'sun' : 'moon'} className="w-4 h-4" />
+              </button>
+            </div>
+          </header>
+
+          {/* MAIN WORKSPACE BODY */}
+          <div className="flex-1 flex overflow-hidden">
+            {activeTab === 'builder' && (
+              <>
+                {/* LEFT DRAWER: PALETTE & SAVED CUSTOM FIELDS */}
+                <aside className="w-72 bg-white dark:bg-mud-darkPaper border-r border-gray-200 dark:border-mud-darkBorder flex flex-col flex-shrink-0 z-10">
+                  <div className="p-4 border-b border-gray-200 dark:border-mud-darkBorder bg-gray-50/50 dark:bg-mud-darkSurface/50">
+                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Field Palette Drawer</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Drag onto canvas to add</p>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {/* BASIC FIELDS */}
+                    <div>
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Basic Field Types</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {FIELD_TYPES.filter(f => f.category === 'Basic').map(f => (
+                          <div
+                            key={f.type}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, { isNew: true, type: f.type })}
+                            onClick={() => handleAddField({ type: f.type })}
+                            className="p-3 bg-white dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg hover:border-mud-primary hover:shadow-md cursor-grab transition flex flex-col items-center justify-center text-center group"
+                          >
+                            <div className="p-2 rounded-lg bg-indigo-50 dark:bg-gray-800 text-mud-primary group-hover:scale-110 transition">
+                              <Icon name={f.icon} className="w-5 h-5" />
+                            </div>
+                            <span className="text-xs font-medium mt-2 text-gray-700 dark:text-gray-300">{f.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* CONTAINER STRUCTURES */}
+                    <div>
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Layout Containers</h3>
+                      <div className="space-y-2">
+                        {FIELD_TYPES.filter(f => f.category === 'Containers').map(f => (
+                          <div
+                            key={f.type}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, { isNew: true, type: f.type })}
+                            onClick={() => handleAddField({ type: f.type })}
+                            className="p-3 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-mud-darkSurface dark:to-gray-800 border border-indigo-200/60 dark:border-mud-darkBorder rounded-lg hover:border-mud-primary hover:shadow-md cursor-grab transition flex items-center space-x-3"
+                          >
+                            <div className="p-2 rounded-lg bg-mud-primary text-white">
+                              <Icon name={f.icon} className="w-5 h-5" />
+                            </div>
+                            <div className="text-left">
+                              <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 block">{f.label}</span>
+                              <span className="text-[10px] text-gray-400">Holds child fields recursively</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* SAVED CUSTOM REUSABLE COMPONENTS */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Saved Custom Fields</h3>
+                        <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded-full font-semibold">
+                          {savedCustomTemplates.length}
+                        </span>
+                      </div>
+                      
+                      {savedCustomTemplates.length === 0 ? (
+                        <div className="p-4 border-2 border-dashed border-gray-200 dark:border-mud-darkBorder rounded-xl text-center">
+                          <Icon name="bookmark" className="w-6 h-6 text-gray-300 mx-auto mb-1" />
+                          <p className="text-xs text-gray-400">Select any field on canvas & click "Save as Custom Template" to store reusable fields here.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {savedCustomTemplates.map(custom => (
+                            <div
+                              key={custom.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, { isNew: true, isCustom: true, template: custom.template })}
+                              onClick={() => handleAddField({ isCustom: true, template: custom.template })}
+                              className="p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 rounded-lg hover:border-amber-400 hover:shadow-md cursor-grab transition flex items-center justify-between"
+                            >
+                              <div className="flex items-center space-x-2.5">
+                                <Icon name={custom.icon} className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">{custom.name}</span>
+                              </div>
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 rounded">Custom</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </aside>
+
+                {/* CENTER VISUAL CANVAS */}
+                <main 
+                  className="flex-1 overflow-y-auto p-8 bg-gray-100/70 dark:bg-mud-darkBg"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, null)}
+                >
+                  <div className="max-w-4xl mx-auto">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">Form Builder Visual Canvas</h2>
+                        <p className="text-xs text-gray-500">Nest fields into containers, use drag handles, or up/down arrows to reorder level position.</p>
+                      </div>
+                      <span className="text-xs text-gray-400 bg-white dark:bg-mud-darkPaper px-3 py-1.5 rounded-lg border border-gray-200 dark:border-mud-darkBorder shadow-sm">
+                        {formTree.length} Top-level Root Nodes
+                      </span>
+                    </div>
+
+                    {formTree.length === 0 ? (
+                      <div 
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => handleDrop(e, null)}
+                        className="h-80 border-2 border-dashed border-gray-300 dark:border-mud-darkBorder rounded-2xl flex flex-col items-center justify-center text-center p-6 bg-white/50 dark:bg-mud-darkPaper/50"
+                      >
+                        <div className="w-14 h-14 bg-indigo-50 dark:bg-mud-darkSurface text-mud-primary rounded-2xl flex items-center justify-center mb-3 shadow-inner">
+                          <Icon name="plus" className="w-8 h-8" />
+                        </div>
+                        <h3 className="font-bold text-gray-700 dark:text-gray-200">Canvas is empty</h3>
+                        <p className="text-xs text-gray-400 max-w-sm mt-1">Drag fields or container layouts from the left drawer to start building your dynamic form.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {formTree.map((field, index) => (
+                          <CanvasNodeItem
+                            key={field.id}
+                            node={field}
+                            index={index}
+                            totalSiblings={formTree.length}
+                            level={0}
+                            selectedFieldId={selectedFieldId}
+                            onSelect={setSelectedFieldId}
+                            onDelete={(id) => setFormTree(prev => deleteNodeFromTree(prev, id))}
+                            onMove={moveSiblingNode}
+                            onSaveCustom={handleSaveAsCustomField}
+                            onDragStart={handleDragStart}
+                            onDrop={handleDrop}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </main>
+
+                {/* RIGHT PROPERTIES & RULES PANEL */}
+                <aside className="w-80 bg-white dark:bg-mud-darkPaper border-l border-gray-200 dark:border-mud-darkBorder flex flex-col flex-shrink-0 z-10">
+                  <div className="p-4 border-b border-gray-200 dark:border-mud-darkBorder bg-gray-50/50 dark:bg-mud-darkSurface/50 flex items-center space-x-2">
+                    <Icon name="settings" className="w-4 h-4 text-mud-primary" />
+                    <h2 className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Field Properties & Rules</h2>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-5">
+                    {selectedField ? (
+                      <PropertyEditor
+                        field={selectedField}
+                        allKeys={getAllFieldKeys(formTree, selectedField.id)}
+                        onChange={(updatedField) => {
+                          setFormTree(prev => updateNodeInTree(prev, updatedField.id, () => updatedField));
+                        }}
+                      />
+                    ) : (
+                      <div className="h-full flex flex-col items-center justify-center text-center p-6 text-gray-400">
+                        <Icon name="settings" className="w-10 h-10 mb-2 opacity-30" />
+                        <p className="text-xs">Click on any field on the canvas to configure its properties, validation rules, and dynamic visibility logic.</p>
+                      </div>
+                    )}
+                  </div>
+                </aside>
+              </>
+            )}
+
+            {/* FORM TESTER SANDBOX TAB */}
+            {activeTab === 'tester' && (
+              <main className="flex-1 overflow-y-auto p-8 bg-gray-100 dark:bg-mud-darkBg">
+                <FormTesterSandbox tree={formTree} />
+              </main>
+            )}
+          </div>
+
+          {/* EXPORT JSON MODAL */}
+          {showJsonModal && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-mud-darkPaper rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-gray-200 dark:border-mud-darkBorder">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-lg dark:text-white flex items-center space-x-2">
+                    <Icon name="code" className="w-5 h-5 text-mud-primary" />
+                    <span>Form Schema JSON</span>
+                  </h3>
+                  <button onClick={() => setShowJsonModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <textarea
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                  className="w-full h-80 font-mono text-xs p-4 bg-gray-900 text-green-400 rounded-xl border border-gray-700 focus:outline-none"
+                />
+                <div className="flex justify-end space-x-3 mt-4">
+                  <button
+                    onClick={() => setShowJsonModal(false)}
+                    className="px-4 py-2 border border-gray-300 dark:border-mud-darkBorder text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleImportJson}
+                    className="px-4 py-2 bg-mud-primary hover:bg-mud-primary-hover text-white rounded-xl text-xs font-semibold shadow"
+                  >
+                    Import & Apply JSON
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- CANVAS NODE ITEM COMPONENT (RECURSIVE WITH UP/DOWN REORDERING & LEVEL INDICATORS) ---
+    function CanvasNodeItem({ node, index, totalSiblings, level, selectedFieldId, onSelect, onDelete, onMove, onSaveCustom, onDragStart, onDrop }) {
+      const isSelected = selectedFieldId === node.id;
+      const isContainer = node.type === 'section' || node.type === 'group';
+
+      return (
+        <div
+          draggable
+          onDragStart={(e) => onDragStart(e, { isNew: false, id: node.id })}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => onDrop(e, isContainer ? node.id : null)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(node.id);
+          }}
+          className={`group relative rounded-xl transition-all duration-150 border ${
+            isSelected
+              ? 'border-mud-primary ring-2 ring-mud-primary/30 shadow-md bg-white dark:bg-mud-darkPaper'
+              : 'border-gray-200 dark:border-mud-darkBorder bg-white/80 dark:bg-mud-darkPaper/80 hover:border-gray-300'
+          } ${isContainer ? 'p-4' : 'p-3'}`}
+          style={{ marginLeft: level > 0 ? `${level * 16}px` : '0px' }}
+        >
+          {/* TOP BAR ACTION HEADER */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <span className="cursor-grab text-gray-400 hover:text-gray-600">
+                <Icon name="grip" className="w-4 h-4" />
+              </span>
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                isContainer
+                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
+                  : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+              }`}>
+                {node.type}
+              </span>
+              <span className="font-semibold text-sm text-gray-800 dark:text-gray-100">{node.label}</span>
+              <span className="text-xs text-gray-400 font-mono">[{node.key}]</span>
+            </div>
+
+            {/* HOVER & REORDER CONTROLS (UP / DOWN ENABLED RESPECTING LEVEL) */}
+            <div className="flex items-center space-x-1 opacity-90 group-hover:opacity-100">
+              {/* LEVEL & ORDER BADGES */}
+              <span className="text-[10px] text-gray-400 bg-gray-100 dark:bg-mud-darkSurface px-1.5 py-0.5 rounded mr-1">
+                L:{level} O:{index}
+              </span>
+
+              {/* REORDER UP */}
+              <button
+                disabled={index === 0}
+                onClick={(e) => { e.stopPropagation(); onMove(node.id, 'up'); }}
+                className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-mud-darkSurface ${index === 0 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-600 dark:text-gray-300'}`}
+                title="Move Up in Level"
+              >
+                <Icon name="arrow-up" className="w-3.5 h-3.5" />
+              </button>
+
+              {/* REORDER DOWN */}
+              <button
+                disabled={index === totalSiblings - 1}
+                onClick={(e) => { e.stopPropagation(); onMove(node.id, 'down'); }}
+                className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-mud-darkSurface ${index === totalSiblings - 1 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-600 dark:text-gray-300'}`}
+                title="Move Down in Level"
+              >
+                <Icon name="arrow-down" className="w-3.5 h-3.5" />
+              </button>
+
+              {/* SAVE AS CUSTOM REUSABLE TEMPLATE BUTTON */}
+              <button
+                onClick={(e) => { e.stopPropagation(); onSaveCustom(node); }}
+                className="p-1 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded"
+                title="Save as Custom Component Template to Drawer"
+              >
+                <Icon name="bookmark" className="w-3.5 h-3.5" />
+              </button>
+
+              {/* DELETE BUTTON */}
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete(node.id); }}
+                className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded"
+                title="Delete Node"
+              >
+                <Icon name="trash" className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* NODE VISUAL PREVIEW / CONTAINER RECURSIVE DROPOUT */}
+          {isContainer ? (
+            <div className="mt-3 p-3 bg-gray-50/70 dark:bg-mud-darkBg/60 border border-dashed border-gray-300 dark:border-mud-darkBorder rounded-xl space-y-2 min-h-[60px]">
+              <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">
+                Container Dropzone ({node.children?.length || 0} items)
+              </div>
+              {node.children && node.children.length > 0 ? (
+                node.children.map((child, childIdx) => (
+                  <CanvasNodeItem
+                    key={child.id}
+                    node={child}
+                    index={childIdx}
+                    totalSiblings={node.children.length}
+                    level={level + 1}
+                    selectedFieldId={selectedFieldId}
+                    onSelect={onSelect}
+                    onDelete={onDelete}
+                    onMove={onMove}
+                    onSaveCustom={onSaveCustom}
+                    onDragStart={onDragStart}
+                    onDrop={onDrop}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-4 text-xs text-gray-400 border border-dashed border-gray-200 dark:border-mud-darkBorder rounded-lg">
+                  Drop fields here to nest inside this container
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-xs text-gray-400 italic">
+              {node.type === 'select' ? `Options: [${node.options?.join(', ')}]` : node.placeholder || 'Standard Field Input'}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- PROPERTY EDITOR COMPONENT ---
+    function PropertyEditor({ field, allKeys, onChange }) {
+      const updateProp = (key, val) => {
+        onChange({ ...field, [key]: val });
+      };
+
+      const updateCondition = (key, val) => {
+        const cond = field.condition || { fieldKey: '', operator: 'equals', value: '' };
+        onChange({ ...field, condition: { ...cond, [key]: val } });
+      };
+
+      return (
+        <div className="space-y-5 text-xs">
+          {/* GENERAL INFO */}
+          <div>
+            <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">General Attributes</h4>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-gray-500 mb-1">Field Label</label>
+                <input
+                  type="text"
+                  value={field.label || ''}
+                  onChange={(e) => updateProp('label', e.target.value)}
+                  className="w-full px-3 py-1.5 bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-500 mb-1">Field Key (Binding Name)</label>
+                <input
+                  type="text"
+                  value={field.key || ''}
+                  onChange={(e) => updateProp('key', e.target.value)}
+                  className="w-full px-3 py-1.5 font-mono bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                />
+              </div>
+
+              {field.type !== 'section' && field.type !== 'group' && field.type !== 'checkbox' && (
+                <div>
+                  <label className="block text-gray-500 mb-1">Placeholder Text</label>
+                  <input
+                    type="text"
+                    value={field.placeholder || ''}
+                    onChange={(e) => updateProp('placeholder', e.target.value)}
+                    className="w-full px-3 py-1.5 bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                  />
+                </div>
+              )}
+
+              {field.type === 'select' && (
+                <div>
+                  <label className="block text-gray-500 mb-1">Options (Comma separated)</label>
+                  <input
+                    type="text"
+                    value={field.options ? field.options.join(', ') : ''}
+                    onChange={(e) => updateProp('options', e.target.value.split(',').map(s => s.trim()))}
+                    className="w-full px-3 py-1.5 bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* VALIDATION RULES */}
+          {field.type !== 'section' && field.type !== 'group' && (
+            <div className="pt-4 border-t border-gray-200 dark:border-mud-darkBorder">
+              <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">Validation Rules</h4>
+              <div className="space-y-3">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!field.required}
+                    onChange={(e) => updateProp('required', e.target.checked)}
+                    className="rounded text-mud-primary"
+                  />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Required Field</span>
+                </label>
+
+                <div>
+                  <label className="block text-gray-500 mb-1">Regex Pattern Validation</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. ^[0-9]+$"
+                    value={field.pattern || ''}
+                    onChange={(e) => updateProp('pattern', e.target.value)}
+                    className="w-full px-3 py-1.5 font-mono bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 mb-1">Custom Error Message</label>
+                  <input
+                    type="text"
+                    value={field.customError || ''}
+                    onChange={(e) => updateProp('customError', e.target.value)}
+                    className="w-full px-3 py-1.5 bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CONDITIONAL VISIBILITY LOGIC */}
+          <div className="pt-4 border-t border-gray-200 dark:border-mud-darkBorder">
+            <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">Conditional Visibility Rules</h4>
+            <div className="p-3 bg-gray-50 dark:bg-mud-darkSurface border border-gray-200 dark:border-mud-darkBorder rounded-xl space-y-3">
+              <p className="text-[10px] text-gray-400">Show this field only IF target field matches rule:</p>
+
+              <div>
+                <label className="block text-gray-500 mb-1">Target Field Key</label>
+                <select
+                  value={field.condition?.fieldKey || ''}
+                  onChange={(e) => updateCondition('fieldKey', e.target.value)}
+                  className="w-full px-3 py-1.5 bg-white dark:bg-mud-darkPaper border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                >
+                  <option value="">-- No Rule (Always Visible) --</option>
+                  {allKeys.map(k => (
+                    <option key={k} value={k}>{k}</option>
+                  ))}
+                </select>
+              </div>
+
+              {field.condition?.fieldKey && (
+                <>
+                  <div>
+                    <label className="block text-gray-500 mb-1">Operator</label>
+                    <select
+                      value={field.condition?.operator || 'equals'}
+                      onChange={(e) => updateCondition('operator', e.target.value)}
+                      className="w-full px-3 py-1.5 bg-white dark:bg-mud-darkPaper border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                    >
+                      <option value="equals">Equals</option>
+                      <option value="not_equals">Does Not Equal</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-500 mb-1">Expected Value</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. true or Full-Time"
+                      value={field.condition?.value || ''}
+                      onChange={(e) => updateCondition('value', e.target.value)}
+                      className="w-full px-3 py-1.5 bg-white dark:bg-mud-darkPaper border border-gray-200 dark:border-mud-darkBorder rounded-lg dark:text-white"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // --- FORM TESTER SANDBOX COMPONENT (DYNAMIC RENDERING & VALIDATION) ---
+    function FormTesterSandbox({ tree }) {
+      const [formData, setFormData] = useState({});
+      const [errors, setErrors] = useState({});
+
+      // Initialize form data defaults
+      useEffect(() => {
+        const initDefaults = (nodes) => {
+          let data = {};
+          nodes.forEach(n => {
+            if (n.key) data[n.key] = n.defaultValue ?? '';
+            if (n.children) data = { ...data, ...initDefaults(n.children) };
+          });
+          return data;
+        };
+        setFormData(initDefaults(tree));
+      }, [tree]);
+
+      // Check conditional visibility
+      const isVisible = (field) => {
+        if (!field.condition || !field.condition.fieldKey) return true;
+        const targetVal = String(formData[field.condition.fieldKey] ?? '');
+        const expectedVal = String(field.condition.value ?? '');
+
+        if (field.condition.operator === 'equals') return targetVal === expectedVal;
+        if (field.condition.operator === 'not_equals') return targetVal !== expectedVal;
+        return true;
+      };
+
+      // Validate inputs
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        let newErrors = {};
+
+        const validateNodes = (nodes) => {
+          nodes.forEach(field => {
+            if (!isVisible(field)) return;
+
+            if (field.key) {
+              const val = formData[field.key];
+              if (field.required && (!val || val === '')) {
+                newErrors[field.key] = 'This field is required.';
+              } else if (field.pattern && val) {
+                const regex = new RegExp(field.pattern);
+                if (!regex.test(val)) {
+                  newErrors[field.key] = field.customError || 'Invalid format.';
+                }
+              }
+            }
+            if (field.children) validateNodes(field.children);
+          });
+        };
+
+        validateNodes(tree);
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length === 0) {
+          alert('Form Submitted Successfully!\nCheck the payload output below.');
+        }
+      };
+
+      // Recursive field renderer
+      const renderField = (field) => {
+        if (!isVisible(field)) return null;
+
+        if (field.type === 'section') {
+          return (
+            <div key={field.id} className="p-6 bg-white dark:bg-mud-darkPaper border border-gray-200 dark:border-mud-darkBorder rounded-2xl shadow-sm mb-4">
+              <h3 className="font-bold text-lg text-gray-800 dark:text-white border-b border-gray-100 dark:border-mud-darkBorder pb-3 mb-4">{field.label}</h3>
+              <div className="space-y-4">
+                {field.children?.map(child => renderField(child))}
+              </div>
+            </div>
+          );
+        }
+
+        if (field.type === 'group') {
+          return (
+            <div key={field.id} className="p-4 bg-gray-50/70 dark:bg-mud-darkSurface/50 border border-indigo-100 dark:border-mud-darkBorder rounded-xl mb-4">
+              <div className="font-semibold text-xs text-indigo-600 dark:text-indigo-300 uppercase tracking-wider mb-3">{field.label}</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {field.children?.map(child => renderField(child))}
+              </div>
+            </div>
+          );
+        }
+
+        const value = formData[field.key] ?? '';
+        const error = errors[field.key];
+
+        return (
+          <div key={field.id} className="space-y-1">
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300">
+              {field.label}
+              {field.required && <span className="text-red-500 ml-0.5">*</span>}
+            </label>
+
+            {field.type === 'text' && (
+              <input
+                type="text"
+                placeholder={field.placeholder}
+                value={value}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                className="w-full px-4 py-2 bg-white dark:bg-mud-darkPaper border border-gray-300 dark:border-mud-darkBorder rounded-xl text-xs dark:text-white focus:ring-2 focus:ring-mud-primary"
+              />
+            )}
+
+            {field.type === 'number' && (
+              <input
+                type="number"
+                placeholder={field.placeholder}
+                value={value}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                className="w-full px-4 py-2 bg-white dark:bg-mud-darkPaper border border-gray-300 dark:border-mud-darkBorder rounded-xl text-xs dark:text-white focus:ring-2 focus:ring-mud-primary"
+              />
+            )}
+
+            {field.type === 'textarea' && (
+              <textarea
+                placeholder={field.placeholder}
+                value={value}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                className="w-full px-4 py-2 bg-white dark:bg-mud-darkPaper border border-gray-300 dark:border-mud-darkBorder rounded-xl text-xs dark:text-white focus:ring-2 focus:ring-mud-primary h-24"
+              />
+            )}
+
+            {field.type === 'select' && (
+              <select
+                value={value}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                className="w-full px-4 py-2 bg-white dark:bg-mud-darkPaper border border-gray-300 dark:border-mud-darkBorder rounded-xl text-xs dark:text-white focus:ring-2 focus:ring-mud-primary"
+              >
+                <option value="">-- Select --</option>
+                {field.options?.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            )}
+
+            {field.type === 'checkbox' && (
+              <label className="flex items-center space-x-2 pt-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!formData[field.key]}
+                  onChange={(e) => setFormData({ ...formData, [field.key]: e.target.checked })}
+                  className="rounded text-mud-primary w-4 h-4"
+                />
+                <span className="text-xs text-gray-600 dark:text-gray-300">Enable / Check option</span>
+              </label>
+            )}
+
+            {field.type === 'date' && (
+              <input
+                type="date"
+                value={value}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                className="w-full px-4 py-2 bg-white dark:bg-mud-darkPaper border border-gray-300 dark:border-mud-darkBorder rounded-xl text-xs dark:text-white focus:ring-2 focus:ring-mud-primary"
+              />
+            )}
+
+            {error && <p className="text-[11px] text-red-500 font-medium mt-0.5">{error}</p>}
+          </div>
+        );
+      };
+
+      return (
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* LIVE RENDERED FORM */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-bold dark:text-white">Live Form Engine Sandbox</h2>
+              <span className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40 px-3 py-1 rounded-full font-semibold border border-green-200 dark:border-green-900">
+                ● Live Rules Active
+              </span>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {tree.map(node => renderField(node))}
+              <button
+                type="submit"
+                className="w-full py-3 bg-mud-primary hover:bg-mud-primary-hover text-white font-bold rounded-xl text-xs shadow-lg transition"
+              >
+                Submit Form
+              </button>
+            </form>
+          </div>
+
+          {/* REALTIME JSON PAYLOAD EXPORT */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-bold dark:text-white">Submitted Payload JSON</h2>
+            <div className="p-4 bg-gray-900 text-green-400 font-mono text-xs rounded-2xl shadow-xl overflow-x-auto min-h-[300px]">
+              <pre>{JSON.stringify(formData, null, 2)}</pre>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

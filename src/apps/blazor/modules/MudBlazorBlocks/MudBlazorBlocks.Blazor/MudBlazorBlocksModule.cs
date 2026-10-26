@@ -9,6 +9,7 @@ using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Se
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Auth;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Abstractions;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Inputs.Custome;
+using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Grid;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Layout;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.Shared.Authorization;
@@ -36,7 +37,7 @@ public class MudBlazorBlocksModule : BlazorModuleBase
         _enabled = true;
         _loaded = true;
         _initialized = true;
-        await base.InitializeAsync(); 
+        await base.InitializeAsync();
     }
 
     public override async Task ConfigureModule(IServiceCollection services, WebAssemblyHostBuilder builder)
@@ -55,11 +56,12 @@ public class MudBlazorBlocksModule : BlazorModuleBase
         InputRegistry.RegisterComponent("date", typeof(DateInput));
 
         services.AddSingleton<IRemoteValidationService, RemoteValidationService>();
+        services.AddScoped<GridEditorState>();
     }
 
     public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
     {
-        
+
         return await base.UseModuleAsync(app);
     }
 }

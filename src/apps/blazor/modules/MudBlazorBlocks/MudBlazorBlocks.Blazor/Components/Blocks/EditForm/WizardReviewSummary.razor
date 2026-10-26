@@ -1,5 +1,6 @@
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FieldType = FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.FieldType;
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.Visibility
 @* WizardReviewSummary.razor *@
 
@@ -28,11 +29,11 @@
                     {
                         <dt class="col-sm-4 text-secondary text-truncate">@input.Label</dt>
                         <dd class="col-sm-8 fw-semibold">
-                            @if (IsJsonOrCodeType(input.Type))
+              @if (IsJsonOrCodeType(Enum.GetName(typeof(FieldType), input.Type)))
                             {
                                 <pre class="bg-dark text-light p-2 rounded small mb-0 font-monospace" style="max-height: 200px; overflow-y: auto;"><code>@FormatValue(input)</code></pre>
                             }
-                            else if (input.Type.Equals("checkbox", StringComparison.OrdinalIgnoreCase))
+              else if (Enum.GetName(typeof(FieldType), input.Type).Equals("checkbox", StringComparison.OrdinalIgnoreCase))
                             {
                                 <span class="badge @(Convert.ToBoolean(input.Value) ? "bg-success" : "bg-secondary")">
                                     @(Convert.ToBoolean(input.Value) ? "Yes / Enabled" : "No / Disabled")
@@ -77,7 +78,7 @@
         var strVal = input.Value.ToString()!;
 
         // Pretty-print JSON for code/JSON fields
-        if (IsJsonOrCodeType(input.Type))
+        if (IsJsonOrCodeType(Enum.GetName(typeof(FieldType), input.Type)))
         {
             try
             {

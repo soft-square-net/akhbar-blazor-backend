@@ -1,0 +1,425 @@
+﻿@page "/dynamic-form-studio"
+
+@using System.Text.Json
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.TreeNode
+@using FieldType = FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.FieldType;
+@using MudBlazor
+<MudLayout>
+  <!-- Top App Bar -->
+  <MudAppBar Elevation="1">
+    <MudText Typo="Typo.h5" Class="ml-4">MudBlazor Dynamic Form Studio</MudText>
+    <MudSpacer />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2" OnClick="ExportSchema">
+      Export JSON Schema
+    </MudButton>
+    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ResetStudio">
+      Reset Studio
+    </MudButton>
+  </MudAppBar>
+
+  <!-- Main Content Area with Tabs -->
+  <MudMainContent Class="pa-6">
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+      
+      <!-- TAB 1: VISUAL BUILDER & INSPECTOR -->
+      <MudTabPanel Text="Visual Builder & Designer" Icon="@Icons.Material.Filled.DesignServices">
+        <MudGrid>
+          
+          <!-- LEFT DRAWER: Available Field Palette -->
+          <MudItem xs="12" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+              <MudText Typo="Typo.h6" Class="mb-3">Field Palette</MudText>
+              <MudText Typo="Typo.caption" Class="mb-4 d-block text-secondary">
+                Click or add components to build your form hierarchy[cite: 3].
+              </MudText>
+
+              <div class="d-flex flex-column gap-2">
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.TextFields" Color="Color.Primary" FullWidth="true" OnClick="() => AddField(FieldType.Text)">
+                  Add Text Input
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Numbers" Color="Color.Primary" FullWidth="true" OnClick="() => AddField(FieldType.Number)">
+                  Add Number Input
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.CheckBox" Color="Color.Primary" FullWidth="true" OnClick="() => AddField(FieldType.Checkbox)">
+                  Add Checkbox
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.List" Color="Color.Primary" FullWidth="true" OnClick="() => AddField(FieldType.Select)">
+                  Add Select Dropdown
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.CalendarMonth" Color="Color.Primary" FullWidth="true" OnClick="() => AddField(FieldType.Date)">
+                  Add Date Picker
+                </MudButton>
+                <MudDivider Class="my-2" />
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FolderOpen" Color="Color.Secondary" FullWidth="true" OnClick="() => AddField(FieldType.ContainerSection)">
+                  Add Container Section
+                </MudButton>
+              </div>
+            </MudPaper>
+          </MudItem>
+
+          <!-- CENTER: Tree Structure & Hierarchy Builder -->
+          <MudItem xs="12" md="5">
+            <MudPaper Class="pa-4" Elevation="2" Style="min-height: 500px;">
+              <MudText Typo="Typo.h6" Class="mb-3">Form Structure Tree</MudText>
+              
+              @if (_treeManager.FlatNodes.Count == 0)
+              {
+                <MudText Typo="Typo.subtitle2" Class="text-center pa-8 text-secondary">
+                  No form fields added yet. Use the palette on the left to start building.
+                </MudText>
+              }
+              else
+              {
+                <MudTreeView T="BlockNodeAdapter" Items="_treeManager.TreeItemData" Dense="true" Hover="true">
+                  <ItemTemplate Context="treeItem" >
+                    <MudTreeViewItem T="BlockNodeAdapter"
+                                     Value="@treeItem.Value"
+                                     Items="@treeItem.Children"
+                                     @bind-Expanded="treeItem.Expanded">
+                      <BodyContent>
+                        @if (treeItem.Value != null)
+                        {
+                          var node = treeItem.Value;
+                          bool isSelected = _treeManager.SelectedNode == node;
+
+                          <div @onclick="() => _treeManager.SelectNode(node)"
+                               class="d-flex align-center flex-grow-1 pa-2 rounded @(isSelected ? "mud-theme-primary-light" : "")"
+                               style="cursor: pointer; width: 100%;">
+                            
+                            <MudIcon Icon="@GetFieldIcon(node.Data)" Class="mr-2" Color="Color.Info" Size="Size.Small" />
+                            
+                            <MudText Typo="Typo.body1" Class="flex-grow-1">
+                              <strong>@(string.IsNullOrEmpty(node.Data.Name) ? "Untitled Field" : node.Data.Name)</strong>
+                              <span class="ml-2 text-muted text-xs">(@node.Data.Inputs.FirstOrDefault()?.Type)</span>
+                            </MudText>
+
+                            <!-- Sibling Reordering Controls -->
+                            <div class="d-flex align-center" @onclick:stopPropagation="true">
+                              <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp"
+                                             Size="Size.Small"
+                                             Disabled="@(!_treeManager.CanMoveUp(node))"
+                                             OnClick="() => _treeManager.MoveNodeUp(node)" />
+                              <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown"
+                                             Size="Size.Small"
+                                             Disabled="@(!_treeManager.CanMoveDown(node))"
+                                             OnClick="() => _treeManager.MoveNodeDown(node)" />
+                              <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                             Size="Size.Small"
+                                             Color="Color.Error"
+                                             OnClick="() => DeleteNode(node)" />
+                            </div>
+                          </div>
+                        }
+                      </BodyContent>
+                    </MudTreeViewItem>
+                  </ItemTemplate>
+                </MudTreeView>
+              }
+            </MudPaper>
+          </MudItem>
+
+          <!-- RIGHT: Property & Validation Inspector -->
+          <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4" Elevation="2" Style="min-height: 500px;">
+              <MudText Typo="Typo.h6" Class="mb-3">Field Inspector & Rules</MudText>
+
+              @if (_treeManager.SelectedNode == null)
+              {
+                <MudText Typo="Typo.body2" Class="text-secondary pa-4">
+                  Select a field from the tree structure in the center to configure its properties, validation rules, and visibility.
+                </MudText>
+              }
+              else
+              {
+                var currentInput = GetCurrentInput(_treeManager.SelectedNode.Data);
+
+                <div class="d-flex flex-column gap-3">
+                  <MudTextField @bind-Value="_treeManager.SelectedNode.Data.Name" Label="Display Label" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
+                  
+                  @if (currentInput != null)
+                  {
+                    <MudTextField @bind-Value="currentInput.FieldKey" Label="Field Key (ID)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField @bind-Value="currentInput.Placeholder" Label="Placeholder Text" Variant="Variant.Outlined" Margin="Margin.Dense" />
+
+                    <MudDivider Class="my-2" />
+                    <MudText Typo="Typo.subtitle2">Validation Rules</MudText>
+                    <MudCheckBox @bind-Value="currentInput.IsRequired" Label="Required Field" Color="Color.Primary" Dense="true" />
+                    
+                    @if (currentInput.Type == FieldType.Text)
+                    {
+                      <MudTextField @bind-Value="currentInput.MinLength" Label="Min Length" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                      <MudTextField @bind-Value="currentInput.MaxLength" Label="Max Length" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                      <MudTextField @bind-Value="currentInput.RegexPattern" Label="Regex Validation Pattern" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    }
+
+                    <MudTextField @bind-Value="currentInput.ErrorMessage" Label="Validation Error Message" Variant="Variant.Outlined" Margin="Margin.Dense" />
+
+                    <MudDivider Class="my-2" />
+                    <MudText Typo="Typo.subtitle2">Conditional Visibility</MudText>
+                    <MudTextField @bind-Value="currentInput.VisibleWhenFieldKey" Label="Show When Field Key equals" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField @bind-Value="currentInput.VisibleEqualsValue" Label="Target Value" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                  }
+                </div>
+              }
+            </MudPaper>
+          </MudItem>
+
+        </MudGrid>
+      </MudTabPanel>
+
+      <!-- TAB 2: LIVE FORM RUNTIME PREVIEW -->
+      <MudTabPanel Text="Live Form Runtime Preview" Icon="@Icons.Material.Filled.PlayArrow">
+        <MudGrid>
+          <MudItem xs="12" md="8">
+            <MudPaper Class="pa-6" Elevation="3">
+              <MudText Typo="Typo.h5" Class="mb-4">Interactive Form Preview</MudText>
+              
+              @if (_treeManager.RootNodes.Count == 0)
+              {
+                <MudText Typo="Typo.body1" Class="text-secondary">Please build form fields in the Visual Builder tab first.</MudText>
+              }
+              else
+              {
+                <MudForm @ref="_form" @bind-IsValid="_isFormValid">
+                  @foreach (var rootNode in _treeManager.RootNodes)
+                  {
+                    @RenderRuntimeNode(rootNode)
+                  }
+
+                  <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="SubmitForm">
+                    Submit Form Data
+                  </MudButton>
+                </MudForm>
+              }
+            </MudPaper>
+          </MudItem>
+
+          <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4" Elevation="2">
+              <MudText Typo="Typo.h6" Class="mb-3">Live Form State (JSON)</MudText>
+              <MudTextField T="string" Value="@_formRuntimeJson" Lines="15" Variant="Variant.Outlined" ReadOnly="true" />
+            </MudPaper>
+          </MudItem>
+        </MudGrid>
+      </MudTabPanel>
+
+      <!-- TAB 3: JSON SCHEMA EXPORT -->
+      <MudTabPanel Text="JSON Schema Code" Icon="@Icons.Material.Filled.Code">
+        <MudPaper Class="pa-4" Elevation="2">
+          <MudText Typo="Typo.h6" Class="mb-3">Full Schema Definition</MudText>
+          <MudTextField T="string" Value="@_exportedSchemaJson" Lines="20" Variant="Variant.Outlined" ReadOnly="true" />
+        </MudPaper>
+      </MudTabPanel>
+
+    </MudTabs>
+  </MudMainContent>
+</MudLayout>
+
+@code {
+  private readonly TreeManager<BlockNodeAdapter> _treeManager = new();
+  private MudForm? _form;
+  private bool _isFormValid;
+  private string _exportedSchemaJson = string.Empty;
+  private string _formRuntimeJson = "{}";
+
+  // Runtime values dictionary keyed by FieldKey
+  private Dictionary<string, string> _runtimeValues = new();
+
+  protected override void OnInitialized()
+  {
+    _treeManager.OnStateChanged += StateHasChanged;
+    LoadDefaultForm();
+  }
+
+  private void LoadDefaultForm()
+  {
+    var sampleRoot = new BlockNode
+    {
+      Name = "User Registration Form",
+      Children = new List<BlockNode>
+      {
+        new BlockNode
+        {
+          Name = "Full Name",
+          Inputs = new List<BlockNodeInput> { new BlockNodeInput { FieldKey = "fullName", Label = "Full Name", Type = FieldType.Text, IsRequired = true } }
+        },
+        new BlockNode
+        {
+          Name = "Newsletter Subscription",
+          Inputs = new List<BlockNodeInput> { new BlockNodeInput { FieldKey = "subscribe", Label = "Subscribe to Newsletter", Type = FieldType.Checkbox } }
+        }
+      }
+    };
+
+    _treeManager.Initialize(new List<BlockNodeAdapter> { BlockNodeAdapter.FromBlockNode(sampleRoot) });
+  }
+
+  private void AddField(FieldType type)
+  {
+    var newBlock = new BlockNode
+    {
+      Name = $"New {type}",
+      Inputs = new List<BlockNodeInput>
+      {
+        new BlockNodeInput
+        {
+          FieldKey = $"field_{Guid.NewGuid().ToString().Substring(0, 6)}",
+          Label = $"New {type}",
+          Type = type
+        }
+      }
+    };
+
+    var adapter = BlockNodeAdapter.FromBlockNode(newBlock);
+
+    if (_treeManager.SelectedNode != null && _treeManager.SelectedNode.Data.Inputs.Any(i => i.Type == FieldType.ContainerSection))
+    {
+      // Add as child to selected container
+      adapter.Parent = _treeManager.SelectedNode;
+      adapter.ParentId = _treeManager.SelectedNode.Id;
+      _treeManager.SelectedNode.Children.Add(adapter);
+      _treeManager.SelectedNode.Data.Children.Add(newBlock);
+    }
+    else
+    {
+      // Add to root
+      _treeManager.RootNodes.Add(adapter);
+    }
+
+    _treeManager.Refresh();
+  }
+
+  private void DeleteNode(BlockNodeAdapter node)
+  {
+    if (node.Parent != null)
+    {
+      node.Parent.Children.Remove(node);
+      node.Parent.Data.Children.Remove(node.Data);
+    }
+    else
+    {
+      _treeManager.RootNodes.Remove(node);
+    }
+    _treeManager.Refresh();
+  }
+
+  private BlockNodeInput? GetCurrentInput(BlockNode node)
+  {
+    if (node.Inputs == null || node.Inputs.Count == 0)
+    {
+      node.Inputs.Add(new BlockNodeInput());
+    }
+    return node.Inputs.FirstOrDefault();
+  }
+
+  private string GetFieldIcon(BlockNode node)
+  {
+    var input = node.Inputs.FirstOrDefault();
+    if (input == null) return Icons.Material.Filled.Folder;
+    return input.Type switch
+    {
+      FieldType.Text => Icons.Material.Filled.TextFields,
+      FieldType.Number => Icons.Material.Filled.Numbers,
+      FieldType.Checkbox => Icons.Material.Filled.CheckBox,
+      FieldType.Select => Icons.Material.Filled.List,
+      FieldType.Date => Icons.Material.Filled.CalendarMonth,
+      FieldType.ContainerSection => Icons.Material.Filled.FolderOpen,
+      _ => Icons.Material.Filled.Input
+    };
+  }
+
+  private void ExportSchema()
+  {
+    _exportedSchemaJson = JsonSerializer.Serialize(_treeManager.RootNodes.Select(r => r.Data), new JsonSerializerOptions { WriteIndented = true });
+  }
+
+  private void SubmitForm()
+  {
+    _formRuntimeJson = JsonSerializer.Serialize(_runtimeValues, new JsonSerializerOptions { WriteIndented = true });
+  }
+
+  // Recursive Render Helper for Live Preview Runtime
+  private RenderFragment RenderRuntimeNode(BlockNodeAdapter node) => __builder =>
+  {
+    var input = node.Data.Inputs.FirstOrDefault();
+    if (input == null) return;
+
+    // Evaluate conditional visibility
+    if (!string.IsNullOrEmpty(input.VisibleWhenFieldKey))
+    {
+      _runtimeValues.TryGetValue(input.VisibleWhenFieldKey, out var targetVal);
+      if (targetVal != input.VisibleEqualsValue) return; // Hide field if condition not met
+    }
+
+    if (input.Type == FieldType.ContainerSection)
+    {
+      <MudText Typo="Typo.h6" Class="mt-4 mb-2">@node.Data.Name</MudText>
+      <MudDivider Class="mb-3" />
+      <div class="pl-4 border-l-2 border-primary">
+        @foreach (var child in node.Children)
+        {
+          @RenderRuntimeNode(child)
+        }
+      </div>
+    }
+    else
+    {
+      <div class="mb-3">
+        @if (input.Type == FieldType.Text)
+        {
+          <MudTextField T="string" Label="@input.Label"
+          Placeholder="@input.Placeholder"
+          Required="@input.IsRequired"
+          RequiredError="@input.ErrorMessage"
+          Immediate="true"
+          Value="@GetRuntimeValue(input.FieldKey)"
+          ValueChanged="@(val => SetRuntimeValue(input.FieldKey, val))" />
+        }
+        else if (input.Type == FieldType.Number)
+        {
+          <MudTextField T="string" Label="@input.Label"
+          InputType="InputType.Number"
+          Required="@input.IsRequired"
+          Value="@GetRuntimeValue(input.FieldKey)"
+          ValueChanged="@(val => SetRuntimeValue(input.FieldKey, val))" />
+        }
+        else if (input.Type == FieldType.Checkbox)
+        {
+          <MudCheckBox T="bool" Label="@input.Label"
+          Color="Color.Primary" Change
+          Value="@(GetRuntimeValue(input.FieldKey) == "true")"
+          ValueChanged="@(val => SetRuntimeValue(input.FieldKey, val ? "true" : "false"))" />
+        }
+        else if (input.Type == FieldType.Select)
+        {
+          <MudSelect T="string" Label="@input.Label" Value="@GetRuntimeValue(input.FieldKey)" ValueChanged="@(val => SetRuntimeValue(input.FieldKey, val))">
+            @foreach (var opt in input.Options)
+            {
+              <MudSelectItem Value="@opt">@opt</MudSelectItem>
+            }
+          </MudSelect>
+        }
+      </div>
+    }
+  };
+
+  private string GetRuntimeValue(string key)
+  {
+    _runtimeValues.TryGetValue(key, out var val);
+    return val ?? string.Empty;
+  }
+
+  private void SetRuntimeValue(string key, string val)
+  {
+    _runtimeValues[key] = val;
+    StateHasChanged();
+  }
+
+  private void ResetStudio()
+  {
+    throw new NotImplementedException();
+  }
+}

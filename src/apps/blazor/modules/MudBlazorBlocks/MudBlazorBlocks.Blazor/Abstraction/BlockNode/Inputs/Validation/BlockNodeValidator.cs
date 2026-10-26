@@ -34,7 +34,7 @@ public static class BlockNodeValidator
         }
 
         // 2. JSON Structure Validation for "json" or "code" type inputs
-        if (input.Type.Equals("json", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(strVal))
+        if (Enum.GetName(typeof(FieldType), input.Type).Equals("json", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(strVal))
         {
             try
             {

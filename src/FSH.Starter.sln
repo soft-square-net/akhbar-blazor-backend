@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36811.4 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.11.12306.390 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{F3DF5AC5-8CDC-46D4-969D-1245A6880215}"
 EndProject
@@ -156,6 +156,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsManager.Application", "api\modules\PluginsManager\PluginsManager.Application\PluginsManager.Application.csproj", "{C34AEAB2-C234-4529-AEB8-C986751CB13A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsManager.Domain", "api\modules\PluginsManager\PluginsManager.Domain\PluginsManager.Domain.csproj", "{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balzor.Modukes.Publish", "apps\blazor\modules\Balzor.Modukes.Publish\Balzor.Modukes.Publish.csproj", "{2AB7B37B-4E5B-421E-A558-183A475D1C2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -647,6 +649,18 @@ Global
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}.Release|x64.Build.0 = Release|Any CPU
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}.Release|x86.ActiveCfg = Release|Any CPU
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B}.Release|x86.Build.0 = Release|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Debug|x64.Build.0 = Debug|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Debug|x86.Build.0 = Debug|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Release|x64.ActiveCfg = Release|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Release|x64.Build.0 = Release|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Release|x86.ActiveCfg = Release|Any CPU
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -714,6 +728,7 @@ Global
 		{E8DAFFED-4033-4EA1-9A8B-EDCD57EDB060} = {E4AA786D-BBB1-4EF6-963B-872CB220D147}
 		{C34AEAB2-C234-4529-AEB8-C986751CB13A} = {E4AA786D-BBB1-4EF6-963B-872CB220D147}
 		{FC7C4794-B1E5-45D9-8AC7-19D8DBFFB21B} = {E4AA786D-BBB1-4EF6-963B-872CB220D147}
+		{2AB7B37B-4E5B-421E-A558-183A475D1C2D} = {47C3BD22-3B71-4CE8-A6D8-02BF86E30F3D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EA8248C2-3877-4AF7-8777-A17E7881E030}

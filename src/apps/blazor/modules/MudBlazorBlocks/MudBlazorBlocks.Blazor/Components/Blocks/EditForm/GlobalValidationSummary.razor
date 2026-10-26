@@ -1,5 +1,6 @@
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs
+@using FieldType = FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.FieldType;
 @using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction.BlockNode.Inputs.Visibility
 @* GlobalValidationSummary.razor *@
 
@@ -52,13 +53,13 @@
 
             foreach (var msg in contextMessages)
             {
-                yield return new ValidationErrorItem(input.Id, input.Label, input.Type, msg);
+        yield return new ValidationErrorItem(input.Id, input.Label, Enum.GetName(typeof(FieldType), input.Type), msg);
             }
 
             // 2. Collect fallback messages directly from model property
             foreach (var err in input.ValidationErrors)
             {
-                yield return new ValidationErrorItem(input.Id, input.Label, input.Type, err);
+        yield return new ValidationErrorItem(input.Id, input.Label, Enum.GetName(typeof(FieldType), input.Type), err);
             }
         }
     }
