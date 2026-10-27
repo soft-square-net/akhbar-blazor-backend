@@ -1,5 +1,9 @@
 ﻿@page "/tailwind-grid-editor"
-
+@using System.Reflection
+@using System.Text.Json
+@using System.Text.RegularExpressions
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction
+@implements IDisposable
 @inject IJSRuntime JS;
 
 <h3>TailwindGridEditor</h3>
@@ -7,12 +11,12 @@
   Tailwind Script Injected by Code!
 </h1>
 
-<button class="bg-emerald-500 text-white px-4 py-2 rounded-lg mt-4" @onclick="HandleClick">
+<button id="tailwind-interactive-button" class="bg-emerald-500 text-white px-4 py-2 rounded-lg mt-4" @onclick="HandleClick">
   Interactive Button
 </button>
 
 @code {
-
+  private IJSObjectReference? _module;
   private void HandleClick()
   {
     Console.WriteLine("Button clicked successfully without RenderTree errors!");
@@ -24,21 +28,44 @@
     if (firstRender)
     {
       // Inject Tailwind CDN and Config dynamically
-      await JS.InvokeVoidAsync("eval", @"
-                if (!document.getElementById('page-tailwind-cdn')) {
-                    const script = document.createElement('script');
-                    script.id = 'page-tailwind-cdn';
-                    script.src = 'https://cdn.tailwindcss.com';
-                    document.head.appendChild(script);
-                }
-            ");
 
-      await JS.InvokeVoidAsync("eval", @"
-                if (!document.getElementById('page-tailwind-config')) {
-                    const configScript = document.createElement('script');
-                    configScript.id = 'page-tailwind-config';
-                    configScript.textContent = `
-                        tailwind.config = {
+      await JS.InjectScriptPromiseAsync("https://cdn.tailwindcss.com", head: true, async: false);
+
+      // 2. Set up your runtime adjustments if you have a custom configuration script
+
+
+      await JS.InvokeVoidAsync("eval", confTailwind);
+
+
+      // 3. Force Tailwind to process Blazor's active elements
+      await RefreshTailwindDOMAsync();
+
+
+      await JS.InjectStyleSheetAsync("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+
+      await JS.InjectStyleSheetAsync("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+
+      // await LoadInternalScript("wwwroot/js/tailwindGridBlockDesigner.js");
+      _module = await JS.LoadAssemblyScript(GetType().Assembly, "wwwroot/js/tailwindGridBlockDesigner.js");
+
+      StateHasChanged();
+    }
+  }
+
+  public  async ValueTask RefreshTailwindDOMAsync()
+  {
+    // Forces Tailwind's MutationObserver to trigger a manual scan over Blazor's components
+    await JS.InvokeVoidAsync("eval", "if (window.tailwind) { window.tailwind.config = window.tailwind.config || {}; }");
+  }
+
+  public void Dispose()
+  {
+    _module?.DisposeAsync();
+    _module = null;
+  }
+
+  string confTailwind = @"
+                      window.tailwind.config = {
                             theme: {
                                 extend: {
                                     colors: {
@@ -56,60 +83,269 @@
                                     }
                                 }
                             }
-                        }
-                    `;
-                    document.head.appendChild(configScript);
-                }
-            ");
-      StateHasChanged();
-    }
-  }
-  // protected async Task OnAfterRenderAsync(bool firstRender)
-  // {
-  //   await base.OnAfterRenderAsync(firstRender);
-  //   // firstRender ensures this runs only once when the component mounts in the DOM
-  //   if (firstRender && !_isLoaded)
-  //   {
-  //     if (isProcessing) return;
-  //     _isLoaded = true;
-  //     isProcessing = true;
-  //     // Inject Tailwind CDN and Config dynamically
-  //     await JS.InvokeVoidAsync("eval", @"
-  //               if (!document.getElementById('page-tailwind-cdn')) {
+                        };
+                      ";
+  // string LoadScriptGenerator(string id,string url, bool head=false) => @"
+  //               if (!document.getElementById('" + id + @"')) {
   //                   const script = document.createElement('script');
-  //                   script.id = 'page-tailwind-cdn';
-  //                   script.src = 'https://cdn.tailwindcss.com';
-  //                   document.head.appendChild(script);
-
-  //                   const configScript = document.createElement('script');
-  //                   configScript.id = 'page-tailwind-config';
-  //                   configScript.textContent = `
-  //                       tailwind.config = {
-  //                           theme: {
-  //                               extend: {
-  //                                   colors: {
-  //                                       mud: {
-  //                                           primary: '#594AE2',
-  //                                           'primary-hover': '#4535C5',
-  //                                           secondary: '#FF4081',
-  //                                           surface: '#FFFFFF',
-  //                                           background: '#F5F5F7',
-  //                                           appbar: '#594AE2',
-  //                                           border: '#E0E0E0',
-  //                                           text: '#424242',
-  //                                           dark: '#1E1E2D'
-  //                                       }
-  //                                   }
-  //                               }
-  //                           }
-  //                       }
-  //                   `;
-  //                   document.head.appendChild(configScript);
+  //                   script.id = '" + id + @"';
+  //                   script.src = '" + url + @"';
+  //                   " + (head ? "document.head.appendChild(script);" : "document.body.appendChild(script);") + @"
   //               }
+  //           ";
+
+  // string LoadStyleSheetGenerator(string id, string url) => @"
+  //               if (!document.getElementById('" + id + @"')) {
+  //                   const styleSheet = document.createElement('link');
+  //                   styleSheet.id = '" + id + @"';
+  //                   styleSheet.rel = 'stylesheet';
+  //                   styleSheet.href = '" + url + @"';
+  //                   document.head.appendChild(styleSheet);
+  //               }
+  //           ";
+
+
+  // private async Task LoadInternalScript(string path, string? sourcesPath = "")
+  // {
+  //   try
+  //   {
+  //     // 1. Locate the currently loaded assembly context
+  //     Assembly rclAssembly = AppDomain.CurrentDomain.GetAssemblies()
+  //         .First(a => a.GetName().Name == Constants.AssemblyFullName);
+  //     // 2. Read the embedded JavaScript raw string out of the reflected DLL binary
+  //     string rawJsContent = RclAssetReader.GetEmbeddedScript(rclAssembly, path);
+
+
+  //     string scriptFileName = Path.GetFileName(path);
+
+  //     // 3. SECURE FIX: Append the special DevTools identifier comment to the bottom of the script
+  //     // This tells Chrome to register it as a physical file under a virtual directory structure.
+  //     sourcesPath = string.IsNullOrWhiteSpace(sourcesPath) ? "_content/" + Constants.ModuleName : sourcesPath;
+  //     sourcesPath = "\n\n//# sourceURL=" + sourcesPath + "/" + scriptFileName;
+
+  //     string processableJs = rawJsContent + sourcesPath;
+
+  //     // 4. Pass the modified content string into the Blob constructor
+  //     // var blobUrl = await JS.InvokeAsync<string>("eval", $@"
+  //     //     (() => {{
+  //     //         const blob = new Blob([{JsonSerializer.Serialize(processableJs)}], {{ type: 'text/javascript' }});
+  //     //         return URL.createObjectURL(blob);
+  //     //     }})()
+  //     // ");
+
+  //     string virtualFileAssetUrl = await JS.InvokeAsync<string>("eval", $@"
+  //               ((scriptText) => {{
+  //                   const blob = new Blob([scriptText], {{ type: 'text/javascript' }});
+  //                   return URL.createObjectURL(blob);
+  //               }})({JsonSerializer.Serialize(processableJs)})
   //           ");
 
-  //     isProcessing = false;
-  //     StateHasChanged();
+  //     // 5. Import the virtual path cleanly as an isolated module
+  //     // IJSObjectReference? _module = await JS.InvokeAsync<IJSObjectReference>("import", blobUrl);
+  //     _module = await JS.InvokeAsync<IJSObjectReference>("import", virtualFileAssetUrl);
+        
+  //     // 6. Clean up the pointer mapping
+  //     await JS.InvokeVoidAsync("URL.revokeObjectURL", virtualFileAssetUrl);
+  //   }
+  //   catch (Exception ex)
+  //   {
+  //     Console.WriteLine($"Failed to resolve reflection script: {ex.Message}");
   //   }
   // }
 }
+
+
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F5F5F7;
+    color: #424242;
+  }
+
+  /* 12-Column Responsive CSS Grid Engine with Dense Auto Packing */
+  .grid-container-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-flow: dense; /* Prevents item overlapping and fills gaps */
+    grid-auto-rows: minmax(65px, auto);
+    gap: 12px;
+    width: 100%;
+    min-height: 70px;
+  }
+
+  /* Block Wrapper Styles */
+  .grid-block-wrapper {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    overflow: hidden; /* Contains floating content & handles */
+  }
+
+    .grid-block-wrapper:hover {
+      border-color: #594AE2;
+      box-shadow: 0 4px 12px rgba(89, 74, 226, 0.12);
+    }
+
+    .grid-block-wrapper.selected {
+      border: 2px solid #594AE2 !important;
+      box-shadow: 0 0 0 3px rgba(89, 74, 226, 0.25) !important;
+    }
+
+    .grid-block-wrapper.dragging {
+      opacity: 0.35;
+      border: 1.5px dashed #594AE2 !important;
+    }
+
+    .grid-block-wrapper.drop-target-over {
+      border: 2px solid #10B981 !important;
+      background-color: rgba(16, 185, 129, 0.05);
+    }
+
+  /* 1) FLOATING / ABSOLUTE TOOLBAR OVERLAY - NO LAYOUT SHIFT OR HEIGHT RESIZE */
+  .block-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    padding: 4px 8px;
+    background: rgba(241, 245, 249, 0.95);
+    backdrop-filter: blur(4px);
+    border-bottom: 1px solid #CBD5E1;
+    border-radius: 7px 7px 0 0;
+    z-index: 20; /* High z-index to overlap block content */
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%);
+    transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease, visibility 0.15s ease;
+    pointer-events: none;
+  }
+
+  /* Slide in and overlap on block hover, focus, or selection */
+  .grid-block-wrapper:hover > .block-toolbar,
+  .grid-block-wrapper.selected > .block-toolbar,
+  .grid-block-wrapper:focus-within > .block-toolbar {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Content Body */
+  .block-content-body {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  /* Mouse Resize Handles */
+  .resize-handle {
+    position: absolute;
+    z-index: 25;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .grid-block-wrapper:hover > .resize-handle,
+  .grid-block-wrapper.selected > .resize-handle {
+    opacity: 1;
+  }
+
+  .handle-r {
+    top: 0;
+    right: -4px;
+    width: 10px;
+    height: 100%;
+    cursor: ew-resize;
+  }
+
+    .handle-r::after {
+      content: '';
+      position: absolute;
+      top: 30%;
+      right: 4px;
+      width: 3px;
+      height: 40%;
+      background: #594AE2;
+      border-radius: 2px;
+    }
+
+  .handle-b {
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    cursor: ns-resize;
+  }
+
+    .handle-b::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 30%;
+      width: 40%;
+      height: 3px;
+      background: #594AE2;
+      border-radius: 2px;
+    }
+
+  .handle-se {
+    bottom: 0px;
+    right: 0px;
+    width: 14px;
+    height: 14px;
+    cursor: nwse-resize;
+    background: #594AE2;
+    border-radius: 3px 0 6px 0;
+    box-shadow: -1px -1px 2px rgba(0,0,0,0.1);
+  }
+
+  /* Resizing Overlay Indicator */
+  .resize-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 30, 45, 0.92);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    z-index: 35;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    white-space: nowrap;
+  }
+
+  /* Custom Scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F1F1F5;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #C7C7D0;
+    border-radius: 4px;
+  }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #A0A0B0;
+    }
+</style>

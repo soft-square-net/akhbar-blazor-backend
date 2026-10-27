@@ -10,6 +10,7 @@ internal static class Constants
 {
     public const string ModuleName = "MudBlazorBlocks";
     public const string ModuleDisplayName = "Mud Blazor Blocks";
-    public static readonly string _content = $"_content/{typeof(Constants).Assembly.GetName().Name}";
+    public static readonly string AssemblyFullName = typeof(Constants).Assembly.GetName().Name;
+    public static readonly string _content = $"_content/{AssemblyFullName}";
     // public static readonly string _outdir =  $"{${outdir}}";
 }

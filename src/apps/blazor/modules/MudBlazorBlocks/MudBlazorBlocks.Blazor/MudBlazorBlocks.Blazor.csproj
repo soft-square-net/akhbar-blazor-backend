@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\tailwindGridBlockDesigner.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Abstraction\TreeNode\TreeNode.jpg" />
     <None Remove="Abstraction\TreeNode\TreeNodeFilterBuilder.jpg" />
     <None Remove="Abstraction\TreeNode\TreeNodeUtility.jpg" />
@@ -58,7 +62,10 @@
   <ItemGroup>
     <Folder Include="Abstraction\BlockNode\Studio\" />
     <Folder Include="Components\Blocks\Dialogs\" />
-    <Folder Include="Components\TailwindEditor\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\js\tailwindGridBlockDesigner.js" />
   </ItemGroup>
 
   <ItemGroup>

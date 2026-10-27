@@ -45,6 +45,58 @@ window.helpers.getElementPosition = async function(dialogId) {
         y: Math.round(rect.top)
     };
 };
+
+
+window.helpers.loadScript = function (url, head = false) {
+  return new Promise((resolve, reject) => {
+    // Check if the script is already loaded to avoid duplicates
+    if (document.querySelector(`script[src="${url}"]`)) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = url;
+    // script.async = true;
+    script.defer = true;
+    // script.type = 'text/javascript';
+
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Script load error for ${url}`));
+    if (head) {
+      document.head.appendChild(script);
+    } else {
+      document.body.appendChild(script);
+    }
+  });
+}
+
+window.helpers.loadScriptWithPromise = function (url, head = false, async = false) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${url}"]`)) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.async = async;
+    script.defer = true;
+
+    script.onload = () => {
+      console.log("Tailwind script fully loaded onto DOM.");
+      resolve();
+    };
+    script.onerror = () => reject(new Error(`Script load error for ${url}`));
+
+    if (head) {
+      document.head.appendChild(script);
+    } else {
+      document.body.appendChild(script);
+    }
+  });
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 // window.downloadFileFromStream = async (fileName, contentStreamReference) => {
 //         const arrayBuffer = await contentStreamReference.arrayBuffer();
