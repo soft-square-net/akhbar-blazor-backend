@@ -1,0 +1,111 @@
+﻿@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Models;
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Services;
+@inject GridDesignerState DesignerState
+
+@using Block = FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Models.GridBlockItem;
+
+<div class="grid-block-wrapper @(DesignerState.SelectedBlock?.Id == Block.Id ? "selected" : "")"
+     style="grid-column: span @Block.ColSpan; grid-row: span @Block.RowSpan; @Block.CustomCss"
+     @onclick:stopPropagation
+     @onclick="() => SelectBlock()">
+
+  <!-- Float Toolbar Overlay on hover -->
+  <div class="block-toolbar">
+    <div class="flex items-center gap-1.5 cursor-grab drag-handle flex-1 min-w-0">
+      <MudIcon Icon="@GetBlockIcon(Block.Type)" Size="Size.Small" Class="mr-1" />
+      <span class="font-bold text-[11px] text-gray-700 truncate">@Block.Type</span>
+      <span class="text-[10px] text-gray-400 font-mono">(@Block.ColSpan x @Block.RowSpan)</span>
+    </div>
+    <div class="flex items-center gap-1 shrink-0">
+      @if (Block.Type == "Container")
+      {
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="() => AddChildBlock()" Title="Add Block" />
+      }
+      <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="() => DeleteSelf()" Title="Delete Block" />
+    </div>
+  </div>
+
+  <!-- Content Body Layout -->
+  <div class="block-content-body p-3 relative h-full w-full">
+    @if (Block.Type == "Container")
+    {
+      <div class="grid-container-12 border border-dashed border-indigo-200 rounded p-2 bg-indigo-50/20 h-full w-full" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; grid-auto-flow: dense;">
+        @if (!Block.Children.Any())
+        {
+          <div class="col-span-12 flex items-center justify-center text-xs text-indigo-400 font-medium py-6">
+            Empty Container Grid
+          </div>
+        }
+        else
+        {
+          @foreach (var child in Block.Children)
+          {
+            <GridBlockNode Block="child" />
+          }
+        }
+      </div>
+    }
+    else if (Block.Type == "Heading")
+    {
+      <CascadingValue Value="Block.CustomCss">
+        @switch (Block.TagName?.ToLower())
+        {
+          case "h1":
+            <h1>@Block.Content</h1>
+            break;
+          case "h3":
+            <h3>@Block.Content</h3>
+            break;
+          default:
+            <h2>@Block.Content</h2>
+            break;
+        }
+      </CascadingValue>
+    }
+    else if (Block.Type == "Paragraph")
+    {
+      <p style="margin:0;">@Block.Content</p>
+    }
+    else if (Block.Type == "Image")
+    {
+      <img src="@Block.ImageUrl" alt="Grid Image" style="width:100%; height:100%; object-fit:cover; border-radius:6px;" />
+    }
+    else if (Block.Type == "CustomHtml")
+    {
+      @((MarkupString)Block.Content)
+    }
+  </div>
+</div>
+
+
+@code {
+  [Parameter] public GridBlockItem Block { get; set; } = null!;
+
+  private void SelectBlock()
+  {
+    DesignerState.SelectedBlock = Block;
+    DesignerState.NotifyStateChanged();
+  }
+
+  private void DeleteSelf()
+  {
+    DesignerState.RemoveBlock(Block.Id);
+  }
+
+  private void AddChildBlock()
+  {
+    Block.Children.Add(new GridBlockItem("Paragraph", 6, 1));
+    DesignerState.RecalculateAllContainerRowSpans();
+    DesignerState.NotifyStateChanged();
+  }
+
+  private string GetBlockIcon(string type) => type switch
+  {
+    "Container" => Icons.Material.Filled.BorderAll,
+    "Heading" => Icons.Material.Filled.Title,
+    "Paragraph" => Icons.Material.Filled.Notes,
+    "Image" => Icons.Material.Filled.Image,
+    "CustomHtml" => Icons.Material.Filled.Code,
+    _ => Icons.Material.Filled.CropSquare
+  };
+}

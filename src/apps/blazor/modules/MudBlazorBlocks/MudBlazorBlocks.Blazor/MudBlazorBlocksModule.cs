@@ -11,6 +11,7 @@ using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Abstractions;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Blocks.Inputs.Custome;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.Grid;
 using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Layout;
+using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Services;
 using FSH.Starter.BlazorShared;
 using FSH.Starter.Shared.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -57,6 +58,7 @@ public class MudBlazorBlocksModule : BlazorModuleBase
 
         services.AddSingleton<IRemoteValidationService, RemoteValidationService>();
         services.AddScoped<GridEditorState>();
+        services.AddScoped<GridDesignerState>();
     }
 
     public override async Task<WebAssemblyHost> UseModuleAsync(WebAssemblyHost app)
