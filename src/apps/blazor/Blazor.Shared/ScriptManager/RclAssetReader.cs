@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
+namespace FSH.Starter.BlazorShared.ScriptManager;
 
 
 public static class RclAssetReader

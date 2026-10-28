@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.JSInterop;
 
-namespace FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Abstraction;
+namespace FSH.Starter.BlazorShared.ScriptManager;
 
 public static class BlazorScriptInjector
 {
