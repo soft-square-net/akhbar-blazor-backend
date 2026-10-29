@@ -1,0 +1,62 @@
+﻿@page "/visual-editor"
+@using FSH.Starter.Blazor.Modules.MudBlazorBlocks.Blazor.Components.VisualEditor
+<MudPaper Height="90vh" Class="mud-theme-primary" Style="overflow:hidden; position:relative;">
+
+  <MudToolBar Dense="@false">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleMenuDrawer" />
+    <MudIconButton Icon="@Icons.Material.Filled.AppRegistration" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleBlocksToolbar" />
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Material.Filled.Equalizer" Color="Color.Inherit" Edge="Edge.Start" OnClick="@TogglePropertyInspector" />
+  </MudToolBar>
+  <MudDrawerContainer Class="mud-height-full">
+    <MudDrawer @bind-Open="@_openBlocksToolbar" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.Start" Overlay="false" Elevation="1" Variant="@DrawerVariant.Temporary">
+      <PostItemsToolbar OnClose="OnPostItemsToolbarClose"/>
+    </MudDrawer>
+    <MudDrawer @bind-Open="@_openPropertyInspector" ClipMode="DrawerClipMode.Docked" Anchor="Anchor.End" Overlay="false" Elevation="1" Variant="@DrawerVariant.Persistent">
+      <MudDrawerHeader>
+        <MudText Typo="Typo.h6">Property Inspector</MudText>
+      </MudDrawerHeader>
+      <PropertyInspector />
+    </MudDrawer>
+
+    <MudMainContent Class="pt-16 px-16">
+      <MudContainer Class="mt-6">
+        <DesignerCanvas />
+      </MudContainer>
+    </MudMainContent>
+  
+  </MudDrawerContainer>
+</MudPaper>
+@code {
+  private bool _openBlocksToolbar = false;
+  private bool _openPropertyInspector = false;
+
+  protected override async Task OnInitializedAsync()
+  {
+    await base.OnInitializedAsync();
+    if (await ClientPreferences.GetPreference() is ClientPreference preferences)
+    {
+      if (preferences.IsDrawerOpen) await ClientPreferences.ToggleDrawerAsync();
+      await ClientPreferences.SetPreference(preferences);
+    }
+  }
+  private void ToggleBlocksToolbar()
+  {
+    _openBlocksToolbar = !_openBlocksToolbar;
+  }
+
+  private void ToggleMenuDrawer()
+  {
+    ClientPreferences.ToggleDrawerAsync();
+  }
+
+  private void TogglePropertyInspector()
+  {
+    _openPropertyInspector = !_openPropertyInspector;
+  }
+
+  private void OnPostItemsToolbarClose()
+  {
+    _openBlocksToolbar = false;
+  }
+}

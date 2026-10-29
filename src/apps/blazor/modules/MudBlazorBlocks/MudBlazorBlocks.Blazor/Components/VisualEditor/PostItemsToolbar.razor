@@ -1,0 +1,13 @@
+﻿<MudToolBar>
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="CloseToolbar"></MudIconButton>
+</MudToolBar>
+<h3>BlockSToolbar</h3>
+
+@code {
+  [Parameter, EditorRequired] public EventCallback OnClose { get; set; } = default!;
+  private void CloseToolbar()
+  {
+    OnClose.InvokeAsync();
+  }
+}
